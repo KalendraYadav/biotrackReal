@@ -1,0 +1,29 @@
+{
+  "name": "nidusclean-backend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "seed": "node ../seed/index.js",
+    "test:auth": "node test-auth.js",
+    "test:endpoints": "node test-endpoints.js",
+    "test:risk": "node test-risk.js"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.10.0",
+    "@prisma/client": "^7.10.0",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "embedded-postgres": "^18.4.0-beta.17",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.3",
+    "pg": "^8.23.0",
+    "socket.io": "^4.8.3"
+  },
+  "devDependencies": {
+    "prisma": "^7.10.0"
+  }
+}

@@ -1,0 +1,187 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  HOSPITAL_AUTHORITY
+  COLLECTION_OFFICER
+  TRANSPORT_OFFICER
+  TREATMENT_FACILITY
+  GOVERNMENT_AUTHORITY
+  COMPLIANCE_INSPECTOR
+}
+
+enum FacilityType {
+  HOSPITAL
+  CBWTF
+}
+
+enum BatchStatus {
+  GENERATED
+  COLLECTED
+  IN_TRANSIT
+  RECEIVED
+  TREATED
+  DISPOSED
+}
+
+enum CustodyStage {
+  GENERATION
+  COLLECTION
+  TRANSPORT_PICKUP
+  TRANSPORT_DROPOFF
+  TREATMENT
+  DISPOSAL
+}
+
+enum CaseStatus {
+  ASSIGNED
+  UNDER_INVESTIGATION
+  RESOLVED
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+model User {
+  id            String    @id @default(uuid())
+  name          String
+  email         String    @unique
+  password_hash String
+  role                  Role
+  facility_id           String?
+  facility              Facility?          @relation(fields: [facility_id], references: [id])
+  verification_status   VerificationStatus @default(VERIFIED)
+  phone_number          String?
+  created_at            DateTime           @default(now())
+
+  custody_events        CustodyEvent[]
+  vehicles              Vehicle[]
+  assigned_risk_cases   RiskCase[]       @relation("AssignedInspector")
+  audit_logs            AuditLog[]
+
+  @@map("users")
+}
+
+model Facility {
+  id                   String       @id @default(uuid())
+  name                 String
+  type                 FacilityType
+  city                 String
+  address              String
+  lat                  Float
+  lng                  Float
+  bed_count            Int?
+  cpcb_registration_no String       @unique
+
+  users                User[]
+  generated_batches    WasteBatch[] @relation("HospitalFacility")
+  assigned_batches     WasteBatch[] @relation("AssignedCBWTF")
+  activity_logs        HospitalActivityLog[]
+
+  @@map("facilities")
+}
+
+model WasteBatch {
+  id                     String      @id @default(uuid())
+  batch_code             String      @unique // e.g. BMW-2026-00124
+  hospital_id            String
+  hospital               Facility    @relation("HospitalFacility", fields: [hospital_id], references: [id])
+  generating_department  String
+  cpcb_waste_category    String      // e.g. Yellow, Red, White, Blue
+  cpcb_waste_type        String
+  quantity_kg            Float
+  unit                   String      @default("kg")
+  qr_code_value          String      @unique
+  status                 BatchStatus @default(GENERATED)
+  assigned_cbwtf_id      String?
+  assigned_cbwtf         Facility?   @relation("AssignedCBWTF", fields: [assigned_cbwtf_id], references: [id])
+  compliance_deadline_at DateTime
+  created_at             DateTime    @default(now())
+
+  custody_events         CustodyEvent[]
+  risk_cases             RiskCase[]
+
+  @@map("waste_batches")
+}
+
+model CustodyEvent {
+  id                   String       @id @default(uuid())
+  batch_id             String
+  batch                WasteBatch   @relation(fields: [batch_id], references: [id], onDelete: Cascade)
+  stage                CustodyStage
+  performed_by_user_id String
+  performed_by         User         @relation(fields: [performed_by_user_id], references: [id])
+  verified_by_scan     Boolean      @default(false)
+  photo_url            String?
+  latitude             Float
+  longitude            Float
+  geofence_valid       Boolean      @default(true)
+  timestamp            DateTime     @default(now())
+  quantity_at_stage_kg Float
+  notes                String?
+
+  @@map("custody_events")
+}
+
+model Vehicle {
+  id                   String    @id @default(uuid())
+  plate_no             String    @unique
+  transport_officer_id String?
+  transport_officer    User?     @relation(fields: [transport_officer_id], references: [id])
+  driver_phone         String?
+  phone_number         String?
+  current_lat          Float?
+  current_lng          Float?
+  last_ping_at         DateTime?
+
+  @@map("vehicles")
+}
+
+model HospitalActivityLog {
+  id                String   @id @default(uuid())
+  hospital_id       String
+  hospital          Facility @relation(fields: [hospital_id], references: [id])
+  date              DateTime
+  bed_occupancy     Int
+  surgeries_count   Int
+  ops_count         Int
+  expected_waste_kg Float
+
+  @@map("hospital_activity_logs")
+}
+
+model RiskCase {
+  id                     String     @id @default(uuid())
+  batch_id               String
+  batch                  WasteBatch @relation(fields: [batch_id], references: [id], onDelete: Cascade)
+  case_code              String     @unique // e.g. INS-2026-0042
+  risk_score             Int        // 0-100
+  triggers               Json       // jsonb array e.g. ["quantity_discrepancy_28kg", "route_deviation"]
+  status                 CaseStatus @default(ASSIGNED)
+  assigned_inspector_id  String?
+  assigned_inspector     User?      @relation("AssignedInspector", fields: [assigned_inspector_id], references: [id])
+  created_at             DateTime   @default(now())
+  resolved_at            DateTime?
+
+  @@map("risk_cases")
+}
+
+model AuditLog {
+  id            String   @id @default(uuid())
+  actor_user_id String?
+  actor         User?    @relation(fields: [actor_user_id], references: [id])
+  action        String
+  entity        String
+  entity_id     String
+  timestamp     DateTime @default(now())
+
+  @@map("audit_log")
+}
