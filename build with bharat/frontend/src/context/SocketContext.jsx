@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react';
 import { io } from 'socket.io-client';
+import { useAuth } from './AuthContext';
 
 const SocketContext = createContext(null);
 
@@ -25,6 +26,7 @@ const playAlertChime = () => {
 };
 
 export function SocketProvider({ children }) {
+  const { token } = useAuth();
   const [isConnected, setIsConnected] = useState(false);
   const [syncMode, setSyncMode] = useState('connecting'); // 'websocket' | 'polling' | 'connecting'
   const [latestPing, setLatestPing] = useState(null);
@@ -132,16 +134,29 @@ export function SocketProvider({ children }) {
     }
   }, []);
 
-  // Initialize Socket.IO connection
+  // Initialize Socket.IO connection with JWT Authentication & VITE_WS_URL
   useEffect(() => {
+    if (!token) {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
+      setIsConnected(false);
+      setSyncMode('connecting');
+      return;
+    }
+
     let socket = null;
     try {
-      // Connect directly to port 5000 in dev or current origin in prod
-      const socketUrl = window.location.port === '5173'
-        ? `${window.location.protocol}//${window.location.hostname}:5000`
-        : '/';
+      const rawWsUrl = import.meta.env.VITE_WS_URL;
+      const socketUrl = rawWsUrl || (
+        window.location.port === '5173'
+          ? `${window.location.protocol}//${window.location.hostname}:5000`
+          : window.location.origin
+      );
 
       socket = io(socketUrl, {
+        auth: { token },
         reconnectionAttempts: 10,
         reconnectionDelay: 1500,
         timeout: 5000,
@@ -161,9 +176,13 @@ export function SocketProvider({ children }) {
         startPolling();
       });
 
-      socket.on('connect_error', () => {
+      socket.on('connect_error', (err) => {
         setIsConnected(false);
-        startPolling();
+        if (err.message && err.message.includes('Authentication error')) {
+          console.warn('[Socket.IO Gateway] Authentication failed:', err.message);
+        } else {
+          startPolling();
+        }
       });
 
       // Handle telemetry ping
@@ -214,7 +233,7 @@ export function SocketProvider({ children }) {
       }
       stopPolling();
     };
-  }, [pushAlert, startPolling, stopPolling]);
+  }, [token, pushAlert, startPolling, stopPolling]);
 
   // Listener subscription helpers
   const subscribeToPing = useCallback((cb) => {

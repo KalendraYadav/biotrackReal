@@ -11,6 +11,11 @@ import riskEngine from '../services/riskEngine.js';
 import { emitCustodyEvent, emitRiskAlert } from '../services/eventBus.js';
 import { authenticateToken, authorizeRoles, ROLES } from '../middleware/auth.js';
 import { prisma } from '../db.js';
+import { 
+  processEvidencePhoto, 
+  attachSignedUrlsToBatch, 
+  getSignedEvidenceUrl 
+} from '../services/storageService.js';
 
 const router = express.Router();
 
@@ -88,7 +93,8 @@ router.get('/:id', authenticateToken, async (req, res) => {
       });
     }
 
-    res.status(200).json({ batch });
+    const enrichedBatch = await attachSignedUrlsToBatch(batch);
+    res.status(200).json({ batch: enrichedBatch });
   } catch (err) {
     console.error('[WasteBatches Route] GET /:id error:', err);
     res.status(500).json({ error: 'Failed to fetch waste batch details', message: err.message });
@@ -135,6 +141,19 @@ router.post('/', authenticateToken, authorizeRoles(ROLES.HOSPITAL_AUTHORITY), as
 
     const performedBy = req.user.id;
 
+    // Process initial evidence photo through Supabase Storage if Base64
+    let resolvedPhotoUrl = photo_url;
+    if (photo_url) {
+      try {
+        resolvedPhotoUrl = await processEvidencePhoto(photo_url, { batchId: 'new-batch', stage: 'GENERATION' });
+      } catch (photoErr) {
+        return res.status(photoErr.statusCode || 400).json({
+          error: photoErr.name || 'Bad Request',
+          message: photoErr.message
+        });
+      }
+    }
+
     const batch = await createBatch({
       hospital_id,
       generating_department,
@@ -145,7 +164,7 @@ router.post('/', authenticateToken, authorizeRoles(ROLES.HOSPITAL_AUTHORITY), as
       notes,
       latitude,
       longitude,
-      photo_url,
+      photo_url: resolvedPhotoUrl,
       performed_by_user_id: performedBy
     });
 
@@ -219,11 +238,24 @@ router.post('/:id/custody-event', authenticateToken, authorizeRoles(
 
     const performerId = user.id;
 
+    // Process evidence photo through Supabase Storage if Base64
+    let resolvedPhotoUrl = photo_url;
+    if (photo_url) {
+      try {
+        resolvedPhotoUrl = await processEvidencePhoto(photo_url, { batchId: id, stage });
+      } catch (photoErr) {
+        return res.status(photoErr.statusCode || 400).json({
+          error: photoErr.name || 'Bad Request',
+          message: photoErr.message
+        });
+      }
+    }
+
     const result = await createCustodyEvent(id, {
       stage,
       quantity_at_stage_kg: quantity_at_stage_kg || quantity,
       verified_by_scan: verified_by_scan !== false,
-      photo_url,
+      photo_url: resolvedPhotoUrl,
       latitude,
       longitude,
       geofence_valid,
@@ -286,9 +318,16 @@ router.post('/:id/custody-event', authenticateToken, authorizeRoles(
     // Broadcast custody event via EventBus -> Socket.IO
     emitCustodyEvent(id, result.event, result.updatedBatchStatus);
 
+    // Attach signed URL for immediate client feedback if stored in Supabase
+    let eventResponse = result.event;
+    if (result.event?.photo_url && result.event.photo_url.startsWith('batches/')) {
+      const signedUrl = await getSignedEvidenceUrl(result.event.photo_url);
+      eventResponse = { ...result.event, signed_photo_url: signedUrl };
+    }
+
     res.status(201).json({
       message: `Custody handover verified and recorded for stage '${stage}'.`,
-      event: result.event,
+      event: eventResponse,
       updatedBatchStatus: result.updatedBatchStatus,
       risk_evaluation: riskEvaluation
     });
@@ -298,4 +337,40 @@ router.post('/:id/custody-event', authenticateToken, authorizeRoles(
   }
 });
 
+/**
+ * GET /api/waste-batches/:id/evidence/:eventId/signed-url
+ * Generates an on-demand short-lived signed URL for a specific custody event photo
+ */
+router.get('/:id/evidence/:eventId/signed-url', authenticateToken, async (req, res) => {
+  try {
+    const { id, eventId } = req.params;
+    const batch = await getBatchById(id);
+
+    if (!batch) {
+      return res.status(404).json({ error: 'Not Found', message: `Waste batch '${id}' was not found.` });
+    }
+
+    const event = (batch.custody_events || []).find((e) => e.id === eventId);
+    if (!event) {
+      return res.status(404).json({ error: 'Not Found', message: `Custody event '${eventId}' was not found for this batch.` });
+    }
+
+    if (!event.photo_url) {
+      return res.status(404).json({ error: 'Not Found', message: 'No photo evidence recorded for this custody event.' });
+    }
+
+    const signedUrl = await getSignedEvidenceUrl(event.photo_url);
+    res.status(200).json({
+      batchId: id,
+      eventId: event.id,
+      photo_url: event.photo_url,
+      signedUrl: signedUrl || event.photo_url
+    });
+  } catch (err) {
+    console.error('[WasteBatches Route] GET /:id/evidence/:eventId/signed-url error:', err);
+    res.status(500).json({ error: 'Failed to generate signed URL', message: err.message });
+  }
+});
+
 export default router;
+

@@ -1,10 +1,9 @@
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { ROLES, ALL_ROLES } from '../constants/roles.js';
+import { getJwtSecret } from '../services/authService.js';
 
 dotenv.config();
-
-const JWT_SECRET = process.env.JWT_SECRET || 'nidusclean_biotrace_super_secure_jwt_secret_2026';
 
 /**
  * Authentication Middleware
@@ -32,7 +31,17 @@ export function authenticateToken(req, res, next) {
     });
   }
 
-  jwt.verify(token, JWT_SECRET, (err, decodedUser) => {
+  let secret;
+  try {
+    secret = getJwtSecret();
+  } catch (err) {
+    return res.status(500).json({
+      error: 'Internal Server Error',
+      message: 'Authentication configuration failure.'
+    });
+  }
+
+  jwt.verify(token, secret, (err, decodedUser) => {
     if (err) {
       const isExpired = err.name === 'TokenExpiredError';
       return res.status(401).json({

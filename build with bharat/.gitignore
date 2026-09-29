@@ -38,3 +38,8 @@ lerna-debug.log*
 uploads/
 scratch/
 temp/
+
+# Local embedded database cluster
+backend/data/pg_data/
+
+secret.txt

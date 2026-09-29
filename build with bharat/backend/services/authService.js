@@ -6,7 +6,22 @@ import { ROLES } from '../constants/roles.js';
 
 dotenv.config();
 
-const JWT_SECRET = process.env.JWT_SECRET || 'nidusclean_biotrace_super_secure_jwt_secret_2026';
+/**
+ * Resolves the JWT secret.
+ * Enforces that process.env.JWT_SECRET must be set in production mode.
+ * @returns {string}
+ */
+export function getJwtSecret() {
+  const secret = process.env.JWT_SECRET;
+  if (!secret || secret.trim() === '') {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('[SECURITY FATAL] JWT_SECRET must be configured in production environment.');
+    }
+    return 'nidusclean_biotrace_super_secure_jwt_secret_2026';
+  }
+  return secret;
+}
+
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 
 // Valid bcrypt hash for password 'password123' (10 salt rounds)
@@ -222,11 +237,11 @@ export function generateToken(user) {
     phone_number: user.phone_number || null
   };
 
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+  return jwt.sign(payload, getJwtSecret(), { expiresIn: JWT_EXPIRES_IN });
 }
 
 /**
- * Finds user by email in database, with fallback to demo users
+ * Finds user by email in database, with fallback to demo users in development only
  * @param {string} email 
  * @returns {Promise<object|null>}
  */
@@ -242,14 +257,20 @@ export async function findUserByEmail(email) {
     if (dbUser) return dbUser;
   } catch (err) {
     console.warn('[AuthService] findUserByEmail database query warning:', err.message);
+    if (process.env.NODE_ENV === 'production') {
+      throw err;
+    }
   }
 
-  // Fallback to demo in-memory list if database unreachable
-  return DEMO_USERS.find(u => u.email.toLowerCase() === normalizedEmail) || null;
+  // Fallback to demo in-memory list ONLY in development if database unreachable
+  if (process.env.NODE_ENV !== 'production') {
+    return DEMO_USERS.find(u => u.email.toLowerCase() === normalizedEmail) || null;
+  }
+  return null;
 }
 
 /**
- * Finds user by ID in database, with fallback to demo users
+ * Finds user by ID in database, with fallback to demo users in development only
  * @param {string} id 
  * @returns {Promise<object|null>}
  */
@@ -264,9 +285,15 @@ export async function findUserById(id) {
     if (dbUser) return dbUser;
   } catch (err) {
     console.warn('[AuthService] findUserById database query warning:', err.message);
+    if (process.env.NODE_ENV === 'production') {
+      throw err;
+    }
   }
 
-  return DEMO_USERS.find(u => u.id === id) || null;
+  if (process.env.NODE_ENV !== 'production') {
+    return DEMO_USERS.find(u => u.id === id) || null;
+  }
+  return null;
 }
 
 /**
@@ -280,7 +307,17 @@ export async function authenticateCredentials(email, password) {
     return { success: false, code: 'MISSING_CREDENTIALS', error: 'Both email and password are required' };
   }
 
-  const user = await findUserByEmail(email);
+  let user = null;
+  try {
+    user = await findUserByEmail(email);
+  } catch (err) {
+    return {
+      success: false,
+      code: 'DATABASE_ERROR',
+      error: 'Database service is temporarily unavailable. Please try again later.'
+    };
+  }
+
   if (!user) {
     return { success: false, code: 'UNKNOWN_USER', error: 'Unknown user email' };
   }

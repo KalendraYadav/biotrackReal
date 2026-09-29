@@ -5,8 +5,35 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const connectionString = process.env.DATABASE_URL || 'postgresql://postgres:password@localhost:5432/nidusclean?schema=public';
-const pool = new pg.Pool({ connectionString, connectionTimeoutMillis: 5000 });
+const connectionString = process.env.DATABASE_URL || 'postgresql://postgres:password@localhost:5435/nidusclean?schema=public';
+
+// Determine SSL requirement dynamically without requiring manual source-code changes
+function shouldEnableSsl(url) {
+  if (process.env.DB_SSL === 'true') return true;
+  if (process.env.DB_SSL === 'false') return false;
+  if (!url) return false;
+  if (url.includes('supabase.co') || url.includes('pooler.supabase.com') || url.includes('sslmode=require')) {
+    return true;
+  }
+  if (process.env.NODE_ENV === 'production' && !url.includes('localhost') && !url.includes('127.0.0.1')) {
+    return true;
+  }
+  return false;
+}
+
+const poolConfig = {
+  connectionString,
+  connectionTimeoutMillis: 5000,
+  max: process.env.DB_POOL_MAX ? parseInt(process.env.DB_POOL_MAX, 10) : 5,
+};
+
+if (shouldEnableSsl(connectionString)) {
+  poolConfig.ssl = {
+    rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED === 'true'
+  };
+}
+
+const pool = new pg.Pool(poolConfig);
 
 // Log pool errors
 pool.on('error', (err) => {

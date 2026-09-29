@@ -3,6 +3,6 @@ dotenv.config();
 
 export default {
   datasource: {
-    url: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/nidusclean?schema=public',
+    url: process.env.DIRECT_URL || process.env.DATABASE_URL || 'postgresql://postgres:password@localhost:5435/nidusclean?schema=public',
   },
 };

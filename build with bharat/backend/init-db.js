@@ -2,8 +2,10 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import pg from 'pg';
-import { ensurePostgresRunning } from './services/pgService.js';
+import dotenv from 'dotenv';
 import { execSync } from 'child_process';
+
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -13,16 +15,12 @@ export async function initializeDatabase() {
   console.log('   BioTrace PostgreSQL Database Initialization');
   console.log('======================================================\n');
 
-  // 1. Ensure PostgreSQL engine is running
-  await ensurePostgresRunning();
-
-  // 2. Connect to nidusclean database
-  const client = new pg.Client({
-    connectionString: 'postgresql://postgres:password@localhost:5432/nidusclean'
-  });
+  // 1. Connect to PostgreSQL database using environment configuration
+  const connectionString = process.env.DATABASE_URL || 'postgresql://postgres:password@localhost:5435/nidusclean?schema=public';
+  const client = new pg.Client({ connectionString });
 
   await client.connect();
-  console.log('[Init DB] Connected to PostgreSQL on port 5432.');
+  console.log('[Init DB] Connected to external PostgreSQL database.');
 
   try {
     // 3. Create schema, types, and tables
@@ -177,7 +175,7 @@ export async function initializeDatabase() {
       stdio: 'inherit',
       env: {
         ...process.env,
-        DATABASE_URL: 'postgresql://postgres:password@localhost:5432/nidusclean?schema=public'
+        DATABASE_URL: connectionString
       }
     });
   } catch (err) {

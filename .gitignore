@@ -1,0 +1,5 @@
+# Ignore sensitive files and secrets
+secret.txt
+*.env
+*.env.local
+*.env.*.local

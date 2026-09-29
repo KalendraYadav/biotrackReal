@@ -1,6 +1,7 @@
 import express from 'express';
 import { authenticateCredentials, findUserById, DEMO_USERS } from '../services/authService.js';
 import { authenticateToken, authorizeRoles, ROLES } from '../middleware/auth.js';
+import { authLoginLimiter } from '../middleware/rateLimiter.js';
 
 const router = express.Router();
 
@@ -9,7 +10,7 @@ const router = express.Router();
  * Public login endpoint with email and password
  * Validates credentials via bcrypt and issues a signed JWT
  */
-router.post('/login', async (req, res) => {
+router.post('/login', authLoginLimiter, async (req, res) => {
   try {
     const { email, password } = req.body || {};
 
@@ -69,6 +70,14 @@ router.get('/me', authenticateToken, async (req, res) => {
  * Returns available demo user credentials for quick role switching and testing
  */
 router.get('/demo-users', (req, res) => {
+  // Production environment safeguard: disable in production unless demo endpoints explicitly allowed
+  if (process.env.NODE_ENV === 'production' && process.env.ALLOW_DEMO_ENDPOINTS !== 'true') {
+    return res.status(404).json({
+      error: 'Not Found',
+      message: 'Demo users endpoint is disabled in production environment.'
+    });
+  }
+
   const users = DEMO_USERS.map(({ password_hash, ...user }) => ({
     ...user,
     demo_password: 'password123'
