@@ -3,24 +3,21 @@ import { useAuth } from '../../context/AuthContext';
 import { useSocket } from '../../context/SocketContext';
 import NationalFacilitiesMap from '../../components/government/NationalFacilitiesMap';
 import { 
-  Activity, 
   Building2, 
   CheckCircle2, 
-  AlertTriangle, 
-  Layers, 
   ShieldAlert, 
   Scale, 
   Globe, 
-  MapPin, 
   ArrowRight, 
   RefreshCw, 
-  FileText, 
-  TrendingUp, 
-  TrendingDown,
-  Clock,
-  Eye,
-  Search
+  Eye, 
+  Search 
 } from 'lucide-react';
+import PageHeader from '../../components/ui/PageHeader';
+import Button from '../../components/ui/Button';
+import Badge from '../../components/ui/Badge';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../../components/ui/Card';
+import EmptyState from '../../components/ui/EmptyState';
 
 export default function GovernmentDashboard() {
   const { user } = useAuth();
@@ -147,415 +144,448 @@ export default function GovernmentDashboard() {
   });
 
   return (
-    <div className="space-y-6 pb-12 font-sans">
-      {/* Header Banner */}
-      <div className="bg-white rounded-lg shadow-sm border border-hazmat-300 p-5 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center space-x-3.5">
-          <div className="w-12 h-12 rounded bg-hazmat-100 border border-hazmat-300 flex items-center justify-center text-steel-900">
-            <Globe className="w-6 h-6 text-steel-800" />
-          </div>
-          <div>
-            <div className="flex items-center space-x-2">
-              <h1 className="text-xl font-serif font-black text-steel-950 tracking-tight">
-                Central Pollution Control Board (CPCB)
-              </h1>
-              <span className="text-[11px] px-2.5 py-0.5 rounded font-mono font-bold bg-steel-900 text-cream-50 border border-steel-800">
-                National BMW Regulatory Gateway
-              </span>
-            </div>
-            <p className="text-xs font-mono text-steel-600 mt-0.5">
-              Authority: <span className="font-bold text-steel-900">{user?.name || 'Dr. Rajesh Verma (CPCB Director)'}</span> &bull; Statutory Oversight: Bio-Medical Waste Management Rules 2016
-            </p>
-          </div>
-        </div>
-
-        <button
-          onClick={loadAllData}
-          className="p-2 border border-hazmat-300 rounded hover:bg-hazmat-50 text-steel-700 transition"
-          title="Refresh National Data"
-        >
-          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-        </button>
-      </div>
+    <div className="space-y-6 max-w-7xl mx-auto">
+      {/* Page Header */}
+      <PageHeader
+        title="Central Pollution Control Board (CPCB)"
+        description={`Authority: ${user?.name || 'Dr. Rajesh Verma (CPCB Director)'} • Statutory Oversight: Bio-Medical Waste Management Rules 2016`}
+        icon={Globe}
+        badge={
+          <Badge variant="neutral">
+            National BMW regulatory gateway
+          </Badge>
+        }
+        actions={
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={loadAllData}
+            loading={loading}
+            icon={RefreshCw}
+            aria-label="Refresh national data"
+          >
+            Refresh
+          </Button>
+        }
+      />
 
       {/* Real-Time Live AI Risk Engine Breach Alert Banner */}
       {latestLiveAlert && (
-        <div className="bg-biohazard-950 border-2 border-biohazard-600 rounded-lg p-4 shadow-modal text-cream-50 animate-fade-in flex flex-wrap items-start justify-between gap-4 font-sans">
-          <div className="flex items-start space-x-3.5">
-            <div className="p-2.5 bg-biohazard-700 text-white rounded mt-0.5 border border-biohazard-500 shadow-sm flex-shrink-0">
-              <ShieldAlert className="w-5 h-5 animate-pulse" />
+        <div 
+          role="alert" 
+          aria-live="assertive"
+          className="rounded-lg p-4 bg-danger-bg border border-danger-border flex flex-wrap items-start justify-between gap-4 text-danger-text"
+        >
+          <div className="flex items-start gap-3.5">
+            <div className="p-2.5 rounded bg-danger/10 text-danger mt-0.5 shrink-0">
+              <ShieldAlert className="w-5 h-5" aria-hidden="true" />
             </div>
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xs font-mono font-bold uppercase tracking-wider text-biohazard-300">
-                  National Compliance Alert: Live Anomaly Detected
+                <span className="text-xs font-semibold uppercase tracking-wider text-danger">
+                  National compliance alert: Live anomaly detected
                 </span>
-                <span className="font-mono text-xs px-2 py-0.5 rounded bg-biohazard-800 text-biohazard-100 font-bold border border-biohazard-600">
+                <Badge variant="danger" size="sm">
                   Severity: {latestLiveAlert.risk_score || latestLiveAlert.riskScore || 90}/100
-                </span>
-                <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-steel-900 text-cream-200 border border-steel-700">
+                </Badge>
+                <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-surface border border-border text-text">
                   {latestLiveAlert.case_code || 'INS-ALERT'}
                 </span>
               </div>
-              <p className="text-sm font-serif font-bold text-white mt-1">
+              <p className="text-sm font-semibold text-text mt-1">
                 {latestLiveAlert.triggers?.[0] || 'Statutory chain-of-custody anomaly flagged by AI Risk Engine.'}
               </p>
-              <p className="text-xs font-mono text-cream-300 mt-0.5">
-                Target Batch: <span className="font-bold text-white">{latestLiveAlert.batch_code || latestLiveAlert.batch_id}</span> &bull; Action: <span className="text-amber-400 font-bold">Inspection Notice Dispatched</span> &bull; Jurisdiction Oversight Active
+              <p className="text-xs text-text-muted mt-0.5">
+                Target batch: <span className="font-mono font-bold text-text">{latestLiveAlert.batch_code || latestLiveAlert.batch_id}</span> • Action: Inspection notice dispatched • Jurisdiction oversight active
               </p>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <button
+          <div className="flex items-center gap-2">
+            <Button
+              variant="destructive"
+              size="sm"
               onClick={() => setActiveTab('breaches')}
-              className="px-3.5 py-1.5 bg-biohazard-600 hover:bg-biohazard-500 text-white text-xs font-mono font-bold rounded flex items-center space-x-1.5 transition shadow-sm"
+              icon={ArrowRight}
             >
-              <span>View Breaches Table</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-            <button
+              View breaches
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => setLatestLiveAlert(null)}
-              className="p-1.5 text-cream-400 hover:text-white rounded hover:bg-white/10 transition text-xs font-mono"
-              title="Dismiss banner"
             >
               Dismiss
-            </button>
+            </Button>
           </div>
         </div>
       )}
 
-      {/* 4 Header Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* 4 Header Stat Cards - Responsive 2x2 on mobile, 4-col on desktop */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Card 1: Total BMW Tracked */}
-        <div className="bg-white rounded-lg p-4 shadow-sm border border-hazmat-300 flex items-center justify-between">
-          <div>
-            <p className="text-[10px] font-mono font-bold text-steel-500 uppercase tracking-wider">Total Waste Tracked</p>
-            <p className="text-2xl font-mono font-bold text-steel-950 mt-1">
-              {totalWasteKg} <span className="text-xs font-normal text-steel-500">kg</span>
-            </p>
-            <p className="text-xs font-mono font-semibold text-forest-700 mt-0.5">
-              {batches.length} digital manifests verified
-            </p>
+        <div className="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200/90 shadow-2xs flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Total Waste Tracked</span>
+            <div className="p-1.5 rounded-lg bg-slate-100 text-slate-700">
+              <Scale className="w-3.5 h-3.5" aria-hidden="true" />
+            </div>
           </div>
-          <div className="w-10 h-10 rounded border border-hazmat-200 bg-hazmat-50 text-steel-800 flex items-center justify-center">
-            <Scale className="w-5 h-5" />
+          <div className="my-2">
+            <div className="text-xl sm:text-2xl font-bold font-mono text-slate-900 tabular-nums">
+              {totalWasteKg} <span className="text-xs font-normal text-slate-500 font-sans">kg</span>
+            </div>
+            <div className="text-[11px] text-slate-500 mt-0.5 tabular-nums">
+              {batches.length} digital manifests verified
+            </div>
           </div>
         </div>
 
         {/* Card 2: 48-Hour SLA Compliance Rate */}
-        <div className="bg-white rounded-lg p-4 shadow-sm border border-hazmat-300 flex items-center justify-between">
-          <div>
-            <p className="text-[10px] font-mono font-bold text-steel-500 uppercase tracking-wider">Statutory 48h SLA</p>
-            <p className="text-2xl font-mono font-bold text-forest-700 mt-1">{complianceRate}%</p>
-            <p className="text-xs font-mono text-steel-500 mt-0.5">Treated within statutory limit</p>
+        <div className="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200/90 shadow-2xs flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Statutory 48h SLA</span>
+            <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700">
+              <CheckCircle2 className="w-3.5 h-3.5" aria-hidden="true" />
+            </div>
           </div>
-          <div className="w-10 h-10 rounded border border-forest-200 bg-forest-50 text-forest-800 flex items-center justify-center">
-            <CheckCircle2 className="w-5 h-5" />
+          <div className="my-2">
+            <div className="text-xl sm:text-2xl font-bold font-mono text-emerald-700 tabular-nums">{complianceRate}%</div>
+            <div className="text-[11px] text-emerald-700 font-medium mt-0.5">Treated within statutory limit</div>
           </div>
         </div>
 
         {/* Card 3: Regulated Facilities Directory */}
-        <div className="bg-white rounded-lg p-4 shadow-sm border border-hazmat-300 flex items-center justify-between">
-          <div>
-            <p className="text-[10px] font-mono font-bold text-steel-500 uppercase tracking-wider">Regulated Units</p>
-            <p className="text-2xl font-mono font-bold text-steel-950 mt-1">
-              {facilities.length} <span className="text-xs font-normal text-steel-500">units</span>
-            </p>
-            <p className="text-xs font-mono text-steel-500 mt-0.5">6 Hospitals &bull; 3 CBWTFs</p>
+        <div className="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200/90 shadow-2xs flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Regulated Units</span>
+            <div className="p-1.5 rounded-lg bg-slate-100 text-slate-700">
+              <Building2 className="w-3.5 h-3.5" aria-hidden="true" />
+            </div>
           </div>
-          <div className="w-10 h-10 rounded border border-steel-200 bg-steel-100 text-steel-800 flex items-center justify-center">
-            <Building2 className="w-5 h-5" />
+          <div className="my-2">
+            <div className="text-xl sm:text-2xl font-bold font-mono text-slate-900 tabular-nums">
+              {facilities.length} <span className="text-xs font-normal text-slate-500 font-sans">units</span>
+            </div>
+            <div className="text-[11px] text-slate-500 mt-0.5">Hospitals & CBWTFs</div>
           </div>
         </div>
 
         {/* Card 4: High-Risk Anomalies */}
-        <div className="bg-white rounded-lg p-4 shadow-sm border border-hazmat-300 flex items-center justify-between">
-          <div>
-            <p className="text-[10px] font-mono font-bold text-steel-500 uppercase tracking-wider">Regulatory Breaches</p>
-            <p className={`text-2xl font-mono font-bold mt-1 ${highRiskCount > 0 ? 'text-biohazard-700' : 'text-steel-950'}`}>
-              {highRiskCount} <span className="text-xs font-normal text-steel-500">active</span>
-            </p>
-            <p className="text-xs font-mono text-biohazard-700 font-semibold mt-0.5">Assigned for field audit</p>
+        <div className="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200/90 shadow-2xs flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Regulatory Breaches</span>
+            <div className="p-1.5 rounded-lg bg-red-50 text-red-700">
+              <ShieldAlert className="w-3.5 h-3.5" aria-hidden="true" />
+            </div>
           </div>
-          <div className="w-10 h-10 rounded border border-biohazard-300 bg-biohazard-50 text-biohazard-700 flex items-center justify-center">
-            <ShieldAlert className="w-5 h-5" />
+          <div className="my-2">
+            <div className={`text-xl sm:text-2xl font-bold font-mono tabular-nums ${highRiskCount > 0 ? 'text-red-700' : 'text-slate-900'}`}>
+              {highRiskCount} <span className="text-xs font-normal text-slate-500 font-sans">active</span>
+            </div>
+            <div className="text-[11px] text-slate-500 mt-0.5">Assigned for field audit</div>
           </div>
         </div>
       </div>
 
-      {/* Main Tabs Navigation */}
-      <div className="bg-white rounded-lg shadow-sm border border-hazmat-300 overflow-hidden">
-        <div className="p-3 border-b border-hazmat-300 flex flex-wrap items-center justify-between gap-3 bg-hazmat-50 font-mono">
-          <div className="flex bg-hazmat-200/80 p-1 rounded text-xs font-bold">
+      {/* Main Tabs Navigation & Data Workspace */}
+      <div className="bg-white rounded-xl border border-slate-200/90 shadow-2xs overflow-hidden">
+        <div className="p-3 sm:p-3.5 border-b border-slate-200/80 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-slate-50/40">
+          <div className="inline-flex flex-wrap rounded-lg border border-slate-200 p-0.5 bg-slate-100/70" role="tablist" aria-label="National views">
             <button
+              role="tab"
+              aria-selected={activeTab === 'map'}
               onClick={() => setActiveTab('map')}
-              className={`px-3 py-1.5 rounded transition ${
-                activeTab === 'map' ? 'bg-white text-steel-950 shadow-sm' : 'text-steel-700 hover:text-steel-950'
+              className={`px-3 py-1.5 rounded-md transition-colors text-xs font-medium ${
+                activeTab === 'map' ? 'bg-white text-slate-900 shadow-xs font-semibold' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               1. National Tracking Map
             </button>
             <button
+              role="tab"
+              aria-selected={activeTab === 'directory'}
               onClick={() => setActiveTab('directory')}
-              className={`px-3 py-1.5 rounded transition ${
-                activeTab === 'directory' ? 'bg-white text-steel-950 shadow-sm' : 'text-steel-700 hover:text-steel-950'
+              className={`px-3 py-1.5 rounded-md transition-colors text-xs font-medium ${
+                activeTab === 'directory' ? 'bg-white text-slate-900 shadow-xs font-semibold' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               2. Facility Directory ({facilities.length})
             </button>
             <button
+              role="tab"
+              aria-selected={activeTab === 'drilldown'}
               onClick={() => setActiveTab('drilldown')}
-              className={`px-3 py-1.5 rounded transition ${
-                activeTab === 'drilldown' ? 'bg-white text-steel-950 shadow-sm' : 'text-steel-700 hover:text-steel-950'
+              className={`px-3 py-1.5 rounded-md transition-colors text-xs font-medium ${
+                activeTab === 'drilldown' ? 'bg-white text-slate-900 shadow-xs font-semibold' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              3. Facility Drill-Down {selectedFacility ? `(${selectedFacility.name.split(' ')[0]})` : ''}
+              3. Facility Drill-down {selectedFacility ? `(${selectedFacility.name.split(' ')[0]})` : ''}
             </button>
             <button
+              role="tab"
+              aria-selected={activeTab === 'breaches'}
               onClick={() => setActiveTab('breaches')}
-              className={`px-3 py-1.5 rounded transition ${
-                activeTab === 'breaches' ? 'bg-white text-steel-950 shadow-sm' : 'text-steel-700 hover:text-steel-950'
+              className={`px-3 py-1.5 rounded-md transition-colors text-xs font-medium ${
+                activeTab === 'breaches' ? 'bg-white text-slate-900 shadow-xs font-semibold' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               4. Active Breaches ({riskCases.length})
             </button>
           </div>
 
-          <div className="w-full sm:w-60">
+          <div className="relative w-full sm:w-60">
+            <Search className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-slate-400" aria-hidden="true" />
             <input
-              type="text"
+              type="search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Filter by city, facility..."
-              className="w-full px-3 py-1.5 bg-white border border-hazmat-300 rounded text-xs font-mono focus:outline-none focus:ring-2 focus:ring-hazmat-500"
+              className="w-full pl-8 pr-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-600/40 focus:border-emerald-600"
+              aria-label="Filter facilities by city or name"
             />
           </div>
         </div>
 
-        {/* TAB 1: NATIONAL MAP */}
-        {activeTab === 'map' && (
-          <div className="p-4 space-y-4">
-            <NationalFacilitiesMap
-              facilities={facilities}
-              vehicles={vehicles}
-              selectedFacilityId={selectedFacility?.id}
-              onSelectFacility={handleSelectFacility}
-            />
+        <div>
+          {/* TAB 1: NATIONAL MAP */}
+          {activeTab === 'map' && (
+            <div className="p-4 space-y-4">
+              <NationalFacilitiesMap
+                facilities={facilities}
+                vehicles={vehicles}
+                selectedFacilityId={selectedFacility?.id}
+                onSelectFacility={handleSelectFacility}
+              />
 
-            <div className="p-3 bg-hazmat-50 border border-hazmat-200 rounded flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
-              <div className="flex items-center space-x-2 text-steel-800">
-                <Globe className="w-4 h-4 text-steel-700" />
-                <span>Click any facility marker on the map to inspect its real-time clinical activity and waste generation audit.</span>
-              </div>
-              <span className="text-steel-500">
-                Tracking {facilities.length} facilities across 5 Indian states
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* TAB 2: FACILITY DIRECTORY */}
-        {activeTab === 'directory' && (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs font-mono">
-              <thead className="bg-hazmat-100 text-steel-700 uppercase font-bold border-b border-hazmat-300">
-                <tr>
-                  <th className="py-2.5 px-4">Facility Name</th>
-                  <th className="py-2.5 px-4">Type</th>
-                  <th className="py-2.5 px-4">City / State</th>
-                  <th className="py-2.5 px-4">Bed Capacity</th>
-                  <th className="py-2.5 px-4">CPCB Registration</th>
-                  <th className="py-2.5 px-4">Active Batches</th>
-                  <th className="py-2.5 px-4 text-right">Audit Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-hazmat-200">
-                {filteredFacilities.map((fac) => {
-                  const isHosp = fac.type === 'HOSPITAL';
-                  return (
-                    <tr key={fac.id} className="hover:bg-hazmat-50/70 transition">
-                      <td className="py-3 px-4 font-bold text-steel-900 font-sans">
-                        {fac.name}
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-bold border ${
-                          isHosp ? 'bg-forest-100 text-forest-900 border-forest-300' : 'bg-steel-200 text-steel-900 border-steel-300'
-                        }`}>
-                          {fac.type}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 text-steel-700 font-sans">
-                        {fac.city}
-                      </td>
-                      <td className="py-3 px-4 font-bold text-steel-800">
-                        {fac.bed_count ? `${fac.bed_count} beds` : 'N/A (CBWTF)'}
-                      </td>
-                      <td className="py-3 px-4 text-steel-600">
-                        {fac.cpcb_registration_no}
-                      </td>
-                      <td className="py-3 px-4 font-bold text-steel-900">
-                        {fac.active_batches_count || 0} batches
-                      </td>
-                      <td className="py-3 px-4 text-right">
-                        <button
-                          onClick={() => handleSelectFacility(fac)}
-                          className="inline-flex items-center space-x-1 px-3 py-1.5 bg-hazmat-900 hover:bg-black text-white font-bold rounded shadow-sm transition"
-                        >
-                          <Eye className="w-3.5 h-3.5" />
-                          <span>Drill-Down</span>
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {/* TAB 3: FACILITY DRILL-DOWN HISTORY */}
-        {activeTab === 'drilldown' && selectedFacility && (
-          <div className="p-6 space-y-6">
-            <div className="bg-hazmat-50 border border-hazmat-300 rounded p-5 flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <span className="text-xs font-mono font-bold text-steel-600 uppercase tracking-wider">Facility Audit Dossier</span>
-                <h2 className="text-lg font-serif font-black text-steel-950 mt-0.5">{selectedFacility.name}</h2>
-                <p className="text-xs font-mono text-steel-600">
-                  {selectedFacility.address} &bull; Reg: <span className="font-bold text-steel-900">{selectedFacility.cpcb_registration_no}</span>
-                </p>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <span className="px-3 py-1 rounded text-xs font-mono font-bold bg-forest-100 text-forest-900 border border-forest-300">
-                  Operating License: Active
+              <div className="p-3 bg-surface-alt border border-border rounded-lg flex flex-wrap items-center justify-between gap-3 text-xs text-text-muted">
+                <div className="flex items-center gap-2 text-text">
+                  <Globe className="w-4 h-4 text-primary shrink-0" aria-hidden="true" />
+                  <span>Click any facility marker on the map to inspect its real-time clinical activity and waste generation audit.</span>
+                </div>
+                <span className="tabular-nums">
+                  Tracking {facilities.length} facilities across 5 Indian states
                 </span>
               </div>
             </div>
+          )}
 
-            {/* Hospital Activity Correlation Summary (if hospital) */}
-            {facilityActivity ? (
-              <div className="space-y-4">
-                <h3 className="font-serif font-bold text-steel-900 text-sm">90-Day Clinical Activity &amp; Waste Generation Correlation</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 font-mono">
-                  <div className="p-4 bg-white border border-hazmat-300 rounded shadow-sm">
-                    <p className="text-[11px] font-bold text-steel-500 uppercase">Average Occupancy</p>
-                    <p className="text-xl font-bold text-steel-950 mt-1">
-                      {facilityActivity.summary?.average_daily_occupancy || 410} <span className="text-xs text-steel-500">beds/day</span>
-                    </p>
-                  </div>
-                  <div className="p-4 bg-white border border-hazmat-300 rounded shadow-sm">
-                    <p className="text-[11px] font-bold text-steel-500 uppercase">Average Waste Rate</p>
-                    <p className="text-xl font-bold text-steel-950 mt-1">
-                      {facilityActivity.summary?.average_daily_waste_kg || 138.4} <span className="text-xs text-steel-500">kg/day</span>
-                    </p>
-                  </div>
-                  <div className="p-4 bg-white border border-hazmat-300 rounded shadow-sm">
-                    <p className="text-[11px] font-bold text-steel-500 uppercase">Correlation Ratio</p>
-                    <p className="text-xl font-bold text-forest-700 mt-1">
-                      {facilityActivity.summary?.correlation_ratio || '0.34 kg/bed'}
-                    </p>
-                  </div>
-                  <div className="p-4 bg-white border border-hazmat-300 rounded shadow-sm">
-                    <p className="text-[11px] font-bold text-steel-500 uppercase">Detected Anomalies</p>
-                    <p className="text-xl font-bold text-biohazard-700 mt-1">
-                      {facilityActivity.anomalies_detected?.length || 2} <span className="text-xs text-steel-500">flags</span>
-                    </p>
-                  </div>
+          {/* TAB 2: FACILITY DIRECTORY */}
+          {activeTab === 'directory' && (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="bg-surface-alt text-text-muted uppercase text-[11px] font-semibold border-b border-border">
+                    <th scope="col" className="py-2.5 px-4">Facility name</th>
+                    <th scope="col" className="py-2.5 px-4">Type</th>
+                    <th scope="col" className="py-2.5 px-4">City / State</th>
+                    <th scope="col" className="py-2.5 px-4">Bed capacity</th>
+                    <th scope="col" className="py-2.5 px-4">CPCB registration</th>
+                    <th scope="col" className="py-2.5 px-4">Active batches</th>
+                    <th scope="col" className="py-2.5 px-4 text-right">Audit action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {filteredFacilities.map((fac) => {
+                    const isHosp = fac.type === 'HOSPITAL';
+                    return (
+                      <tr key={fac.id} className="hover:bg-surface-alt/70 transition-colors">
+                        <td className="py-3 px-4 font-semibold text-text">
+                          {fac.name}
+                        </td>
+                        <td className="py-3 px-4">
+                          <Badge variant={isHosp ? 'primary' : 'neutral'} size="sm">
+                            {fac.type}
+                          </Badge>
+                        </td>
+                        <td className="py-3 px-4 text-text-muted">
+                          {fac.city}
+                        </td>
+                        <td className="py-3 px-4 font-medium text-text tabular-nums">
+                          {fac.bed_count ? `${fac.bed_count} beds` : 'N/A (CBWTF)'}
+                        </td>
+                        <td className="py-3 px-4 font-mono text-text-muted">
+                          {fac.cpcb_registration_no}
+                        </td>
+                        <td className="py-3 px-4 font-semibold text-text tabular-nums">
+                          {fac.active_batches_count || 0} batches
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => handleSelectFacility(fac)}
+                            icon={Eye}
+                          >
+                            Drill-down
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* TAB 3: FACILITY DRILL-DOWN HISTORY */}
+          {activeTab === 'drilldown' && selectedFacility && (
+            <div className="p-6 space-y-6">
+              <div className="bg-surface-alt border border-border rounded-lg p-5 flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <span className="text-xs font-semibold text-text-muted uppercase tracking-wider">Facility audit dossier</span>
+                  <h2 className="text-lg font-bold text-text mt-0.5">{selectedFacility.name}</h2>
+                  <p className="text-xs text-text-muted">
+                    {selectedFacility.address} • Reg: <span className="font-mono font-semibold text-text">{selectedFacility.cpcb_registration_no}</span>
+                  </p>
                 </div>
 
-                {/* Anomaly Callout Cards */}
-                {facilityActivity.anomalies_detected?.length > 0 && (
-                  <div className="space-y-2">
-                    <h4 className="text-xs font-mono font-bold text-steel-700 uppercase">Flagged Activity Anomalies:</h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {facilityActivity.anomalies_detected.map((anom, idx) => (
-                        <div key={idx} className="p-3 bg-amber-50 border border-amber-300 rounded text-xs space-y-1 font-mono">
-                          <div className="flex items-center justify-between">
-                            <span className="font-bold text-amber-950">{anom.anomaly_type}</span>
-                            <span className="text-[10px] text-amber-800">{anom.date}</span>
-                          </div>
-                          <p className="text-amber-900 text-[11px] font-sans">{anom.message}</p>
-                        </div>
-                      ))}
-                    </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant="success" dot>
+                    Operating license: Active
+                  </Badge>
+                </div>
+              </div>
+
+              {/* Hospital Activity Correlation Summary (if hospital) */}
+              {facilityActivity ? (
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-text text-sm">90-Day clinical activity & waste generation correlation</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                    <Card>
+                      <CardContent className="p-4">
+                        <p className="text-xs font-medium text-text-muted uppercase">Average occupancy</p>
+                        <p className="text-xl font-bold text-text mt-1 tabular-nums">
+                          {facilityActivity.summary?.average_daily_occupancy || 410} <span className="text-xs font-normal text-text-muted">beds/day</span>
+                        </p>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardContent className="p-4">
+                        <p className="text-xs font-medium text-text-muted uppercase">Average waste rate</p>
+                        <p className="text-xl font-bold text-text mt-1 tabular-nums">
+                          {facilityActivity.summary?.average_daily_waste_kg || 138.4} <span className="text-xs font-normal text-text-muted">kg/day</span>
+                        </p>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardContent className="p-4">
+                        <p className="text-xs font-medium text-text-muted uppercase">Correlation ratio</p>
+                        <p className="text-xl font-bold text-success mt-1 tabular-nums">
+                          {facilityActivity.summary?.correlation_ratio || '0.34 kg/bed'}
+                        </p>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardContent className="p-4">
+                        <p className="text-xs font-medium text-text-muted uppercase">Detected anomalies</p>
+                        <p className="text-xl font-bold text-danger mt-1 tabular-nums">
+                          {facilityActivity.anomalies_detected?.length || 2} <span className="text-xs font-normal text-text-muted">flags</span>
+                        </p>
+                      </CardContent>
+                    </Card>
                   </div>
-                )}
-              </div>
-            ) : (
-              <div className="p-6 bg-hazmat-50 rounded border border-hazmat-200 text-center text-xs font-mono text-steel-600">
-                CBWTF treatment plant log &mdash; weight balance matching at 99.2% legal threshold.
-              </div>
-            )}
-          </div>
-        )}
 
-        {/* TAB 4: ACTIVE REGULATORY BREACHES */}
-        {activeTab === 'breaches' && (
-          <div className="overflow-x-auto">
-            <div className="p-3 bg-biohazard-50 border-b border-biohazard-200 flex items-center justify-between text-xs font-mono text-biohazard-950">
-              <div className="flex items-center space-x-2">
-                <ShieldAlert className="w-4 h-4 text-biohazard-700 flex-shrink-0" />
-                <span>
-                  <strong>National AI Risk Engine Audit Queue: </strong>
-                  Cases flagged with composite risk score &ge; 70. Assigned to regional compliance field inspectors.
-                </span>
-              </div>
-              <span className="font-bold">{riskCases.length} Total Audit Cases</span>
+                  {/* Anomaly Callout Cards */}
+                  {facilityActivity.anomalies_detected?.length > 0 && (
+                    <div className="space-y-2">
+                      <h4 className="text-xs font-semibold text-text uppercase">Flagged activity anomalies:</h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {facilityActivity.anomalies_detected.map((anom, idx) => (
+                          <div key={idx} className="p-3 bg-warning-bg border border-warning-border rounded-lg text-xs space-y-1">
+                            <div className="flex items-center justify-between">
+                              <span className="font-semibold text-warning-text">{anom.anomaly_type}</span>
+                              <span className="text-[10px] text-text-muted tabular-nums">{anom.date}</span>
+                            </div>
+                            <p className="text-text text-[11px]">{anom.message}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="p-6 bg-surface-alt rounded-lg border border-border text-center text-xs text-text-muted">
+                  CBWTF treatment plant log — weight balance matching at 99.2% legal threshold.
+                </div>
+              )}
             </div>
+          )}
 
-            <table className="w-full text-left text-xs font-mono">
-              <thead className="bg-hazmat-100 text-steel-700 uppercase font-bold border-b border-hazmat-300">
-                <tr>
-                  <th className="py-2.5 px-4">Case Code</th>
-                  <th className="py-2.5 px-4">Risk Score</th>
-                  <th className="py-2.5 px-4">Target Batch</th>
-                  <th className="py-2.5 px-4">Trigger Violations</th>
-                  <th className="py-2.5 px-4">Investigation Status</th>
-                  <th className="py-2.5 px-4">Assigned Inspector</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-hazmat-200">
-                {riskCases.map((rc) => {
-                  const isCritical = rc.risk_score >= 80;
-                  return (
-                    <tr key={rc.id} className="hover:bg-hazmat-50/70 transition">
-                      <td className="py-3 px-4 font-bold text-steel-900">
-                        {rc.case_code}
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-bold border ${
-                          isCritical ? 'bg-biohazard-100 text-biohazard-950 border-biohazard-300' : 'bg-amber-100 text-amber-950 border-amber-300'
-                        }`}>
-                          {rc.risk_score}/100
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 text-steel-800">
-                        {rc.batch?.batch_code || rc.batch_id}
-                      </td>
-                      <td className="py-3 px-4 text-steel-700 max-w-xs font-sans">
-                        <ul className="list-disc list-inside space-y-0.5 text-[11px]">
-                          {rc.triggers?.slice(0, 2).map((t, i) => (
-                            <li key={i} className="truncate">{t}</li>
-                          ))}
-                        </ul>
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-bold border ${
-                          rc.status === 'RESOLVED' ? 'bg-forest-100 text-forest-900 border-forest-300' : 'bg-hazmat-200 text-steel-900 border-hazmat-300'
-                        }`}>
-                          {rc.status}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 text-steel-800 font-sans">
-                        {rc.assigned_inspector?.name || rc.assigned_inspector_id || 'Inspector Amit Deshmukh'}
+          {/* TAB 4: ACTIVE REGULATORY BREACHES */}
+          {activeTab === 'breaches' && (
+            <div className="overflow-x-auto">
+              <div className="p-3 bg-surface-alt border-b border-border flex items-center justify-between text-xs text-text-muted">
+                <div className="flex items-center gap-2">
+                  <ShieldAlert className="w-4 h-4 text-danger shrink-0" aria-hidden="true" />
+                  <span>
+                    <strong className="text-text">National AI risk engine audit queue: </strong>
+                    Cases flagged with composite risk score ≥ 70. Assigned to regional compliance field inspectors.
+                  </span>
+                </div>
+                <span className="font-semibold text-text tabular-nums">{riskCases.length} total audit cases</span>
+              </div>
+
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="bg-surface-alt text-text-muted uppercase text-[11px] font-semibold border-b border-border">
+                    <th scope="col" className="py-2.5 px-4">Case code</th>
+                    <th scope="col" className="py-2.5 px-4">Risk score</th>
+                    <th scope="col" className="py-2.5 px-4">Target batch</th>
+                    <th scope="col" className="py-2.5 px-4">Trigger violations</th>
+                    <th scope="col" className="py-2.5 px-4">Investigation status</th>
+                    <th scope="col" className="py-2.5 px-4">Assigned inspector</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {riskCases.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="py-8">
+                        <EmptyState
+                          title="No active regulatory breaches"
+                          description="The compliance risk engine currently reports 0 open critical breaches."
+                        />
                       </td>
                     </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
+                  ) : (
+                    riskCases.map((rc) => {
+                      const isCritical = rc.risk_score >= 80;
+                      return (
+                        <tr key={rc.id} className="hover:bg-surface-alt/70 transition-colors">
+                          <td className="py-3 px-4 font-mono font-bold text-text">
+                            {rc.case_code}
+                          </td>
+                          <td className="py-3 px-4">
+                            <Badge variant={isCritical ? 'danger' : 'warning'} size="sm">
+                              {rc.risk_score}/100
+                            </Badge>
+                          </td>
+                          <td className="py-3 px-4 font-mono text-text">
+                            {rc.batch?.batch_code || rc.batch_id}
+                          </td>
+                          <td className="py-3 px-4 text-text max-w-xs">
+                            <ul className="list-disc list-inside space-y-0.5 text-[11px] text-text-muted">
+                              {rc.triggers?.slice(0, 2).map((t, i) => (
+                                <li key={i} className="truncate">{t}</li>
+                              ))}
+                            </ul>
+                          </td>
+                          <td className="py-3 px-4">
+                            <Badge variant={rc.status === 'RESOLVED' ? 'success' : 'neutral'} size="sm">
+                              {rc.status}
+                            </Badge>
+                          </td>
+                          <td className="py-3 px-4 text-text">
+                            {rc.assigned_inspector?.name || rc.assigned_inspector_id || 'Inspector Amit Deshmukh'}
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

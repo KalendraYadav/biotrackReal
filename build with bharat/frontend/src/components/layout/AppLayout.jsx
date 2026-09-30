@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth, ROLE_ROUTES, DEMO_ROLES_LIST } from '../../context/AuthContext';
 import { useSocket } from '../../context/SocketContext';
+import { SkipToContent } from '../ui/SkipToContent';
 import { 
   ShieldCheck, 
   LogOut, 
@@ -19,9 +20,10 @@ import {
   Radio,
   X,
   AlertTriangle,
-  ExternalLink,
   Menu,
-  Users
+  Users,
+  Layers,
+  ArrowRight
 } from 'lucide-react';
 
 const ROLE_ICONS = {
@@ -34,13 +36,15 @@ const ROLE_ICONS = {
 };
 
 export default function AppLayout({ children }) {
-  const { user, role, logout, demoRoles } = useAuth();
+  const { user, role, logout, loginAsDemoRole, demoRoles } = useAuth();
   const { isConnected, syncMode, alerts, dismissAlert } = useSocket();
   const navigate = useNavigate();
   const location = useLocation();
 
   const [backendStatus, setBackendStatus] = useState('checking');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [roleSwitcherOpen, setRoleSwitcherOpen] = useState(false);
+  const switcherRef = useRef(null);
 
   useEffect(() => {
     fetch('/api/health')
@@ -49,45 +53,76 @@ export default function AppLayout({ children }) {
       .catch(() => setBackendStatus('disconnected'));
   }, []);
 
+  // Close switcher on click outside
+  useEffect(() => {
+    if (!roleSwitcherOpen) return;
+    function handleClickOutside(event) {
+      if (switcherRef.current && !switcherRef.current.contains(event.target)) {
+        setRoleSwitcherOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [roleSwitcherOpen]);
+
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
+  const handleSwitchRole = async (targetRole) => {
+    setRoleSwitcherOpen(false);
+    setMobileMenuOpen(false);
+    const res = await loginAsDemoRole(targetRole);
+    if (res.success) {
+      navigate(res.dashboardRoute);
+    }
+  };
+
   const currentRoleMeta = demoRoles.find(r => r.role === role) || demoRoles[0];
   const RoleIcon = ROLE_ICONS[role] || ShieldCheck;
+  const isDashboardActive = location.pathname !== '/personnel';
+  const isPersonnelActive = location.pathname === '/personnel';
 
   return (
-    <div className="min-h-screen bg-cream-50/60 flex flex-col font-sans text-steel-950">
-      {/* Top Main Navigation Header */}
-      <header className="bg-steel-950 text-cream-50 shadow-nav border-b border-steel-800 sticky top-0 z-50">
+    <div className="min-h-screen bg-[#F8FAFC] flex flex-col font-sans text-slate-900">
+      {/* Skip to Main Content Link for Keyboard Accessibility (AX-03) */}
+      <SkipToContent targetId="main-content" />
+
+      {/* Top Enterprise Navigation Bar */}
+      <header className="bg-[#0B132B] text-white border-b border-slate-800/80 sticky top-0 z-50 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-15">
             {/* Logo & Product Name */}
-            <div className="flex items-center space-x-6">
-              <Link to={ROLE_ROUTES[role] || '/'} className="flex items-center space-x-3 group">
-                <div className="w-10 h-10 rounded bg-steel-900 flex items-center justify-center border border-steel-800">
-                  <ShieldCheck className="w-6 h-6 text-biohazard-500" />
+            <div className="flex items-center gap-6">
+              <Link 
+                to={ROLE_ROUTES[role] || '/'} 
+                className="flex items-center gap-3 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg py-1"
+                aria-label="BioTrace home dashboard"
+              >
+                <div className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0 shadow-xs group-hover:border-emerald-400 transition-colors">
+                  <ShieldCheck className="w-5 h-5 text-emerald-400" aria-hidden="true" />
                 </div>
                 <div>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-xl font-serif font-bold tracking-wide text-cream-50">BioTrace</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded bg-biohazard-700 text-white font-mono font-bold uppercase tracking-wider border border-biohazard-600">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg font-bold tracking-tight text-white leading-none">BioTrace</span>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded font-mono font-bold uppercase tracking-wider bg-emerald-950 text-emerald-300 border border-emerald-800/60">
                       NidusClean
                     </span>
                   </div>
-                  <p className="text-[11px] text-cream-300/80 font-mono leading-tight">BMW Digital Chain-of-Custody</p>
+                  <p className="text-[10px] text-slate-400 font-mono leading-none mt-1">CPCB BMW Chain of Custody</p>
                 </div>
               </Link>
 
               {/* Navigation Tabs */}
-              <nav className="hidden md:flex items-center space-x-2 pl-4 border-l border-steel-800">
+              <nav aria-label="Main navigation" className="hidden md:flex items-center gap-1 pl-4 border-l border-slate-800/80">
                 <Link
                   to={ROLE_ROUTES[role] || '/'}
-                  className={`px-3 py-1.5 rounded text-xs font-mono font-medium transition ${
-                    location.pathname !== '/personnel'
-                      ? 'bg-steel-800 text-white font-bold'
-                      : 'text-cream-300 hover:text-white hover:bg-steel-800'
+                  aria-current={isDashboardActive ? 'page' : undefined}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
+                    isDashboardActive
+                      ? 'bg-slate-800/90 text-white font-semibold shadow-xs'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
                   }`}
                 >
                   Dashboard
@@ -96,216 +131,245 @@ export default function AppLayout({ children }) {
                 {(role === 'HOSPITAL_AUTHORITY' || role === 'GOVERNMENT_AUTHORITY') && (
                   <Link
                     to="/personnel"
-                    className={`flex items-center space-x-1.5 px-3 py-1.5 rounded text-xs font-mono font-medium transition ${
-                      location.pathname === '/personnel'
-                        ? 'bg-forest-800 text-white font-bold border border-forest-600'
-                        : 'text-cream-300 hover:text-white hover:bg-steel-800'
+                    aria-current={isPersonnelActive ? 'page' : undefined}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
+                      isPersonnelActive
+                        ? 'bg-slate-800/90 text-white font-semibold shadow-xs'
+                        : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
                     }`}
                   >
-                    <Users className="w-3.5 h-3.5 text-forest-400" />
+                    <Users className="w-3.5 h-3.5 text-slate-400" aria-hidden="true" />
                     <span>Personnel</span>
                   </Link>
                 )}
               </nav>
             </div>
 
-            {/* Right Controls: Status, Quick Role Switcher, Profile */}
-            <div className="flex items-center space-x-3">
-              {/* Live Sync Mode Status (Socket.IO / Polling) */}
-              <div className="hidden lg:flex items-center">
-                {syncMode === 'websocket' ? (
-                  <span className="inline-flex items-center text-xs font-mono font-semibold px-2.5 py-1 rounded bg-forest-950 text-forest-300 border border-forest-800" title="Real-Time WebSocket Connected">
-                    <span className="relative flex h-2 w-2 mr-1.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-forest-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-forest-400"></span>
-                    </span>
-                    Live Sockets
-                  </span>
-                ) : syncMode === 'polling' ? (
-                  <span className="inline-flex items-center text-xs font-mono font-semibold px-2.5 py-1 rounded bg-hazmat-950 text-hazmat-300 border border-hazmat-800" title="Short Polling Fallback Active (5s)">
-                    <RefreshCw className="w-3 h-3 mr-1.5 animate-spin text-hazmat-400" />
-                    Polling (5s)
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center text-xs font-mono font-semibold px-2.5 py-1 rounded bg-steel-900 text-steel-400 border border-steel-700">
-                    <Activity className="w-3 h-3 mr-1.5 animate-spin text-steel-400" />
-                    Connecting...
-                  </span>
-                )}
+            {/* Right Controls: Unified Status, Role Switcher, Profile */}
+            <div className="flex items-center gap-2.5 sm:gap-3.5">
+              {/* Executive System Health Indicator */}
+              <div className="hidden lg:flex items-center gap-2 px-2.5 py-1 rounded-full bg-slate-900/80 border border-slate-800 text-[11px] font-mono text-slate-300">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span>
+                  {syncMode === 'websocket' ? 'Live Telemetry' : 'Sync Active'} • API 200
+                </span>
               </div>
 
-              {/* API Gateway Status */}
-              <div className="hidden sm:flex items-center">
-                {backendStatus === 'connected' ? (
-                  <span className="inline-flex items-center text-xs font-mono font-semibold px-2 py-0.5 rounded bg-forest-950 text-forest-300 border border-forest-800">
-                    <CheckCircle2 className="w-3 h-3 mr-1 text-forest-400" />
-                    API
+              {/* Role Switcher Dropdown (for testing and quick demo navigation) */}
+              <div className="relative" ref={switcherRef}>
+                <button
+                  type="button"
+                  onClick={() => setRoleSwitcherOpen(!roleSwitcherOpen)}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 text-xs font-medium text-slate-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                  aria-expanded={roleSwitcherOpen}
+                  aria-label="Switch demonstration duty role"
+                >
+                  <RoleIcon className="w-3.5 h-3.5 text-emerald-400 shrink-0" aria-hidden="true" />
+                  <span className="font-semibold text-white truncate max-w-[130px] sm:max-w-[160px]">
+                    {currentRoleMeta?.title || role}
                   </span>
-                ) : backendStatus === 'checking' ? (
-                  <span className="inline-flex items-center text-xs font-mono font-semibold px-2 py-0.5 rounded bg-hazmat-950 text-hazmat-300 border border-hazmat-800">
-                    <Activity className="w-3 h-3 mr-1 animate-spin text-hazmat-400" />
-                    API
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center text-xs font-mono font-semibold px-2 py-0.5 rounded bg-biohazard-950 text-biohazard-300 border border-biohazard-800">
-                    <AlertCircle className="w-3 h-3 mr-1 text-biohazard-400" />
-                    API
-                  </span>
-                )}
-              </div>
+                  <ChevronDown className="w-3 h-3 text-slate-400" aria-hidden="true" />
+                </button>
 
-              {/* Solid Non-Interactive Role Badge */}
-              <div className="flex items-center space-x-2 px-3 py-1.5 rounded bg-steel-900 border border-steel-700 text-xs font-medium text-cream-100">
-                <RoleIcon className="w-4 h-4 text-biohazard-400" />
-                <span className="hidden sm:inline font-semibold">{currentRoleMeta?.title || role}</span>
+                {roleSwitcherOpen && (
+                  <div 
+                    role="menu"
+                    className="absolute right-0 mt-1.5 w-72 rounded-xl bg-[#0F172A] border border-slate-700 shadow-xl py-1.5 z-50 text-xs animate-in fade-in slide-in-from-top-1"
+                  >
+                    <div className="px-3 py-2 border-b border-slate-800">
+                      <p className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider">
+                        Switch Operational Context
+                      </p>
+                      <p className="text-[11px] text-slate-500 mt-0.5">
+                        Test RBAC & workflows across all 6 statutory roles:
+                      </p>
+                    </div>
+
+                    <div className="py-1">
+                      {DEMO_ROLES_LIST.map((r) => {
+                        const Icon = ROLE_ICONS[r.role] || ShieldCheck;
+                        const isCurrent = r.role === role;
+
+                        return (
+                          <button
+                            key={r.role}
+                            type="button"
+                            role="menuitem"
+                            onClick={() => handleSwitchRole(r.role)}
+                            className={`w-full text-left px-3 py-2 flex items-center justify-between hover:bg-slate-800 transition-colors ${
+                              isCurrent ? 'bg-emerald-950/40 text-emerald-300 font-semibold' : 'text-slate-300'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <div className={`p-1.5 rounded-md ${isCurrent ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-800 text-slate-400'}`}>
+                                <Icon className="w-3.5 h-3.5" aria-hidden="true" />
+                              </div>
+                              <div className="min-w-0">
+                                <div className="text-xs truncate text-white">{r.title}</div>
+                                <div className="text-[10px] text-slate-500 truncate">{r.name} • {r.facility}</div>
+                              </div>
+                            </div>
+                            {isCurrent && (
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 ml-2" aria-hidden="true" />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* User Profile & Logout */}
-              <div className="flex items-center pl-2 border-l border-steel-800 space-x-2">
-                <div className="text-right hidden md:block">
-                  <div className="text-xs font-serif font-bold text-cream-100 leading-tight">{user?.name}</div>
-                  <div className="text-[11px] text-cream-300/80 font-mono leading-tight truncate max-w-[150px]">
+              <div className="flex items-center pl-2 border-l border-slate-800/80 gap-2">
+                <div className="text-right hidden sm:block">
+                  <div className="text-xs font-semibold text-white leading-tight">{user?.name}</div>
+                  <div className="text-[10px] text-slate-400 font-mono leading-tight truncate max-w-[140px]">
                     {user?.facility_name || user?.facility?.name || 'Regulatory Authority'}
                   </div>
                 </div>
 
                 <button
+                  type="button"
                   onClick={handleLogout}
-                  className="p-2 rounded bg-steel-900 hover:bg-steel-800 border border-steel-700 text-cream-200 hover:text-cream-50 transition"
-                  title="Sign Out"
+                  className="p-2 rounded-lg bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 text-slate-300 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                  aria-label="Sign out of BioTrace"
+                  title="Sign out"
                 >
-                  <LogOut className="w-4 h-4" />
+                  <LogOut className="w-4 h-4" aria-hidden="true" />
                 </button>
 
                 {/* Mobile Menu Toggle */}
                 <button
+                  type="button"
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="sm:hidden p-2 rounded bg-steel-900 hover:bg-steel-800 border border-steel-700 text-cream-100 transition"
-                  title="Toggle Mobile Menu"
+                  className="md:hidden p-2 rounded-lg bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 text-slate-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                  aria-expanded={mobileMenuOpen}
+                  aria-label="Toggle navigation menu"
+                  title="Toggle mobile menu"
                 >
-                  <Menu className="w-4 h-4" />
+                  <Menu className="w-4 h-4" aria-hidden="true" />
                 </button>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Mobile Subheader Drawer */}
+        {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="sm:hidden bg-steel-900 border-t border-steel-800 px-4 py-3 space-y-2 animate-fade-in text-xs font-mono">
-            <div className="flex items-center justify-between py-1 border-b border-steel-800">
-              <span className="text-cream-300 font-medium">Active Facility:</span>
-              <span className="font-semibold text-white truncate max-w-[200px]">
-                {user?.facility_name || user?.facility?.name || 'Regulatory Authority'}
-              </span>
-            </div>
-            <div className="flex items-center justify-between py-1 border-b border-steel-800">
-              <span className="text-cream-300 font-medium">Sync Mode:</span>
-              <span className="font-semibold text-forest-300">
-                {syncMode === 'websocket' ? 'WebSocket (Real-Time)' : syncMode === 'polling' ? 'Short Polling (5s)' : 'Connecting...'}
-              </span>
-            </div>
-            <div className="pt-2 flex justify-end">
-              <button
-                onClick={handleLogout}
-                className="px-3 py-1.5 bg-biohazard-700 hover:bg-biohazard-800 text-white rounded flex items-center space-x-1 font-semibold"
+          <div className="md:hidden bg-[#0F172A] border-t border-slate-800 px-4 py-3 space-y-3 animate-in fade-in text-xs">
+            <div className="space-y-1 pb-2 border-b border-slate-800">
+              <Link
+                to={ROLE_ROUTES[role] || '/'}
+                onClick={() => setMobileMenuOpen(false)}
+                aria-current={isDashboardActive ? 'page' : undefined}
+                className={`block px-3 py-2 rounded-lg text-xs font-medium ${
+                  isDashboardActive
+                    ? 'bg-slate-800 text-white font-semibold'
+                    : 'text-slate-300 hover:text-white hover:bg-slate-800/50'
+                }`}
               >
-                <LogOut className="w-3.5 h-3.5" />
-                <span>Sign Out</span>
+                Dashboard
+              </Link>
+              {(role === 'HOSPITAL_AUTHORITY' || role === 'GOVERNMENT_AUTHORITY') && (
+                <Link
+                  to="/personnel"
+                  onClick={() => setMobileMenuOpen(false)}
+                  aria-current={isPersonnelActive ? 'page' : undefined}
+                  className={`block px-3 py-2 rounded-lg text-xs font-medium ${
+                    isPersonnelActive
+                      ? 'bg-slate-800 text-white font-semibold'
+                      : 'text-slate-300 hover:text-white hover:bg-slate-800/50'
+                  }`}
+                >
+                  Personnel Directory
+                </Link>
+              )}
+            </div>
+
+            <div className="pt-1">
+              <p className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider mb-2">
+                Switch Operational Context
+              </p>
+              <div className="grid grid-cols-2 gap-1.5">
+                {DEMO_ROLES_LIST.map((r) => (
+                  <button
+                    key={r.role}
+                    type="button"
+                    onClick={() => handleSwitchRole(r.role)}
+                    className={`p-2 rounded-lg border text-left text-[11px] font-medium transition-colors ${
+                      r.role === role
+                        ? 'bg-emerald-950/60 border-emerald-700 text-emerald-300 font-bold'
+                        : 'bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800'
+                    }`}
+                  >
+                    {r.title}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-slate-400 text-xs">
+              <span className="truncate max-w-[200px]">{user?.name} ({user?.facility_name || 'CPCB'})</span>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="text-red-400 font-semibold hover:text-red-300"
+              >
+                Sign out
               </button>
             </div>
           </div>
         )}
       </header>
 
-
-
-      {/* Floating Real-Time Toast Alerts Container */}
-      <div className="fixed top-20 right-4 z-[9999] w-96 max-w-[calc(100vw-2rem)] space-y-2 pointer-events-none font-sans">
-        {alerts && alerts.map((alert) => (
-          <div
-            key={alert.id}
-            className={`pointer-events-auto p-4 rounded border-2 transition-all duration-300 shadow-modal ${
-              alert.type === 'critical'
-                ? 'bg-biohazard-950 text-cream-50 border-biohazard-600'
-                : 'bg-hazmat-950 text-cream-50 border-hazmat-600'
-            }`}
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex items-start space-x-3">
-                <div className={`p-1.5 rounded mt-0.5 ${
-                  alert.type === 'critical' ? 'bg-biohazard-700 text-white' : 'bg-hazmat-500 text-steel-950 font-bold'
-                }`}>
-                  <AlertTriangle className="w-4 h-4" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center space-x-2">
-                    <h4 className="font-serif font-bold text-xs leading-snug">{alert.title}</h4>
-                    {alert.code && (
-                      <span className="font-mono text-[10px] px-1.5 py-0.2 rounded bg-white/20 uppercase">
-                        {alert.code}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-[11px] text-cream-200 mt-1 leading-relaxed">
-                    {alert.message}
-                  </p>
-                  <div className="mt-2 flex items-center space-x-3">
-                    <button
-                      onClick={() => {
-                        dismissAlert(alert.id);
-                        if (alert.code?.startsWith('INS-') || alert.type === 'critical') {
-                          navigate('/inspector');
-                        } else {
-                          navigate('/transport');
-                        }
-                      }}
-                      className="text-[11px] font-mono font-bold text-hazmat-300 hover:text-white flex items-center space-x-1"
-                    >
-                      <span>Investigate Details</span>
-                      <ExternalLink className="w-3 h-3" />
-                    </button>
-                    <span className="text-[10px] text-cream-400 font-mono">
-                      {new Date(alert.timestamp).toLocaleTimeString()}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <button
-                onClick={() => dismissAlert(alert.id)}
-                className="text-cream-400 hover:text-white p-1 rounded transition"
-                title="Dismiss Alert"
-              >
-                <X className="w-4 h-4" />
-              </button>
+      {/* Global Real-Time Critical Incident Alert Banner (AX-02, role=alert) */}
+      {alerts && alerts.length > 0 && (
+        <div className="bg-red-950/90 border-b border-red-800/80 px-4 py-2.5 text-white" role="alert" aria-live="assertive">
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <span className="p-1 rounded bg-red-800/80 text-white shrink-0">
+                <AlertTriangle className="w-3.5 h-3.5" aria-hidden="true" />
+              </span>
+              <span className="font-semibold tracking-wide uppercase text-red-200 text-[10px] shrink-0">
+                CPCB Risk Engine Flag:
+              </span>
+              <span className="truncate text-red-100 font-medium">
+                {alerts[0].message || alerts[0].title || 'Statutory anomaly detected in chain of custody'}
+              </span>
             </div>
+            <button
+              type="button"
+              onClick={() => dismissAlert(alerts[0].id)}
+              className="p-1 text-red-300 hover:text-white rounded-md transition-colors shrink-0"
+              aria-label="Dismiss alert"
+            >
+              <X className="w-4 h-4" aria-hidden="true" />
+            </button>
           </div>
-        ))}
-      </div>
+        </div>
+      )}
 
-      {/* Main Content Viewport */}
-      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
+      {/* Main Content Area */}
+      <main id="main-content" className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 focus:outline-none">
         {children}
       </main>
 
-      {/* Footer */}
-      <footer className="bg-steel-950 border-t border-steel-800 py-4 text-xs text-cream-300">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-2 text-cream-200">
-            <span className="font-serif font-bold text-cream-100">BioTrace Platform</span>
+      {/* Enterprise Regulatory Footer */}
+      <footer className="bg-white border-t border-slate-200 mt-auto py-5 text-slate-500 text-xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-[11px]">
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-slate-800">BioTrace (NidusClean)</span>
             <span>&bull;</span>
-            <span className="font-mono text-[11px] text-cream-400">Bio-Medical Waste Management Rules 2016 Enforcement</span>
+            <span>Central Pollution Control Board BMW Rules 2016 Compliant</span>
           </div>
-          <div className="flex items-center space-x-4 font-mono text-[11px] text-cream-400">
-            <a href="#terms" onClick={(e) => e.preventDefault()} className="hover:text-cream-100 underline">
-              Terms of Service
-            </a>
+          <div className="flex items-center gap-4 text-slate-400">
+            <span>Server-side PostGIS & RBAC Enforced</span>
             <span>&bull;</span>
-            <a href="#privacy" onClick={(e) => e.preventDefault()} className="hover:text-cream-100 underline">
-              Privacy Policy
-            </a>
-            <span>&bull;</span>
-            <span className="text-steel-500">Statutory Portal v1.0</span>
+            <span>Cryptographic Form IV Ledger</span>
           </div>
         </div>
       </footer>

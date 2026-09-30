@@ -175,57 +175,57 @@ export default function NationalFacilitiesMap({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-hazmat-300 overflow-hidden font-sans">
+    <div className="bg-white rounded-xl border border-slate-200/90 shadow-2xs overflow-hidden font-sans">
       {/* Map Filter Controls Bar */}
-      <div className="p-3 bg-hazmat-100 border-b border-hazmat-300 flex flex-wrap items-center justify-between gap-2 font-mono">
+      <div className="p-3 bg-slate-50/80 border-b border-slate-200/80 flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center space-x-2">
-          <span className="text-xs font-bold text-steel-800 uppercase">Region Filter:</span>
+          <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Region Focus:</span>
           <div className="flex flex-wrap gap-1">
             <button
               onClick={() => zoomToRegion(21.5, 78.9, 5)}
-              className="px-2.5 py-1 bg-white hover:bg-hazmat-50 border border-hazmat-300 rounded text-xs font-bold text-steel-800 transition"
+              className="px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-200/90 rounded-md text-xs font-medium text-slate-700 transition-colors shadow-2xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
             >
               All India
             </button>
             <button
               onClick={() => zoomToRegion(28.5672, 77.2100, 11)}
-              className="px-2.5 py-1 bg-white hover:bg-hazmat-50 border border-hazmat-300 rounded text-xs font-bold text-steel-800 transition"
+              className="px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-200/90 rounded-md text-xs font-medium text-slate-700 transition-colors shadow-2xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
             >
               Delhi NCR
             </button>
             <button
               onClick={() => zoomToRegion(19.0760, 72.8777, 11)}
-              className="px-2.5 py-1 bg-white hover:bg-hazmat-50 border border-hazmat-300 rounded text-xs font-bold text-steel-800 transition"
+              className="px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-200/90 rounded-md text-xs font-medium text-slate-700 transition-colors shadow-2xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
             >
               Mumbai
             </button>
             <button
               onClick={() => zoomToRegion(12.9716, 77.5946, 11)}
-              className="px-2.5 py-1 bg-white hover:bg-hazmat-50 border border-hazmat-300 rounded text-xs font-bold text-steel-800 transition"
+              className="px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-200/90 rounded-md text-xs font-medium text-slate-700 transition-colors shadow-2xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
             >
               Bengaluru
             </button>
             <button
               onClick={() => zoomToRegion(13.0827, 80.2707, 11)}
-              className="px-2.5 py-1 bg-white hover:bg-hazmat-50 border border-hazmat-300 rounded text-xs font-bold text-steel-800 transition"
+              className="px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-200/90 rounded-md text-xs font-medium text-slate-700 transition-colors shadow-2xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
             >
               Chennai
             </button>
           </div>
         </div>
 
-        <div className="flex items-center space-x-3 text-xs font-mono text-steel-700">
+        <div className="flex items-center space-x-3 text-xs text-slate-600">
           <div className="flex items-center space-x-1.5">
-            <div className="w-2.5 h-2.5 rounded-sm bg-[#14462a]" />
-            <span className="font-semibold">Hospitals ({facilities.filter(f => f.type === 'HOSPITAL').length})</span>
+            <div className="w-2.5 h-2.5 rounded-sm bg-emerald-800" />
+            <span className="font-medium text-slate-700">Hospitals ({facilities.filter(f => f.type === 'HOSPITAL').length})</span>
           </div>
           <div className="flex items-center space-x-1.5">
-            <div className="w-2.5 h-2.5 rounded-sm bg-steel-800" />
-            <span className="font-semibold">CBWTFs ({facilities.filter(f => f.type === 'CBWTF').length})</span>
+            <div className="w-2.5 h-2.5 rounded-sm bg-slate-800" />
+            <span className="font-medium text-slate-700">CBWTFs ({facilities.filter(f => f.type === 'CBWTF').length})</span>
           </div>
           <div className="flex items-center space-x-1.5">
-            <div className="w-2.5 h-2.5 rounded-sm bg-hazmat-600" />
-            <span className="font-semibold">Carriers ({vehicles.length})</span>
+            <div className="w-2.5 h-2.5 rounded-sm bg-amber-600" />
+            <span className="font-medium text-slate-700">Carriers ({vehicles.length})</span>
           </div>
         </div>
       </div>
@@ -234,7 +234,7 @@ export default function NationalFacilitiesMap({
       <div 
         ref={mapContainerRef} 
         style={{ height: '400px', width: '100%', zIndex: 1 }} 
-        className="relative bg-hazmat-100"
+        className="relative bg-slate-100"
       />
     </div>
   );

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   X, 
   ShieldAlert, 
@@ -34,6 +34,16 @@ export default function CaseDetailModal({
   const batch = riskCase?.batch || {};
   const isResolved = riskCase?.status === 'RESOLVED';
   const isUnderInvestigation = riskCase?.status === 'UNDER_INVESTIGATION';
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        onClose?.();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
 
   // Sample photo evidence items if custody events don't have images
   const sampleEvidence = [
@@ -93,7 +103,12 @@ export default function CaseDetailModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-steel-950/80 backdrop-blur-sm animate-fade-in font-sans">
-      <div className="bg-white w-full max-w-3xl rounded-lg shadow-modal border-2 border-steel-800 overflow-hidden flex flex-col max-h-[92vh]">
+      <div 
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="case-dossier-title"
+        className="bg-white w-full max-w-3xl rounded-lg shadow-modal border-2 border-steel-800 overflow-hidden flex flex-col max-h-[92vh]"
+      >
         {/* Header */}
         <div className="px-6 py-4 bg-steel-950 text-cream-50 border-b border-steel-800 flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -102,7 +117,7 @@ export default function CaseDetailModal({
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <h3 className="font-serif font-bold text-base text-cream-100 tracking-wide">
+                <h3 id="case-dossier-title" className="font-serif font-bold text-base text-cream-100 tracking-wide">
                   Audit Inspection Dossier: {riskCase?.case_code}
                 </h3>
                 <span className={`px-2 py-0.5 rounded text-[11px] font-mono font-bold tracking-tight ${

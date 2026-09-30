@@ -118,13 +118,20 @@ export default function HandoverVerificationModal({
     }
   }, [batch?.quantity_kg]);
 
-  // Stop camera and QR scanner when modal closes or unmounts
+  // Stop camera and QR scanner when modal closes or unmounts, and handle ESC key
   useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        onClose?.();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
     return () => {
+      window.removeEventListener('keydown', handleKeyDown);
       stopCamera();
       stopQrScanner();
     };
-  }, []);
+  }, [onClose]);
 
   // Control QR Scanner lifecycle on Step 1
   useEffect(() => {
@@ -703,7 +710,12 @@ export default function HandoverVerificationModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-steel-950/70 backdrop-blur-xs animate-fade-in font-sans">
-      <div className="bg-white w-full max-w-2xl rounded-lg shadow-modal border-2 border-steel-800 overflow-hidden flex flex-col max-h-[90vh]">
+      <div 
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="handover-modal-title"
+        className="bg-white w-full max-w-2xl rounded-lg shadow-modal border-2 border-steel-800 overflow-hidden flex flex-col max-h-[90vh]"
+      >
         {/* Header */}
         <div className="px-6 py-4 bg-steel-900 text-cream flex items-center justify-between border-b border-hazmat-800">
           <div className="flex items-center space-x-3">
@@ -711,7 +723,7 @@ export default function HandoverVerificationModal({
               <Truck className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-serif font-black text-base text-cream tracking-tight">
+              <h3 id="handover-modal-title" className="font-serif font-black text-base text-cream tracking-tight">
                 {stage === 'COLLECTION' 
                   ? 'Hospital Gate Collection Handover' 
                   : stage === 'TRANSPORT_PICKUP' 

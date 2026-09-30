@@ -6,20 +6,24 @@ import {
   Truck, 
   MapPin, 
   Navigation, 
-  Radio, 
   ShieldCheck, 
   AlertTriangle, 
   CheckCircle2, 
-  Layers, 
   Package, 
   QrCode, 
-  ArrowRight,
-  RefreshCw,
-  Clock,
-  Building2,
-  Scale,
-  Phone
+  RefreshCw, 
+  Clock, 
+  Building2, 
+  Scale, 
+  Phone,
+  Search
 } from 'lucide-react';
+import PageHeader from '../../components/ui/PageHeader';
+import Button from '../../components/ui/Button';
+import Badge from '../../components/ui/Badge';
+import StatusPill, { CategoryBadge } from '../../components/ui/StatusPill';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../../components/ui/Card';
+import EmptyState from '../../components/ui/EmptyState';
 
 export default function TransportDashboard() {
   const { user } = useAuth();
@@ -104,7 +108,6 @@ export default function TransportDashboard() {
 
   // Filter transport batches
   const transportBatches = allBatches.filter(b => {
-    // Show batches that are in stages relevant to transport
     const isRelevantStage = ['COLLECTED', 'IN_TRANSIT', 'RECEIVED', 'GENERATED'].includes(b.status);
     if (!isRelevantStage) return false;
 
@@ -127,209 +130,163 @@ export default function TransportDashboard() {
   const batchesReadyPickup = allBatches.filter(b => b.status === 'COLLECTED');
   const totalCargoKg = batchesInTransit.reduce((acc, b) => acc + (b.quantity_kg || 0), 0);
 
-  // Category Badge Helper
-  const getCategoryBadge = (cat) => {
-    switch (cat?.toLowerCase()) {
-      case 'yellow':
-        return 'bg-amber-100 text-amber-900 border-amber-300';
-      case 'red':
-        return 'bg-rose-100 text-rose-900 border-rose-300';
-      case 'white':
-        return 'bg-slate-100 text-slate-800 border-slate-300';
-      case 'blue':
-        return 'bg-sky-100 text-sky-900 border-sky-300';
-      default:
-        return 'bg-slate-100 text-slate-700 border-slate-200';
-    }
-  };
-
-  // Status Badge Helper
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case 'COLLECTED':
-        return 'bg-amber-50 text-amber-700 border-amber-200';
-      case 'IN_TRANSIT':
-        return 'bg-orange-50 text-brand-orange border-orange-200 font-bold';
-      case 'RECEIVED':
-        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
-      default:
-        return 'bg-slate-50 text-slate-600 border-slate-200';
-    }
-  };
-
   // Open Handover Modal for Pickup or Drop-off
   const handleStartHandover = (batch, stage) => {
     setSelectedBatchForHandover(batch);
     setHandoverStage(stage);
   };
 
-  // On successful custody event completion
   const handleHandoverSuccess = () => {
     loadBatches();
   };
 
   return (
-    <div className="space-y-6 pb-12">
-      {/* Real-time Route Deviation Alert Banner */}
+    <div className="space-y-6 max-w-7xl mx-auto">
+      {/* Page Header */}
+      <PageHeader
+        title="Transit Fleet Telemetry & Geofence Enforcement"
+        description={`Authorized carrier: ${user?.facility_name || 'EcoSafe Waste Handlers'} • Operator: ${user?.name || 'Vikram Singh'}`}
+        icon={Truck}
+        badge={
+          <Badge variant={deviationState.isDeviated ? 'danger' : 'success'} dot>
+            {deviationState.isDeviated ? 'Deviation alert' : 'Corridor compliant'}
+          </Badge>
+        }
+        actions={
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={loadBatches}
+            loading={loadingBatches}
+            icon={RefreshCw}
+            aria-label="Refresh transit fleet data"
+          >
+            Refresh
+          </Button>
+        }
+      />
+
+      {/* Route Deviation Alert Banner - Positioned cleanly beneath PageHeader */}
       {deviationState.isDeviated && (
-        <div className="bg-biohazard-50 border-l-4 border-biohazard-600 rounded-r-lg p-4 shadow-panel flex flex-wrap items-center justify-between gap-3 text-biohazard-900 animate-pulse">
+        <div 
+          role="alert" 
+          aria-live="assertive"
+          className="rounded-xl p-4 bg-red-50/90 border border-red-200 flex flex-wrap items-center justify-between gap-3 text-red-950 shadow-2xs animate-fade-in"
+        >
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-biohazard-100 text-biohazard-700 rounded border border-biohazard-200">
-              <AlertTriangle className="w-5 h-5" />
+            <div className="p-2 rounded-lg bg-red-100 text-red-700 shrink-0">
+              <AlertTriangle className="w-5 h-5" aria-hidden="true" />
             </div>
             <div>
-              <h4 className="font-serif font-black text-sm">GEOFENCE ROUTE DEVIATION DETECTED</h4>
-              <p className="text-xs text-biohazard-800 mt-0.5">
-                Vehicle <span className="font-mono font-bold">{vehicle.plate_no}</span> is{' '}
-                <span className="font-mono font-bold underline">{deviationState.distanceKm} km outside</span> approved safe green corridor. Real-time telemetry flagged and logged in CPCB Risk Engine.
+              <h4 className="font-semibold text-sm text-red-900">Geofence route deviation detected</h4>
+              <p className="text-xs text-red-700/90 mt-0.5">
+                Vehicle <span className="font-mono font-bold text-red-950">{vehicle.plate_no}</span> is{' '}
+                <span className="font-mono font-bold underline tabular-nums">{deviationState.distanceKm} km outside</span> approved safe green corridor. Real-time telemetry flagged and logged in CPCB Risk Engine.
               </p>
             </div>
           </div>
-          <span className="text-xs bg-biohazard-600 text-white px-3 py-1 rounded font-mono font-bold">
+          <Badge variant="danger" size="sm">
             CPCB Rule 12 Breach Flag
-          </span>
+          </Badge>
         </div>
       )}
 
-      {/* Role Banner / Dispatch Terminal Header */}
-      <div className="bg-white rounded-lg shadow-panel border border-hazmat-200 p-5 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center space-x-3.5">
-          <div className="w-12 h-12 rounded-lg bg-hazmat-100 border border-hazmat-300 flex items-center justify-center text-hazmat-900">
-            <Truck className="w-6 h-6" />
-          </div>
-          <div>
-            <div className="flex items-center space-x-2">
-              <h1 className="text-xl font-serif font-black text-steel-900 tracking-tight">
-                Transit Fleet Telemetry &amp; Geofence Enforcement
-              </h1>
-              <span className="text-[11px] px-2.5 py-0.5 rounded font-mono font-bold bg-hazmat-100 text-hazmat-900 border border-hazmat-300">
-                CPCB Safe Corridor GPS Protocol
-              </span>
-            </div>
-            <p className="text-xs text-steel-500 mt-0.5">
-              Authorized Carrier: <span className="font-semibold text-steel-700">{user?.facility_name || 'EcoSafe Waste Handlers'}</span> &bull; Operator: <span className="font-mono text-steel-700">{user?.name || 'Vikram Singh'}</span>
-            </p>
-          </div>
-        </div>
-
-        {/* Live Corridor Status Indicator */}
-        <div className="flex items-center space-x-3">
-          <div className={`px-3 py-1.5 rounded border flex items-center space-x-2 text-xs font-mono font-bold ${
-            deviationState.isDeviated 
-              ? 'bg-biohazard-50 text-biohazard-800 border-biohazard-300 animate-pulse' 
-              : 'bg-forest-50 text-forest-800 border-forest-300'
-          }`}>
-            <span className={`w-2 h-2 rounded-full ${deviationState.isDeviated ? 'bg-biohazard-600' : 'bg-forest-600 animate-ping'}`} />
-            <span>{deviationState.isDeviated ? 'ROUTE DEVIATION DETECTED' : 'SAFE CORRIDOR: COMPLIANT'}</span>
-          </div>
-
-          <button
-            onClick={loadBatches}
-            className="p-2 border border-hazmat-300 rounded hover:bg-hazmat-50 text-steel-600 transition"
-            title="Refresh Fleet Data"
-          >
-            <RefreshCw className={`w-4 h-4 ${loadingBatches ? 'animate-spin text-hazmat-700' : ''}`} />
-          </button>
-        </div>
-      </div>
-
-      {/* Top Header Stat Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      {/* Metrics Row (4 Cards) - Responsive 2x2 grid on mobile, 4-col on desktop */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Card 1: Active Fleet Vehicle */}
-        <div className="bg-white rounded-lg p-4 shadow-panel border border-hazmat-200 flex items-center justify-between">
-          <div>
-            <p className="text-xs font-mono uppercase tracking-wider text-steel-500">Fleet Vehicle</p>
-            <p className="text-xl font-serif font-black text-steel-900 mt-1 font-mono">{vehicle.plate_no}</p>
-            <p className="text-xs text-steel-600 mt-0.5 font-mono">
-              Driver: <span className="font-semibold text-steel-800">{vehicle.driver_name || user?.name || 'Vikram Singh'}</span>
-            </p>
-            <p className="text-xs text-forest-800 mt-1 font-mono flex items-center space-x-1.5 font-semibold">
-              <Phone className="w-3 h-3 text-forest-600" />
-              <span>{vehicle.driver_phone || user?.phone_number || '+91 98111 22334'}</span>
-            </p>
+        <div className="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200/90 shadow-2xs flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Fleet Vehicle</span>
+            <div className="p-1.5 rounded-lg bg-slate-100 text-slate-700">
+              <Truck className="w-3.5 h-3.5" aria-hidden="true" />
+            </div>
           </div>
-          <div className="w-11 h-11 rounded-lg bg-hazmat-50 border border-hazmat-200 text-hazmat-900 flex items-center justify-center">
-            <Truck className="w-5 h-5" />
+          <div className="my-2">
+            <div className="text-xl sm:text-2xl font-bold text-slate-900 font-mono tracking-tight">{vehicle.plate_no}</div>
+            <div className="text-[11px] text-slate-500 mt-0.5 truncate">
+              Driver: <span className="font-medium text-slate-700">{vehicle.driver_name || user?.name || 'Vikram Singh'}</span>
+            </div>
+            <div className="text-[11px] text-emerald-700 mt-1 font-mono flex items-center gap-1 font-medium">
+              <Phone className="w-3 h-3 text-emerald-600 shrink-0" aria-hidden="true" />
+              <span>{vehicle.driver_phone || user?.phone_number || '+91 98111 22334'}</span>
+            </div>
           </div>
         </div>
 
         {/* Card 2: Geofence Corridor Status */}
-        <div className="bg-white rounded-lg p-4 shadow-panel border border-hazmat-200 flex items-center justify-between">
-          <div>
-            <p className="text-xs font-mono uppercase tracking-wider text-steel-500">Corridor Boundary</p>
-            <div className="flex items-center space-x-1.5 mt-1">
-              <div className={`w-2 h-2 rounded-full ${
-                deviationState.isDeviated ? 'bg-biohazard-600 animate-ping' : 'bg-forest-600'
-              }`} />
-              <p className={`text-sm font-mono font-bold ${
-                deviationState.isDeviated ? 'text-biohazard-700' : 'text-forest-700'
-              }`}>
-                {deviationState.isDeviated ? 'DEVIATION ALERT' : 'SECURE (±2.0 km)'}
-              </p>
+        <div className="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200/90 shadow-2xs flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Corridor Boundary</span>
+            <div className="p-1.5 rounded-lg bg-slate-100 text-slate-700">
+              <Navigation className="w-3.5 h-3.5" aria-hidden="true" />
             </div>
-            <p className="text-xs text-steel-500 mt-0.5 font-mono">
+          </div>
+          <div className="my-2">
+            <div className="flex items-center gap-1.5">
+              <span className={`w-2 h-2 rounded-full ${deviationState.isDeviated ? 'bg-red-500' : 'bg-emerald-500'}`} />
+              <div className={`text-base sm:text-lg font-mono font-bold ${deviationState.isDeviated ? 'text-red-700' : 'text-emerald-700'}`}>
+                {deviationState.isDeviated ? 'Deviation Alert' : 'Secure (±2.0 km)'}
+              </div>
+            </div>
+            <div className="text-[11px] text-slate-500 mt-0.5">
               {deviationState.isDeviated 
                 ? `+${deviationState.distanceKm} km off corridor` 
-                : 'AIIMS → EcoSafe Corridor'}
-            </p>
-          </div>
-          <div className={`w-11 h-11 rounded-lg flex items-center justify-center border ${
-            deviationState.isDeviated ? 'bg-biohazard-50 border-biohazard-200 text-biohazard-700' : 'bg-forest-50 border-forest-200 text-forest-800'
-          }`}>
-            <Navigation className="w-5 h-5" />
+                : 'AIIMS → EcoSafe corridor'}
+            </div>
           </div>
         </div>
 
         {/* Card 3: Active Cargo on Board */}
-        <div className="bg-white rounded-lg p-4 shadow-panel border border-hazmat-200 flex items-center justify-between">
-          <div>
-            <p className="text-xs font-mono uppercase tracking-wider text-steel-500">Cargo in Transit</p>
-            <p className="text-xl font-serif font-black text-steel-900 mt-1">
-              {batchesInTransit.length} <span className="text-xs font-normal text-steel-500 font-mono">batches</span>
-            </p>
-            <p className="text-xs text-hazmat-900 font-mono font-bold mt-0.5">
-              {totalCargoKg.toFixed(1)} kg sealed cargo
-            </p>
+        <div className="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200/90 shadow-2xs flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Cargo In Transit</span>
+            <div className="p-1.5 rounded-lg bg-slate-100 text-slate-700">
+              <Package className="w-3.5 h-3.5" aria-hidden="true" />
+            </div>
           </div>
-          <div className="w-11 h-11 rounded-lg bg-hazmat-50 border border-hazmat-200 text-hazmat-800 flex items-center justify-center">
-            <Package className="w-5 h-5" />
+          <div className="my-2">
+            <div className="text-xl sm:text-2xl font-bold font-mono text-slate-900 tabular-nums">
+              {batchesInTransit.length} <span className="text-xs font-normal text-slate-500 font-sans">batches</span>
+            </div>
+            <div className="text-[11px] text-slate-500 mt-0.5 tabular-nums">
+              <span className="font-semibold text-slate-900">{totalCargoKg.toFixed(1)} kg</span> sealed cargo
+            </div>
           </div>
         </div>
 
         {/* Card 4: Pickups Awaiting Collection */}
-        <div className="bg-white rounded-lg p-4 shadow-panel border border-hazmat-200 flex items-center justify-between">
-          <div>
-            <p className="text-xs font-mono uppercase tracking-wider text-steel-500">Assigned Pickups</p>
-            <p className="text-xl font-serif font-black text-steel-900 mt-1">
-              {batchesReadyPickup.length} <span className="text-xs font-normal text-steel-500 font-mono">at dock</span>
-            </p>
-            <p className="text-xs text-forest-800 font-mono font-semibold mt-0.5">
-              Hospital bay staging
-            </p>
+        <div className="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200/90 shadow-2xs flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Assigned Pickups</span>
+            <div className="p-1.5 rounded-lg bg-slate-100 text-slate-700">
+              <Building2 className="w-3.5 h-3.5" aria-hidden="true" />
+            </div>
           </div>
-          <div className="w-11 h-11 rounded-lg bg-hazmat-50 border border-hazmat-200 text-steel-700 flex items-center justify-center">
-            <Building2 className="w-5 h-5" />
+          <div className="my-2">
+            <div className="text-xl sm:text-2xl font-bold font-mono text-slate-900 tabular-nums">
+              {batchesReadyPickup.length} <span className="text-xs font-normal text-slate-500 font-sans">at dock</span>
+            </div>
+            <div className="text-[11px] text-slate-500 mt-0.5">
+              Hospital bay staging
+            </div>
           </div>
         </div>
       </div>
 
-      {/* SECTION 1: LIVE TRANSIT MAP VIEW */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
+      {/* SECTION 1: LIVE TRANSIT MAP VIEW (Leaflet / OpenStreetMap Preserved) */}
+      <div className="space-y-2.5">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 px-1">
           <div>
-            <h2 className="text-sm font-serif font-black text-steel-900 uppercase tracking-wide">
-              Live Vehicle Transit &amp; Geofenced Corridor
-            </h2>
-            <p className="text-xs text-steel-500">
+            <h2 className="text-sm font-bold text-slate-900">Live Vehicle Transit & Geofenced Corridor</h2>
+            <p className="text-xs text-slate-500">
               OpenStreetMap telemetry tracking with CPCB approved safe corridor boundary overlay.
             </p>
           </div>
-          <div className="flex items-center space-x-2 text-xs font-mono text-steel-500">
-            <span className="w-2 h-2 rounded-full bg-forest-600 animate-pulse"></span>
+          <div className="flex items-center gap-1.5 text-[11px] font-mono text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 self-start sm:self-auto">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span>Live GPS Telemetry Active</span>
           </div>
         </div>
-
         <LiveTransitMap
           vehicleId={vehicle.id}
           plateNo={vehicle.plate_no}
@@ -338,159 +295,175 @@ export default function TransportDashboard() {
       </div>
 
       {/* SECTION 2: ASSIGNED PICKUPS & ACTIVE TRANSIT MANIFEST */}
-      <div className="bg-white rounded-lg shadow-panel border border-hazmat-200 overflow-hidden">
-        <div className="p-4 border-b border-hazmat-200 flex flex-wrap items-center justify-between gap-3 bg-hazmat-50/50">
+      <Card>
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-border pb-3">
           <div>
-            <h2 className="font-serif font-black text-sm text-steel-900 uppercase tracking-tight">
-              Assigned Pickups &amp; Transit Manifest
-            </h2>
-            <p className="text-xs text-steel-500">
-              Select any batch to initiate the 5-step QR, PIN, Camera, and Geolocation custody verification flow.
-            </p>
+            <CardTitle className="text-sm">Assigned pickups & transit manifest</CardTitle>
+            <CardDescription className="text-xs">
+              Select any batch to initiate the 5-step QR, PIN, camera, and geolocation custody verification.
+            </CardDescription>
           </div>
 
-          <div className="flex items-center space-x-2">
-            {/* Filter Pills */}
-            <div className="flex bg-hazmat-100 p-1 rounded text-xs font-mono font-bold">
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Filter Buttons */}
+            <div className="inline-flex rounded-lg border border-border p-0.5 bg-surface-alt" role="group" aria-label="Filter batches">
               <button
+                type="button"
                 onClick={() => setFilterTab('all')}
-                className={`px-3 py-1 rounded transition ${
-                  filterTab === 'all' ? 'bg-white text-steel-900 shadow-sm border border-hazmat-200' : 'text-steel-600 hover:text-steel-900'
+                className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+                  filterTab === 'all'
+                    ? 'bg-surface text-text shadow-xs border border-border'
+                    : 'text-text-muted hover:text-text'
                 }`}
               >
                 All ({allBatches.length})
               </button>
               <button
+                type="button"
                 onClick={() => setFilterTab('pickup')}
-                className={`px-3 py-1 rounded transition ${
-                  filterTab === 'pickup' ? 'bg-white text-steel-900 shadow-sm border border-hazmat-200' : 'text-steel-600 hover:text-steel-900'
+                className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+                  filterTab === 'pickup'
+                    ? 'bg-surface text-text shadow-xs border border-border'
+                    : 'text-text-muted hover:text-text'
                 }`}
               >
-                Ready for Pickup ({batchesReadyPickup.length})
+                Ready for pickup ({batchesReadyPickup.length})
               </button>
               <button
+                type="button"
                 onClick={() => setFilterTab('transit')}
-                className={`px-3 py-1 rounded transition ${
-                  filterTab === 'transit' ? 'bg-white text-steel-900 shadow-sm border border-hazmat-200' : 'text-steel-600 hover:text-steel-900'
+                className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+                  filterTab === 'transit'
+                    ? 'bg-surface text-text shadow-xs border border-border'
+                    : 'text-text-muted hover:text-text'
                 }`}
               >
-                In Transit ({batchesInTransit.length})
+                In transit ({batchesInTransit.length})
               </button>
             </div>
 
-            <button
-              onClick={loadBatches}
-              className="p-1.5 border border-hazmat-300 rounded hover:bg-white text-steel-600 transition"
-              title="Refresh Batches"
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-            </button>
+            {/* Search Input */}
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-text-muted" aria-hidden="true" />
+              <input
+                type="search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search batch or facility..."
+                className="pl-8 pr-3 py-1.5 text-xs rounded-md border border-border bg-surface text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-ring w-44 sm:w-56"
+                aria-label="Search batch code or facility"
+              />
+            </div>
           </div>
-        </div>
+        </CardHeader>
 
-        {/* Manifest Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-hazmat-50 text-steel-600 uppercase font-mono border-b border-hazmat-200">
-              <tr>
-                <th className="py-3 px-4">Batch Code</th>
-                <th className="py-3 px-4">CPCB Category</th>
-                <th className="py-3 px-4">Origin Facility</th>
-                <th className="py-3 px-4">Destination CBWTF</th>
-                <th className="py-3 px-4">Manifest Weight</th>
-                <th className="py-3 px-4">Current Status</th>
-                <th className="py-3 px-4 text-right">Handover Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-hazmat-100">
-              {transportBatches.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="py-8 text-center text-steel-400 font-mono">
-                    No waste batches match the selected filter.
-                  </td>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="border-b border-border bg-surface-alt text-[11px] font-semibold text-text-muted uppercase tracking-wider">
+                  <th scope="col" className="py-3 px-4">Batch code</th>
+                  <th scope="col" className="py-3 px-4">CPCB category</th>
+                  <th scope="col" className="py-3 px-4">Origin facility</th>
+                  <th scope="col" className="py-3 px-4">Destination CBWTF</th>
+                  <th scope="col" className="py-3 px-4">Manifest weight</th>
+                  <th scope="col" className="py-3 px-4">Current status</th>
+                  <th scope="col" className="py-3 px-4 text-right">Handover action</th>
                 </tr>
-              ) : (
-                transportBatches.map((batch) => {
-                  const isReadyForPickup = batch.status === 'COLLECTED' || batch.status === 'GENERATED';
-                  const isInTransit = batch.status === 'IN_TRANSIT';
-                  const isReceived = batch.status === 'RECEIVED' || batch.status === 'TREATED' || batch.status === 'DISPOSED';
+              </thead>
+              <tbody className="divide-y divide-border">
+                {transportBatches.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="py-8">
+                      <EmptyState
+                        title="No waste batches found"
+                        description="No waste batches match the selected filter or search term."
+                      />
+                    </td>
+                  </tr>
+                ) : (
+                  transportBatches.map((batch) => {
+                    const isReadyForPickup = batch.status === 'COLLECTED' || batch.status === 'GENERATED';
+                    const isInTransit = batch.status === 'IN_TRANSIT';
+                    const isReceived = batch.status === 'RECEIVED' || batch.status === 'TREATED' || batch.status === 'DISPOSED';
 
-                  return (
-                    <tr key={batch.id} className="hover:bg-hazmat-50/70 transition">
-                      {/* Batch Code */}
-                      <td className="py-3.5 px-4 font-mono font-bold text-steel-900">
-                        {batch.batch_code}
-                      </td>
+                    return (
+                      <tr key={batch.id} className="hover:bg-surface-alt/70 transition-colors">
+                        {/* Batch Code */}
+                        <td className="py-3 px-4 font-mono font-bold text-text">
+                          {batch.batch_code}
+                        </td>
 
-                      {/* CPCB Category */}
-                      <td className="py-3.5 px-4">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-bold border ${getCategoryBadge(batch.cpcb_waste_category)}`}>
-                          {batch.cpcb_waste_category}
-                        </span>
-                      </td>
+                        {/* CPCB Category */}
+                        <td className="py-3 px-4">
+                          <CategoryBadge category={batch.cpcb_waste_category} />
+                        </td>
 
-                      {/* Origin Hospital */}
-                      <td className="py-3.5 px-4 text-steel-700 font-medium">
-                        <div>{batch.hospital?.name || 'AIIMS Central Hospital'}</div>
-                        <div className="text-[10px] text-steel-400 font-mono">{batch.generating_department}</div>
-                      </td>
+                        {/* Origin Hospital */}
+                        <td className="py-3 px-4 text-text">
+                          <div className="font-medium">{batch.hospital?.name || 'AIIMS Central Hospital'}</div>
+                          <div className="text-[10px] text-text-muted">{batch.generating_department}</div>
+                        </td>
 
-                      {/* Destination CBWTF */}
-                      <td className="py-3.5 px-4 text-steel-700">
-                        {batch.assigned_cbwtf?.name || 'EcoSafe Waste Handlers CBWTF'}
-                      </td>
+                        {/* Destination CBWTF */}
+                        <td className="py-3 px-4 text-text-muted">
+                          {batch.assigned_cbwtf?.name || 'EcoSafe Waste Handlers CBWTF'}
+                        </td>
 
-                      {/* Weight */}
-                      <td className="py-3.5 px-4 font-mono font-bold text-steel-800">
-                        {batch.quantity_kg} kg
-                      </td>
+                        {/* Weight */}
+                        <td className="py-3 px-4 font-semibold text-text tabular-nums">
+                          {batch.quantity_kg} kg
+                        </td>
 
-                      {/* Status */}
-                      <td className="py-3.5 px-4">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-bold border ${getStatusBadge(batch.status)}`}>
-                          {batch.status}
-                        </span>
-                      </td>
+                        {/* Status */}
+                        <td className="py-3 px-4">
+                          <StatusPill status={batch.status} />
+                        </td>
 
-                      {/* Handover Action */}
-                      <td className="py-3.5 px-4 text-right">
-                        {isReadyForPickup && (
-                          <button
-                            onClick={() => handleStartHandover(batch, 'TRANSPORT_PICKUP')}
-                            className="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-hazmat-900 hover:bg-black text-white text-xs font-mono font-bold rounded shadow-sm transition"
-                          >
-                            <QrCode className="w-3.5 h-3.5" />
-                            <span>Verify Pickup</span>
-                          </button>
-                        )}
+                        {/* Handover Action */}
+                        <td className="py-3 px-4 text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            {isReadyForPickup && (
+                              <Button
+                                variant="primary"
+                                size="sm"
+                                onClick={() => handleStartHandover(batch, 'TRANSPORT_PICKUP')}
+                                icon={QrCode}
+                              >
+                                Verify pickup
+                              </Button>
+                            )}
 
-                        {isInTransit && (
-                          <button
-                            onClick={() => handleStartHandover(batch, 'TRANSPORT_DROPOFF')}
-                            className="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-forest-700 hover:bg-forest-800 text-white text-xs font-mono font-bold rounded shadow-sm transition"
-                          >
-                            <CheckCircle2 className="w-3.5 h-3.5" />
-                            <span>Verify Drop-off</span>
-                          </button>
-                        )}
+                            {isInTransit && (
+                              <Button
+                                variant="primary"
+                                size="sm"
+                                onClick={() => handleStartHandover(batch, 'TRANSPORT_DROPOFF')}
+                                icon={CheckCircle2}
+                              >
+                                Verify drop-off
+                              </Button>
+                            )}
 
-                        {isReceived && (
-                          <span className="inline-flex items-center text-xs font-mono text-forest-700 font-semibold space-x-1">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-forest-600" />
-                            <span>Delivered to CBWTF</span>
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                            {isReceived && (
+                              <span className="inline-flex items-center text-xs text-success font-medium gap-1">
+                                <CheckCircle2 className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                                <span>Delivered</span>
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* Handover Verification Modal Wizard */}
+      {/* Handover Verification Modal Wizard (Fully Preserved) */}
       {selectedBatchForHandover && (
         <HandoverVerificationModal
           batch={selectedBatchForHandover}

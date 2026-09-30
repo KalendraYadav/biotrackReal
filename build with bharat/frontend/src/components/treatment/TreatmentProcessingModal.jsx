@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   X, 
   Flame, 
@@ -88,6 +88,16 @@ export default function TreatmentProcessingModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        onClose?.();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   const handleSubmitTreatment = async () => {
     setLoading(true);
     setError(null);
@@ -135,7 +145,12 @@ export default function TreatmentProcessingModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-steel-950/70 backdrop-blur-sm animate-fade-in font-sans">
-      <div className="bg-white w-full max-w-xl rounded-lg shadow-modal border border-hazmat-300 overflow-hidden flex flex-col max-h-[90vh]">
+      <div 
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="treatment-modal-title"
+        className="bg-white w-full max-w-xl rounded-lg shadow-modal border border-hazmat-300 overflow-hidden flex flex-col max-h-[90vh]"
+      >
         {/* Header */}
         <div className="px-6 py-4 bg-steel-900 text-cream-50 flex items-center justify-between border-b border-steel-700">
           <div className="flex items-center space-x-3">
@@ -143,7 +158,7 @@ export default function TreatmentProcessingModal({
               <Flame className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-serif font-bold text-base text-cream-50">Execute Biomedical Waste Treatment</h3>
+              <h3 id="treatment-modal-title" className="font-serif font-bold text-base text-cream-50">Execute Biomedical Waste Treatment</h3>
               <p className="text-xs font-mono text-steel-400">
                 Batch: <span className="font-bold text-hazmat-400">{batch?.batch_code}</span> &bull; {batch?.cpcb_waste_category} Category
               </p>

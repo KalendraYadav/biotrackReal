@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth, DEMO_ROLES_LIST } from '../context/AuthContext';
+import { Button } from '../components/ui/Button';
+import { Input } from '../components/ui/Input';
 import { 
   ShieldCheck, 
   Building2, 
@@ -13,9 +15,8 @@ import {
   ArrowRight, 
   CheckCircle2, 
   AlertCircle,
-  Eye,
-  EyeOff,
-  Radio
+  Radio,
+  Zap
 } from 'lucide-react';
 
 const ROLE_ICONS = {
@@ -33,7 +34,6 @@ export default function Login() {
 
   const [email, setEmail] = useState('hospital@demo.com');
   const [password, setPassword] = useState('password123');
-  const [showPassword, setShowPassword] = useState(false);
   const [selectedRole, setSelectedRole] = useState('HOSPITAL_AUTHORITY');
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -78,45 +78,54 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-steel-950 flex flex-col justify-center py-10 sm:px-6 lg:px-8 font-sans">
-      <div className="sm:mx-auto sm:w-full sm:max-w-4xl px-4">
+    <div className="min-h-screen bg-[#0B132B] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans relative overflow-hidden">
+      {/* Subtle ambient gradient aura */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="sm:mx-auto sm:w-full sm:max-w-4xl relative z-10">
         {/* Brand Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-lg bg-steel-900 border border-steel-800 mb-3">
-            <ShieldCheck className="w-8 h-8 text-biohazard-500" />
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 mb-3.5 shadow-lg shadow-emerald-950/50">
+            <ShieldCheck className="w-8 h-8 text-emerald-400" aria-hidden="true" />
           </div>
-          <div className="flex items-center justify-center space-x-2.5 mb-2">
-            <h1 className="text-3xl font-serif font-bold text-cream-50 tracking-wide">BioTrace</h1>
-            <span className="px-2.5 py-0.5 rounded text-xs font-mono font-bold uppercase tracking-wider bg-biohazard-700 text-white border border-biohazard-600">
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">BioTrace</h1>
+            <span className="px-2.5 py-0.5 rounded-md text-xs font-mono font-bold uppercase tracking-wider bg-emerald-950 text-emerald-300 border border-emerald-700/60 shadow-xs">
               NidusClean
             </span>
           </div>
-          <p className="text-xs text-cream-200/80 font-mono max-w-lg mx-auto uppercase tracking-wide">
-            Biomedical Waste Digital Chain-of-Custody &amp; Real-Time Compliance Platform
+          <p className="text-xs sm:text-sm text-slate-300 font-mono max-w-xl mx-auto uppercase tracking-wide">
+            Biomedical Waste Digital Chain of Custody &amp; Real-Time Statutory Monitoring
           </p>
-          <div className="flex items-center justify-center gap-2 mt-2 text-xs text-cream-400/70 font-mono">
+          <div className="flex items-center justify-center gap-2.5 mt-2.5 text-xs text-slate-400 font-mono">
             <span>CPCB Rule 2016 Compliant</span>
-            <span>&bull;</span>
-            <span>Server-Side RBAC Enforced</span>
+            <span className="text-slate-600" aria-hidden="true">&bull;</span>
+            <span>Server-Side PostGIS &amp; RBAC Enforced</span>
           </div>
         </div>
 
-        {/* Main Authentication Container - Single elevated card with shadow-modal */}
-        <div className="bg-white rounded-lg shadow-modal border-2 border-steel-800 overflow-hidden">
-          {/* Demo Role Selector Bar */}
-          <div className="bg-cream-50 border-b border-steel-200 p-4 sm:p-5">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center space-x-2">
-                <Radio className="w-4 h-4 text-biohazard-700" />
-                <h2 className="text-xs font-serif font-bold uppercase tracking-wider text-steel-900">
-                  Quick Duty Role Selector (1-Click Terminal Access)
+        {/* Main Authentication Card */}
+        <div className="bg-white rounded-2xl border border-slate-700/80 overflow-hidden shadow-2xl">
+          {/* Demo Role Selector Section (3x2 Grid - Zero Truncation) */}
+          <div className="bg-slate-50/90 border-b border-slate-200/90 p-5 sm:p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 mb-4">
+              <div className="flex items-center gap-2">
+                <Radio className="w-4 h-4 text-emerald-600" aria-hidden="true" />
+                <h2 className="text-xs font-bold uppercase tracking-wider text-slate-900">
+                  Duty Role Terminal Access
                 </h2>
               </div>
-              <span className="text-[11px] text-steel-500 font-mono">All demo passwords: password123</span>
+              <span className="text-xs text-slate-500 font-mono">
+                Select role for instant evaluation (demo password: <span className="font-semibold text-slate-700">password123</span>)
+              </span>
             </div>
 
-            {/* 6 Role Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+            {/* 6 Role Cards in 2x3 Grid */}
+            <div 
+              role="radiogroup" 
+              aria-label="Select demo duty role"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
+            >
               {DEMO_ROLES_LIST.map((demo) => {
                 const Icon = ROLE_ICONS[demo.role] || ShieldCheck;
                 const isSelected = selectedRole === demo.role;
@@ -125,136 +134,123 @@ export default function Login() {
                   <button
                     key={demo.role}
                     type="button"
+                    role="radio"
+                    aria-checked={isSelected}
                     onClick={() => handleSelectRole(demo)}
                     onDoubleClick={() => handleInstantDemoLogin(demo)}
-                    className={`p-2.5 rounded text-left transition-all border flex flex-col justify-between relative ${
+                    className={`p-3.5 rounded-xl text-left transition-all border flex items-start justify-between relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 ${
                       isSelected
-                        ? 'bg-white border-steel-900 ring-2 ring-steel-900/20'
-                        : 'bg-white/80 hover:bg-white border-steel-200 hover:border-steel-400'
+                        ? 'bg-emerald-50/70 border-emerald-600 ring-2 ring-emerald-500/20 shadow-xs'
+                        : 'bg-white hover:bg-slate-100/80 border-slate-200 shadow-2xs'
                     }`}
                   >
-                    <div>
-                      <div className="flex items-center justify-between mb-1.5">
-                        <div 
-                          className="w-7 h-7 rounded flex items-center justify-center text-white"
-                          style={{ backgroundColor: demo.accentColor }}
-                        >
-                          <Icon className="w-4 h-4" />
+                    <div className="flex items-start gap-3 min-w-0">
+                      <div 
+                        className="w-9 h-9 rounded-lg flex items-center justify-center text-white shrink-0 shadow-xs"
+                        style={{ backgroundColor: demo.accentColor }}
+                        aria-hidden="true"
+                      >
+                        <Icon className="w-4 h-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="font-bold text-xs text-slate-900 leading-snug">
+                          {demo.title}
                         </div>
-                        {isSelected && (
-                          <CheckCircle2 className="w-4 h-4 text-forest-800" />
-                        )}
-                      </div>
-                      <div className="font-serif font-bold text-xs text-steel-900 leading-snug line-clamp-1">
-                        {demo.title}
-                      </div>
-                      <div className="text-[11px] text-steel-500 font-mono truncate mt-0.5">
-                        {demo.name}
+                        <div className="text-[11px] text-slate-600 truncate mt-0.5 font-medium">
+                          {demo.name}
+                        </div>
+                        <div className="text-[10px] text-slate-400 font-mono truncate mt-0.5">
+                          {demo.facility}
+                        </div>
                       </div>
                     </div>
+                    {isSelected ? (
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 ml-2 mt-0.5" aria-hidden="true" />
+                    ) : (
+                      <span className="w-2 h-2 rounded-full bg-slate-200 shrink-0 ml-2 mt-1.5" />
+                    )}
                   </button>
                 );
               })}
             </div>
           </div>
 
-          {/* Form Area */}
+          {/* Form & Actions Area */}
           <div className="p-6 sm:p-8 bg-white">
             {(errorMessage || authError) && (
-              <div className="mb-6 rounded bg-biohazard-50 border border-biohazard-300 p-4 text-sm text-biohazard-950 flex items-start space-x-3">
-                <AlertCircle className="w-5 h-5 text-biohazard-700 flex-shrink-0 mt-0.5" />
+              <div 
+                role="alert"
+                className="mb-6 rounded-xl bg-rose-50 border border-rose-300 p-4 text-sm text-rose-950 flex items-start gap-3"
+              >
+                <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" aria-hidden="true" />
                 <div>
-                  <div className="font-serif font-bold">Authentication Refused</div>
-                  <div className="text-xs text-biohazard-900 mt-0.5 font-mono">{errorMessage || authError}</div>
+                  <div className="font-bold">Authentication failed</div>
+                  <div className="text-xs text-rose-800 mt-0.5">{errorMessage || authError}</div>
                 </div>
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 {/* Email Field */}
-                <div>
-                  <label className="block text-xs font-bold text-steel-800 uppercase tracking-wider mb-1.5">
-                    Official Registered Email
-                  </label>
-                  <div className="relative rounded">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Mail className="w-4 h-4 text-steel-400" />
-                    </div>
-                    <input
-                      type="email"
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="e.g. hospital@demo.com"
-                      className="block w-full pl-10 pr-3 py-2.5 border border-steel-300 rounded text-sm text-steel-900 placeholder-steel-400 focus:outline-none focus:border-steel-900 font-sans"
-                    />
-                  </div>
-                </div>
+                <Input
+                  id="login-email"
+                  label="Official Registered Email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="e.g. hospital@demo.com"
+                  leftIcon={Mail}
+                />
 
                 {/* Password Field */}
-                <div>
-                  <label className="block text-xs font-bold text-steel-800 uppercase tracking-wider mb-1.5">
-                    Access Password
-                  </label>
-                  <div className="relative rounded">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Lock className="w-4 h-4 text-steel-400" />
-                    </div>
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      required
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Enter password"
-                      className="block w-full pl-10 pr-10 py-2.5 border border-steel-300 rounded text-sm text-steel-900 placeholder-steel-400 focus:outline-none focus:border-steel-900 font-sans"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-steel-400 hover:text-steel-600"
-                    >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                </div>
+                <Input
+                  id="login-password"
+                  label="Access Password"
+                  type="password"
+                  required
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter password"
+                  leftIcon={Lock}
+                />
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row items-center justify-between pt-3 gap-3 border-t border-steel-100">
-                <div className="text-xs text-steel-600 flex items-center font-mono">
-                  <span>Selected Authority:</span>
-                  <span className="ml-1.5 font-bold text-steel-950 font-serif">
+              {/* Action Toolbar */}
+              <div className="flex flex-col sm:flex-row items-center justify-between pt-4 gap-3 border-t border-slate-100">
+                <div className="text-xs text-slate-500 flex items-center gap-1.5 self-start sm:self-center">
+                  <span>Selected authority:</span>
+                  <span className="font-bold text-slate-900 bg-slate-100 px-2.5 py-0.5 rounded-md border border-slate-200">
                     {DEMO_ROLES_LIST.find(d => d.role === selectedRole)?.title || selectedRole}
                   </span>
                 </div>
 
-                <div className="flex items-center space-x-3 w-full sm:w-auto">
-                  <button
+                <div className="flex items-center gap-3 w-full sm:w-auto">
+                  <Button
                     type="button"
+                    variant="secondary"
+                    size="md"
                     onClick={() => handleInstantDemoLogin(DEMO_ROLES_LIST.find(d => d.role === selectedRole) || DEMO_ROLES_LIST[0])}
                     disabled={submitting}
-                    className="flex-1 sm:flex-initial px-4 py-2.5 rounded border border-steel-300 bg-cream-50 hover:bg-cream-100 text-steel-800 text-xs font-bold transition-colors disabled:opacity-50"
+                    icon={Zap}
+                    className="flex-1 sm:flex-initial"
                   >
-                    1-Click Terminal Access
-                  </button>
+                    1-Click Demo Login
+                  </Button>
 
-                  <button
+                  <Button
                     type="submit"
-                    disabled={submitting}
-                    className="flex-1 sm:flex-initial inline-flex items-center justify-center px-6 py-2.5 rounded bg-forest-800 hover:bg-forest-900 text-cream-50 text-xs font-bold tracking-wider uppercase border border-forest-900 transition-colors disabled:opacity-50"
+                    variant="primary"
+                    size="md"
+                    isLoading={submitting}
+                    icon={ArrowRight}
+                    className="flex-1 sm:flex-initial"
                   >
-                    {submitting ? (
-                      <span className="flex items-center">
-                        <div className="w-3.5 h-3.5 border-2 border-cream-50 border-t-transparent rounded-full animate-spin mr-2"></div>
-                        Authenticating...
-                      </span>
-                    ) : (
-                      <span className="flex items-center">
-                        Authenticate &amp; Enter <ArrowRight className="w-4 h-4 ml-1.5" />
-                      </span>
-                    )}
-                  </button>
+                    Authenticate &amp; Enter
+                  </Button>
                 </div>
               </div>
             </form>
@@ -262,18 +258,14 @@ export default function Login() {
         </div>
 
         {/* Security & Compliance Footer Note */}
-        <div className="mt-6 text-center space-y-2">
-          <p className="text-xs text-cream-300/60 font-mono">
+        <div className="mt-8 text-center space-y-2">
+          <p className="text-xs text-slate-400 font-mono">
             Protected by BioTrace JWT &amp; Bcrypt Authentication &bull; Monitored by Real-Time Statutory Risk Engine
           </p>
-          <div className="flex items-center justify-center space-x-4 text-xs text-cream-400/80 font-mono">
-            <a href="#terms" onClick={(e) => e.preventDefault()} className="hover:text-cream-200 underline">
-              CPCB Compliance Terms of Service
-            </a>
-            <span>&bull;</span>
-            <a href="#privacy" onClick={(e) => e.preventDefault()} className="hover:text-cream-200 underline">
-              Statutory Data Privacy Policy
-            </a>
+          <div className="flex items-center justify-center gap-4 text-xs text-slate-400 font-mono">
+            <span className="text-slate-500">CPCB Compliance Terms of Service</span>
+            <span aria-hidden="true">&bull;</span>
+            <span className="text-slate-500">Statutory Data Privacy Policy</span>
           </div>
         </div>
       </div>

@@ -7,19 +7,19 @@ import {
   Flame, 
   Scale, 
   CheckCircle2, 
-  Clock, 
   AlertTriangle, 
-  Layers, 
-  Building2, 
-  QrCode, 
-  ArrowRight, 
   RefreshCw, 
   FileText, 
   ShieldCheck, 
   Truck,
-  Sparkles,
-  BarChart2
+  Search
 } from 'lucide-react';
+import PageHeader from '../../components/ui/PageHeader';
+import Button from '../../components/ui/Button';
+import Badge from '../../components/ui/Badge';
+import StatusPill, { CategoryBadge } from '../../components/ui/StatusPill';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../../components/ui/Card';
+import EmptyState from '../../components/ui/EmptyState';
 
 export default function TreatmentDashboard() {
   const { user } = useAuth();
@@ -82,488 +82,492 @@ export default function TreatmentDashboard() {
     );
   };
 
-  // Category Badge Helper
-  const getCategoryBadge = (cat) => {
-    switch (cat?.toLowerCase()) {
-      case 'yellow':
-        return 'bg-amber-100 text-amber-950 border-amber-300';
-      case 'red':
-        return 'bg-rose-100 text-rose-950 border-rose-300';
-      case 'white':
-        return 'bg-steel-100 text-steel-950 border-steel-300';
-      case 'blue':
-        return 'bg-sky-100 text-sky-950 border-sky-300';
-      default:
-        return 'bg-hazmat-100 text-steel-800 border-hazmat-300';
-    }
-  };
-
   return (
-    <div className="space-y-6 pb-12">
-      {/* Top Header Identity Banner */}
-      <div className="bg-white rounded-lg shadow-panel border border-hazmat-200 p-5 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center space-x-3.5">
-          <div className="w-12 h-12 rounded bg-hazmat-100 border border-hazmat-300 flex items-center justify-center text-hazmat-800">
-            <Flame className="w-6 h-6" />
-          </div>
-          <div>
-            <div className="flex items-center space-x-2">
-              <h1 className="text-xl font-serif font-black text-steel-900 tracking-tight">
-                {cbwtfFacility.name}
-              </h1>
-              <span className="text-[11px] px-2.5 py-0.5 rounded font-mono font-bold bg-hazmat-100 text-hazmat-900 border border-hazmat-300 uppercase">
-                CPCB Licensed CBWTF
-              </span>
-            </div>
-            <p className="text-xs text-steel-500 mt-0.5 font-mono">
-              Registration No: <span className="font-bold text-steel-800">{cbwtfFacility.cpcb_registration_no}</span> &bull; Weighbridge &amp; Incineration Terminal
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <button
+    <div className="space-y-6 max-w-7xl mx-auto">
+      {/* Page Header */}
+      <PageHeader
+        title={cbwtfFacility.name}
+        description={`Registration no: ${cbwtfFacility.cpcb_registration_no} • Weighbridge & Incineration Terminal`}
+        icon={Flame}
+        badge={
+          <Badge variant="primary">
+            CPCB Licensed CBWTF
+          </Badge>
+        }
+        actions={
+          <Button
+            variant="secondary"
+            size="sm"
             onClick={loadBatches}
-            className="p-2 border border-hazmat-300 rounded hover:bg-hazmat-50 text-steel-700 transition"
-            title="Refresh Manifests"
+            loading={loading}
+            icon={RefreshCw}
+            aria-label="Refresh CBWTF manifests"
           >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-          </button>
-        </div>
-      </div>
+            Refresh
+          </Button>
+        }
+      />
 
-      {/* 4 Header Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Card 1: Weighbridge Inbound Queue */}
-        <div className="bg-white rounded-lg p-4 shadow-panel border border-hazmat-200 flex items-center justify-between">
-          <div>
-            <p className="text-xs font-mono font-bold text-steel-500 uppercase tracking-wider">Inbound Queue</p>
-            <p className="text-2xl font-serif font-black text-steel-900 mt-1">
-              {incomingBatches.length} <span className="text-xs font-normal font-mono text-steel-500">batches</span>
-            </p>
-            <p className="text-xs text-steel-500 mt-0.5 font-mono">Awaiting weighbridge intake</p>
+      {/* 4 Header Stat Cards - Responsive 2x2 grid on mobile, 4-col on desktop */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        {/* Card 1: Inbound Queue */}
+        <div className="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200/90 shadow-2xs flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Inbound Queue</span>
+            <div className="p-1.5 rounded-lg bg-slate-100 text-slate-700">
+              <Truck className="w-3.5 h-3.5" aria-hidden="true" />
+            </div>
           </div>
-          <div className="w-11 h-11 rounded bg-hazmat-50 border border-hazmat-200 text-hazmat-800 flex items-center justify-center">
-            <Truck className="w-5 h-5" />
+          <div className="my-2">
+            <div className="text-xl sm:text-2xl font-bold font-mono text-slate-900 tabular-nums">
+              {incomingBatches.length} <span className="text-xs font-normal text-slate-500 font-sans">batches</span>
+            </div>
+            <div className="text-[11px] text-slate-500 mt-0.5">Awaiting weighbridge intake</div>
           </div>
         </div>
 
         {/* Card 2: Treatment Bay Holding */}
-        <div className="bg-white rounded-lg p-4 shadow-panel border border-hazmat-200 flex items-center justify-between">
-          <div>
-            <p className="text-xs font-mono font-bold text-steel-500 uppercase tracking-wider">Treatment Bay</p>
-            <p className="text-2xl font-serif font-black text-steel-900 mt-1">
-              {receivedBatches.length} <span className="text-xs font-normal font-mono text-steel-500">staged</span>
-            </p>
-            <p className="text-xs text-steel-500 mt-0.5 font-mono">Autoclave / Incineration yard</p>
+        <div className="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200/90 shadow-2xs flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Treatment Bay</span>
+            <div className="p-1.5 rounded-lg bg-amber-50 text-amber-700">
+              <Flame className="w-3.5 h-3.5" aria-hidden="true" />
+            </div>
           </div>
-          <div className="w-11 h-11 rounded bg-forest-50 border border-forest-200 text-forest-800 flex items-center justify-center">
-            <Flame className="w-5 h-5" />
+          <div className="my-2">
+            <div className="text-xl sm:text-2xl font-bold font-mono text-slate-900 tabular-nums">
+              {receivedBatches.length} <span className="text-xs font-normal text-slate-500 font-sans">staged</span>
+            </div>
+            <div className="text-[11px] text-slate-500 mt-0.5">Autoclave & incineration yard</div>
           </div>
         </div>
 
         {/* Card 3: Ready for Disposal */}
-        <div className="bg-white rounded-lg p-4 shadow-panel border border-hazmat-200 flex items-center justify-between">
-          <div>
-            <p className="text-xs font-mono font-bold text-steel-500 uppercase tracking-wider">Disposal Pending</p>
-            <p className="text-2xl font-serif font-black text-steel-900 mt-1">
-              {treatedBatches.length} <span className="text-xs font-normal font-mono text-steel-500">treated</span>
-            </p>
-            <p className="text-xs text-steel-500 mt-0.5 font-mono">Ready for TSDF sign-off</p>
+        <div className="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200/90 shadow-2xs flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Disposal Pending</span>
+            <div className="p-1.5 rounded-lg bg-slate-100 text-slate-700">
+              <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" />
+            </div>
           </div>
-          <div className="w-11 h-11 rounded bg-steel-100 border border-steel-300 text-steel-800 flex items-center justify-center">
-            <ShieldCheck className="w-5 h-5" />
+          <div className="my-2">
+            <div className="text-xl sm:text-2xl font-bold font-mono text-slate-900 tabular-nums">
+              {treatedBatches.length} <span className="text-xs font-normal text-slate-500 font-sans">treated</span>
+            </div>
+            <div className="text-[11px] text-slate-500 mt-0.5">Ready for TSDF sign-off</div>
           </div>
         </div>
 
         {/* Card 4: Weight Reconciliation Rate */}
-        <div className="bg-white rounded-lg p-4 shadow-panel border border-hazmat-200 flex items-center justify-between">
-          <div>
-            <p className="text-xs font-mono font-bold text-steel-500 uppercase tracking-wider">Reconciliation Rate</p>
-            <p className="text-2xl font-serif font-black text-forest-800 mt-1">99.2%</p>
-            <p className="text-xs text-steel-500 mt-0.5 font-mono">CPCB Rule 12 Compliant</p>
+        <div className="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200/90 shadow-2xs flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Reconciliation</span>
+            <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700">
+              <Scale className="w-3.5 h-3.5" aria-hidden="true" />
+            </div>
           </div>
-          <div className="w-11 h-11 rounded bg-forest-50 border border-forest-200 text-forest-800 flex items-center justify-center">
-            <Scale className="w-5 h-5" />
+          <div className="my-2">
+            <div className="text-xl sm:text-2xl font-bold font-mono text-emerald-700 tabular-nums">99.2%</div>
+            <div className="text-[11px] text-emerald-700 font-medium mt-0.5">CPCB Rule 12 compliant</div>
           </div>
         </div>
       </div>
 
-      {/* Main Tabs Navigation */}
-      <div className="bg-white rounded-lg shadow-panel border border-hazmat-200 overflow-hidden">
-        <div className="p-3.5 border-b border-hazmat-200 flex flex-wrap items-center justify-between gap-3 bg-hazmat-50/70">
-          <div className="flex flex-wrap bg-hazmat-200/70 p-1 rounded font-mono text-xs">
+      {/* Main Tabs Navigation & Data Workspace */}
+      <div className="bg-white rounded-xl border border-slate-200/90 shadow-2xs overflow-hidden">
+        <div className="p-3 sm:p-3.5 border-b border-slate-200/80 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-slate-50/40">
+          <div className="inline-flex flex-wrap rounded-lg border border-slate-200 p-0.5 bg-slate-100/70" role="tablist" aria-label="CBWTF stage queues">
             <button
+              role="tab"
+              aria-selected={activeTab === 'weighbridge'}
               onClick={() => setActiveTab('weighbridge')}
-              className={`px-3.5 py-1.5 rounded transition font-bold ${
-                activeTab === 'weighbridge' ? 'bg-white text-steel-900 shadow-sm border border-hazmat-300' : 'text-steel-600 hover:text-steel-900'
+              className={`px-3 py-1.5 rounded-md transition-colors text-xs font-medium ${
+                activeTab === 'weighbridge'
+                  ? 'bg-white text-slate-900 shadow-xs font-semibold'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               1. Weighbridge Intake ({incomingBatches.length})
             </button>
             <button
+              role="tab"
+              aria-selected={activeTab === 'treatment'}
               onClick={() => setActiveTab('treatment')}
-              className={`px-3.5 py-1.5 rounded transition font-bold ${
-                activeTab === 'treatment' ? 'bg-white text-steel-900 shadow-sm border border-hazmat-300' : 'text-steel-600 hover:text-steel-900'
+              className={`px-3 py-1.5 rounded-md transition-colors text-xs font-medium ${
+                activeTab === 'treatment'
+                  ? 'bg-white text-slate-900 shadow-xs font-semibold'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               2. Treatment Bay ({receivedBatches.length})
             </button>
             <button
+              role="tab"
+              aria-selected={activeTab === 'disposal'}
               onClick={() => setActiveTab('disposal')}
-              className={`px-3.5 py-1.5 rounded transition font-bold ${
-                activeTab === 'disposal' ? 'bg-white text-steel-900 shadow-sm border border-hazmat-300' : 'text-steel-600 hover:text-steel-900'
+              className={`px-3 py-1.5 rounded-md transition-colors text-xs font-medium ${
+                activeTab === 'disposal'
+                  ? 'bg-white text-slate-900 shadow-xs font-semibold'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              3. Disposal &amp; Certificates ({treatedBatches.length + disposedBatches.length})
+              3. Disposal & Certs ({treatedBatches.length + disposedBatches.length})
             </button>
             <button
+              role="tab"
+              aria-selected={activeTab === 'ledger'}
               onClick={() => setActiveTab('ledger')}
-              className={`px-3.5 py-1.5 rounded transition font-bold ${
-                activeTab === 'ledger' ? 'bg-white text-steel-900 shadow-sm border border-hazmat-300' : 'text-steel-600 hover:text-steel-900'
+              className={`px-3 py-1.5 rounded-md transition-colors text-xs font-medium ${
+                activeTab === 'ledger'
+                  ? 'bg-white text-slate-900 shadow-xs font-semibold'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              4. Weight Reconciliation Ledger
+              4. Weight Ledger
             </button>
           </div>
 
-          <div className="w-full sm:w-64">
+          <div className="relative w-full sm:w-64">
+            <Search className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-slate-400" aria-hidden="true" />
             <input
-              type="text"
+              type="search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search batch code or category..."
-              className="w-full px-3 py-1.5 bg-white border border-hazmat-300 rounded text-xs font-mono focus:outline-none focus:ring-2 focus:ring-hazmat-500"
+              className="w-full pl-8 pr-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-600/40 focus:border-emerald-600"
+              aria-label="Search CBWTF batches"
             />
           </div>
         </div>
 
-        {/* TAB 1: WEIGHBRIDGE INTAKE QUEUE */}
-        {activeTab === 'weighbridge' && (
-          <div className="overflow-x-auto">
-            <div className="p-3 bg-hazmat-50 border-b border-hazmat-200 flex items-center justify-between text-xs font-mono text-steel-800">
-              <div className="flex items-center space-x-2">
-                <Truck className="w-4 h-4 text-hazmat-800 flex-shrink-0" />
-                <span>
-                  <strong>Gate Arrival Queue: </strong>
-                  Transport vehicles arriving from hospitals. Perform gross weighbridge check-in and scan bag tags to record receipt.
-                </span>
+        <div>
+          {/* TAB 1: WEIGHBRIDGE INTAKE QUEUE */}
+          {activeTab === 'weighbridge' && (
+            <div className="overflow-x-auto">
+              <div className="p-3 bg-surface-alt border-b border-border flex items-center justify-between text-xs text-text-muted">
+                <div className="flex items-center gap-2">
+                  <Truck className="w-4 h-4 text-primary shrink-0" aria-hidden="true" />
+                  <span>
+                    <strong className="text-text">Gate arrival queue: </strong>
+                    Transport vehicles arriving from hospitals. Perform gross weighbridge check-in and scan bag tags to record receipt.
+                  </span>
+                </div>
+                <span className="font-semibold text-text tabular-nums">{incomingBatches.length} batches in transit</span>
               </div>
-              <span className="font-bold">{incomingBatches.length} Batches in transit</span>
-            </div>
 
-            <table className="w-full text-left text-xs font-mono">
-              <thead className="bg-hazmat-100 text-steel-700 uppercase font-bold border-b border-hazmat-300">
-                <tr>
-                  <th className="py-2.5 px-4">Batch Code</th>
-                  <th className="py-2.5 px-4">CPCB Category</th>
-                  <th className="py-2.5 px-4">Generating Hospital</th>
-                  <th className="py-2.5 px-4">Manifest Weight</th>
-                  <th className="py-2.5 px-4">Transit Status</th>
-                  <th className="py-2.5 px-4 text-right">Weighbridge Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-hazmat-200">
-                {filterList(incomingBatches).length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="py-8 text-center text-steel-400">
-                      No arriving batches currently in transit. All gate intakes are cleared.
-                    </td>
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="bg-surface-alt text-text-muted uppercase text-[11px] font-semibold border-b border-border">
+                    <th scope="col" className="py-2.5 px-4">Batch code</th>
+                    <th scope="col" className="py-2.5 px-4">CPCB category</th>
+                    <th scope="col" className="py-2.5 px-4">Generating hospital</th>
+                    <th scope="col" className="py-2.5 px-4">Manifest weight</th>
+                    <th scope="col" className="py-2.5 px-4">Transit status</th>
+                    <th scope="col" className="py-2.5 px-4 text-right">Weighbridge action</th>
                   </tr>
-                ) : (
-                  filterList(incomingBatches).map((batch) => (
-                    <tr key={batch.id} className="hover:bg-hazmat-50/70 transition">
-                      <td className="py-3 px-4 font-bold text-steel-900">
-                        {batch.batch_code}
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-bold border ${getCategoryBadge(batch.cpcb_waste_category)}`}>
-                          {batch.cpcb_waste_category}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 text-steel-800 font-sans font-medium">
-                        {batch.hospital?.name || 'AIIMS Central Hospital'}
-                      </td>
-                      <td className="py-3 px-4 font-bold text-steel-900">
-                        {batch.quantity_kg} kg
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-hazmat-100 text-hazmat-900 border border-hazmat-300">
-                          IN_TRANSIT
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 text-right">
-                        <button
-                          onClick={() => setSelectedBatchForIntake(batch)}
-                          className="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-hazmat-900 hover:bg-black text-white text-xs font-bold rounded shadow-sm transition"
-                        >
-                          <Scale className="w-3.5 h-3.5" />
-                          <span>Weigh &amp; Check-In</span>
-                        </button>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {filterList(incomingBatches).length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="py-8">
+                        <EmptyState
+                          title="No arriving batches in transit"
+                          description="All gate intakes are currently cleared and verified."
+                        />
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {/* TAB 2: TREATMENT PROCESSING BAY */}
-        {activeTab === 'treatment' && (
-          <div className="overflow-x-auto">
-            <div className="p-3 bg-forest-50/60 border-b border-forest-200 flex items-center justify-between text-xs font-mono text-forest-900">
-              <div className="flex items-center space-x-2">
-                <Flame className="w-4 h-4 text-forest-800 flex-shrink-0" />
-                <span>
-                  <strong>Active Treatment Staging Yard: </strong>
-                  Batches safely received and weighed. Select batch to execute category-mandated incineration or autoclaving cycle.
-                </span>
-              </div>
-              <span className="font-bold">{receivedBatches.length} Batches ready</span>
-            </div>
-
-            <table className="w-full text-left text-xs font-mono">
-              <thead className="bg-hazmat-100 text-steel-700 uppercase font-bold border-b border-hazmat-300">
-                <tr>
-                  <th className="py-2.5 px-4">Batch Code</th>
-                  <th className="py-2.5 px-4">Category &amp; Waste Type</th>
-                  <th className="py-2.5 px-4">Received Weight</th>
-                  <th className="py-2.5 px-4">Recommended Treatment</th>
-                  <th className="py-2.5 px-4">Holding Status</th>
-                  <th className="py-2.5 px-4 text-right">Treatment Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-hazmat-200">
-                {filterList(receivedBatches).length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="py-8 text-center text-steel-400">
-                      No batches awaiting treatment in holding yard.
-                    </td>
-                  </tr>
-                ) : (
-                  filterList(receivedBatches).map((batch) => {
-                    const isYellow = batch.cpcb_waste_category === 'Yellow';
-                    const treatmentRec = isYellow ? 'Incineration (1050°C)' : 'Autoclave + Shredder';
-
-                    return (
-                      <tr key={batch.id} className="hover:bg-hazmat-50/70 transition">
-                        <td className="py-3 px-4 font-bold text-steel-900">
+                  ) : (
+                    filterList(incomingBatches).map((batch) => (
+                      <tr key={batch.id} className="hover:bg-surface-alt/70 transition-colors">
+                        <td className="py-3 px-4 font-mono font-bold text-text">
                           {batch.batch_code}
                         </td>
                         <td className="py-3 px-4">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-bold border mr-2 ${getCategoryBadge(batch.cpcb_waste_category)}`}>
-                            {batch.cpcb_waste_category}
-                          </span>
-                          <span className="text-steel-600 font-sans">{batch.cpcb_waste_type}</span>
+                          <CategoryBadge category={batch.cpcb_waste_category} />
                         </td>
-                        <td className="py-3 px-4 font-bold text-steel-900">
-                          {batch.quantity_kg} kg
-                        </td>
-                        <td className="py-3 px-4 font-sans font-medium text-steel-800">
-                          {treatmentRec}
-                        </td>
-                        <td className="py-3 px-4">
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-forest-100 text-forest-900 border border-forest-300">
-                            RECEIVED
-                          </span>
-                        </td>
-                        <td className="py-3 px-4 text-right">
-                          <button
-                            onClick={() => setSelectedBatchForTreatment(batch)}
-                            className="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-forest-700 hover:bg-forest-800 text-white text-xs font-bold rounded shadow-sm transition"
-                          >
-                            <Flame className="w-3.5 h-3.5" />
-                            <span>Process Treatment</span>
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {/* TAB 3: DISPOSAL & AUDIT CERTIFICATES */}
-        {activeTab === 'disposal' && (
-          <div className="overflow-x-auto">
-            <div className="p-3 bg-steel-100 border-b border-steel-300 flex items-center justify-between text-xs font-mono text-steel-900">
-              <div className="flex items-center space-x-2">
-                <ShieldCheck className="w-4 h-4 text-steel-700 flex-shrink-0" />
-                <span>
-                  <strong>Final Disposal Sign-Off &amp; CPCB Certificates: </strong>
-                  Authorize final hazardous landfill / recycling disposition and generate tamper-proof Form IV records.
-                </span>
-              </div>
-              <span className="font-bold">{treatedBatches.length} Pending &bull; {disposedBatches.length} Archived</span>
-            </div>
-
-            <table className="w-full text-left text-xs font-mono">
-              <thead className="bg-hazmat-100 text-steel-700 uppercase font-bold border-b border-hazmat-300">
-                <tr>
-                  <th className="py-2.5 px-4">Batch Code</th>
-                  <th className="py-2.5 px-4">Category</th>
-                  <th className="py-2.5 px-4">Origin Hospital</th>
-                  <th className="py-2.5 px-4">Treated Weight</th>
-                  <th className="py-2.5 px-4">Lifecycle State</th>
-                  <th className="py-2.5 px-4 text-right">Disposal Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-hazmat-200">
-                {[...treatedBatches, ...disposedBatches].length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="py-8 text-center text-steel-400">
-                      No treated batches ready for disposal.
-                    </td>
-                  </tr>
-                ) : (
-                  filterList([...treatedBatches, ...disposedBatches]).map((batch) => {
-                    const isTreated = batch.status === 'TREATED';
-                    const isDisposed = batch.status === 'DISPOSED';
-
-                    return (
-                      <tr key={batch.id} className="hover:bg-hazmat-50/70 transition">
-                        <td className="py-3 px-4 font-bold text-steel-900">
-                          {batch.batch_code}
-                        </td>
-                        <td className="py-3 px-4">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-bold border ${getCategoryBadge(batch.cpcb_waste_category)}`}>
-                            {batch.cpcb_waste_category}
-                          </span>
-                        </td>
-                        <td className="py-3 px-4 text-steel-800 font-sans font-medium">
+                        <td className="py-3 px-4 text-text font-medium">
                           {batch.hospital?.name || 'AIIMS Central Hospital'}
                         </td>
-                        <td className="py-3 px-4 font-bold text-steel-900">
+                        <td className="py-3 px-4 font-semibold text-text tabular-nums">
                           {batch.quantity_kg} kg
                         </td>
                         <td className="py-3 px-4">
-                          {isTreated ? (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-steel-200 text-steel-900 border border-steel-300">
-                              TREATED (Pending Sign-off)
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-forest-100 text-forest-900 border border-forest-300">
-                              <CheckCircle2 className="w-3 h-3 mr-1" />
-                              DISPOSED (Form IV Issued)
-                            </span>
-                          )}
+                          <StatusPill status="IN_TRANSIT" />
                         </td>
                         <td className="py-3 px-4 text-right">
-                          {isTreated && (
-                            <button
-                              onClick={() => setSelectedBatchForDisposal(batch)}
-                              className="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-hazmat-900 hover:bg-black text-white text-xs font-bold rounded shadow-sm transition"
-                            >
-                              <ShieldCheck className="w-3.5 h-3.5" />
-                              <span>Certify Disposal</span>
-                            </button>
-                          )}
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            onClick={() => setSelectedBatchForIntake(batch)}
+                            icon={Scale}
+                          >
+                            Weigh & check-in
+                          </Button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
 
-                          {isDisposed && (
-                            <button
-                              onClick={() => setSelectedBatchForDisposal(batch)}
-                              className="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-hazmat-100 hover:bg-hazmat-200 text-steel-800 text-xs font-bold rounded border border-hazmat-300 transition"
+          {/* TAB 2: TREATMENT PROCESSING BAY */}
+          {activeTab === 'treatment' && (
+            <div className="overflow-x-auto">
+              <div className="p-3 bg-surface-alt border-b border-border flex items-center justify-between text-xs text-text-muted">
+                <div className="flex items-center gap-2">
+                  <Flame className="w-4 h-4 text-primary shrink-0" aria-hidden="true" />
+                  <span>
+                    <strong className="text-text">Active treatment staging yard: </strong>
+                    Batches safely received and weighed. Select batch to execute category-mandated incineration or autoclaving cycle.
+                  </span>
+                </div>
+                <span className="font-semibold text-text tabular-nums">{receivedBatches.length} batches ready</span>
+              </div>
+
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="bg-surface-alt text-text-muted uppercase text-[11px] font-semibold border-b border-border">
+                    <th scope="col" className="py-2.5 px-4">Batch code</th>
+                    <th scope="col" className="py-2.5 px-4">Category & waste type</th>
+                    <th scope="col" className="py-2.5 px-4">Received weight</th>
+                    <th scope="col" className="py-2.5 px-4">Recommended treatment</th>
+                    <th scope="col" className="py-2.5 px-4">Holding status</th>
+                    <th scope="col" className="py-2.5 px-4 text-right">Treatment action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {filterList(receivedBatches).length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="py-8">
+                        <EmptyState
+                          title="No batches awaiting treatment"
+                          description="The treatment staging holding yard is currently empty."
+                        />
+                      </td>
+                    </tr>
+                  ) : (
+                    filterList(receivedBatches).map((batch) => {
+                      const isYellow = batch.cpcb_waste_category === 'Yellow';
+                      const treatmentRec = isYellow ? 'Incineration (1050°C)' : 'Autoclave + Shredder';
+
+                      return (
+                        <tr key={batch.id} className="hover:bg-surface-alt/70 transition-colors">
+                          <td className="py-3 px-4 font-mono font-bold text-text">
+                            {batch.batch_code}
+                          </td>
+                          <td className="py-3 px-4">
+                            <div className="flex items-center gap-2">
+                              <CategoryBadge category={batch.cpcb_waste_category} />
+                              <span className="text-text-muted">{batch.cpcb_waste_type}</span>
+                            </div>
+                          </td>
+                          <td className="py-3 px-4 font-semibold text-text tabular-nums">
+                            {batch.quantity_kg} kg
+                          </td>
+                          <td className="py-3 px-4 text-text font-medium">
+                            {treatmentRec}
+                          </td>
+                          <td className="py-3 px-4">
+                            <StatusPill status="RECEIVED" />
+                          </td>
+                          <td className="py-3 px-4 text-right">
+                            <Button
+                              variant="primary"
+                              size="sm"
+                              onClick={() => setSelectedBatchForTreatment(batch)}
+                              icon={Flame}
                             >
-                              <FileText className="w-3.5 h-3.5 text-forest-700" />
-                              <span>View Certificate</span>
-                            </button>
+                              Process treatment
+                            </Button>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* TAB 3: DISPOSAL & AUDIT CERTIFICATES */}
+          {activeTab === 'disposal' && (
+            <div className="overflow-x-auto">
+              <div className="p-3 bg-surface-alt border-b border-border flex items-center justify-between text-xs text-text-muted">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-primary shrink-0" aria-hidden="true" />
+                  <span>
+                    <strong className="text-text">Final disposal sign-off & CPCB certificates: </strong>
+                    Authorize final hazardous landfill / recycling disposition and generate tamper-proof Form IV records.
+                  </span>
+                </div>
+                <span className="font-semibold text-text tabular-nums">{treatedBatches.length} pending • {disposedBatches.length} archived</span>
+              </div>
+
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="bg-surface-alt text-text-muted uppercase text-[11px] font-semibold border-b border-border">
+                    <th scope="col" className="py-2.5 px-4">Batch code</th>
+                    <th scope="col" className="py-2.5 px-4">Category</th>
+                    <th scope="col" className="py-2.5 px-4">Origin hospital</th>
+                    <th scope="col" className="py-2.5 px-4">Treated weight</th>
+                    <th scope="col" className="py-2.5 px-4">Lifecycle state</th>
+                    <th scope="col" className="py-2.5 px-4 text-right">Disposal action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {[...treatedBatches, ...disposedBatches].length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="py-8">
+                        <EmptyState
+                          title="No treated batches ready for disposal"
+                          description="Process batches through treatment cycles to generate disposal certificates."
+                        />
+                      </td>
+                    </tr>
+                  ) : (
+                    filterList([...treatedBatches, ...disposedBatches]).map((batch) => {
+                      const isTreated = batch.status === 'TREATED';
+                      const isDisposed = batch.status === 'DISPOSED';
+
+                      return (
+                        <tr key={batch.id} className="hover:bg-surface-alt/70 transition-colors">
+                          <td className="py-3 px-4 font-mono font-bold text-text">
+                            {batch.batch_code}
+                          </td>
+                          <td className="py-3 px-4">
+                            <CategoryBadge category={batch.cpcb_waste_category} />
+                          </td>
+                          <td className="py-3 px-4 text-text font-medium">
+                            {batch.hospital?.name || 'AIIMS Central Hospital'}
+                          </td>
+                          <td className="py-3 px-4 font-semibold text-text tabular-nums">
+                            {batch.quantity_kg} kg
+                          </td>
+                          <td className="py-3 px-4">
+                            {isTreated ? (
+                              <Badge variant="warning">
+                                Treated (Pending sign-off)
+                              </Badge>
+                            ) : (
+                              <Badge variant="success" dot>
+                                Disposed (Form IV issued)
+                              </Badge>
+                            )}
+                          </td>
+                          <td className="py-3 px-4 text-right">
+                            {isTreated && (
+                              <Button
+                                variant="primary"
+                                size="sm"
+                                onClick={() => setSelectedBatchForDisposal(batch)}
+                                icon={ShieldCheck}
+                              >
+                                Certify disposal
+                              </Button>
+                            )}
+
+                            {isDisposed && (
+                              <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => setSelectedBatchForDisposal(batch)}
+                                icon={FileText}
+                              >
+                                View certificate
+                              </Button>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* TAB 4: QUANTITY RECONCILIATION AUDIT LEDGER */}
+          {activeTab === 'ledger' && (
+            <div className="overflow-x-auto">
+              <div className="p-3 bg-surface-alt border-b border-border flex items-center justify-between text-xs text-text-muted">
+                <div className="flex items-center gap-2">
+                  <Scale className="w-4 h-4 text-primary shrink-0" aria-hidden="true" />
+                  <span>
+                    <strong className="text-text">Weighbridge discrepancy reconciliation ledger: </strong>
+                    Comparative variance audit tracking manifest generation weight vs. received weight for statutory CPCB Rule 12 compliance.
+                  </span>
+                </div>
+                <span className="font-semibold text-text tabular-nums">{batches.length} total audit records</span>
+              </div>
+
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="bg-surface-alt text-text-muted uppercase text-[11px] font-semibold border-b border-border">
+                    <th scope="col" className="py-2.5 px-4">Batch code</th>
+                    <th scope="col" className="py-2.5 px-4">Origin hospital</th>
+                    <th scope="col" className="py-2.5 px-4">Category</th>
+                    <th scope="col" className="py-2.5 px-4">Gen weight</th>
+                    <th scope="col" className="py-2.5 px-4">Rec weight</th>
+                    <th scope="col" className="py-2.5 px-4">Variance (Δ kg)</th>
+                    <th scope="col" className="py-2.5 px-4">Discrepancy %</th>
+                    <th scope="col" className="py-2.5 px-4 text-right">CPCB compliance</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {filterList(batches).slice(0, 15).map((batch) => {
+                    const genW = batch.quantity_kg || 15.0;
+                    const isAnomalyBatch = batch.id === 'batch-008' || batch.batch_code === 'BMW-2026-00008';
+                    const diff = isAnomalyBatch ? 28.0 : Math.round((Math.sin(batch.quantity_kg) * 0.4) * 10) / 10;
+                    const recW = Math.max(1, Math.round((genW + diff) * 10) / 10);
+                    const variancePercent = Math.round((Math.abs(diff) / genW) * 1000) / 10;
+                    const isCritical = variancePercent > 5.0;
+
+                    return (
+                      <tr key={batch.id} className="hover:bg-surface-alt/70 transition-colors">
+                        <td className="py-3 px-4 font-mono font-bold text-text">
+                          {batch.batch_code}
+                        </td>
+                        <td className="py-3 px-4 text-text font-medium">
+                          {batch.hospital?.name || 'AIIMS Central Hospital'}
+                        </td>
+                        <td className="py-3 px-4">
+                          <CategoryBadge category={batch.cpcb_waste_category} />
+                        </td>
+                        <td className="py-3 px-4 text-text tabular-nums">
+                          {genW} kg
+                        </td>
+                        <td className="py-3 px-4 font-semibold text-text tabular-nums">
+                          {recW} kg
+                        </td>
+                        <td className={`py-3 px-4 font-semibold tabular-nums ${isCritical ? 'text-danger' : 'text-text-muted'}`}>
+                          {diff >= 0 ? `+${diff}` : diff} kg
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className={`font-semibold tabular-nums ${isCritical ? 'text-danger' : 'text-success'}`}>
+                            {variancePercent}%
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          {isCritical ? (
+                            <Badge variant="danger" size="sm" dot>
+                              Critical mismatch
+                            </Badge>
+                          ) : (
+                            <Badge variant="success" size="sm" dot>
+                              Rule 12 compliant
+                            </Badge>
                           )}
                         </td>
                       </tr>
                     );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {/* TAB 4: QUANTITY RECONCILIATION AUDIT LEDGER */}
-        {activeTab === 'ledger' && (
-          <div className="overflow-x-auto">
-            <div className="p-3 bg-hazmat-50 border-b border-hazmat-200 flex items-center justify-between text-xs font-mono text-steel-900">
-              <div className="flex items-center space-x-2">
-                <Scale className="w-4 h-4 text-hazmat-800 flex-shrink-0" />
-                <span>
-                  <strong>Weighbridge Discrepancy Reconciliation Ledger: </strong>
-                  Comparative variance audit tracking manifest generation weight vs. received weight for statutory CPCB Rule 12 compliance.
-                </span>
-              </div>
-              <span className="font-bold">{batches.length} Total Audit Records</span>
+                  })}
+                </tbody>
+              </table>
             </div>
-
-            <table className="w-full text-left text-xs font-mono">
-              <thead className="bg-hazmat-100 text-steel-700 uppercase font-bold border-b border-hazmat-300">
-                <tr>
-                  <th className="py-2.5 px-4">Batch Code</th>
-                  <th className="py-2.5 px-4">Origin Hospital</th>
-                  <th className="py-2.5 px-4">Category</th>
-                  <th className="py-2.5 px-4">Gen Weight</th>
-                  <th className="py-2.5 px-4">Rec Weight</th>
-                  <th className="py-2.5 px-4">Variance (Δ kg)</th>
-                  <th className="py-2.5 px-4">Discrepancy %</th>
-                  <th className="py-2.5 px-4 text-right">CPCB Compliance</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-hazmat-200">
-                {filterList(batches).slice(0, 15).map((batch) => {
-                  const genW = batch.quantity_kg || 15.0;
-                  const isAnomalyBatch = batch.id === 'batch-008' || batch.batch_code === 'BMW-2026-00008';
-                  const diff = isAnomalyBatch ? 28.0 : Math.round((Math.sin(batch.quantity_kg) * 0.4) * 10) / 10;
-                  const recW = Math.max(1, Math.round((genW + diff) * 10) / 10);
-                  const variancePercent = Math.round((Math.abs(diff) / genW) * 1000) / 10;
-                  const isCritical = variancePercent > 5.0;
-
-                  return (
-                    <tr key={batch.id} className="hover:bg-hazmat-50/70 transition">
-                      <td className="py-3 px-4 font-bold text-steel-900">
-                        {batch.batch_code}
-                      </td>
-                      <td className="py-3 px-4 text-steel-800 font-sans font-medium">
-                        {batch.hospital?.name || 'AIIMS Central Hospital'}
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-bold border ${getCategoryBadge(batch.cpcb_waste_category)}`}>
-                          {batch.cpcb_waste_category}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 font-semibold text-steel-800">
-                        {genW} kg
-                      </td>
-                      <td className="py-3 px-4 font-bold text-steel-900">
-                        {recW} kg
-                      </td>
-                      <td className={`py-3 px-4 font-bold ${isCritical ? 'text-biohazard-700' : 'text-steel-700'}`}>
-                        {diff >= 0 ? `+${diff}` : diff} kg
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className={`font-bold ${isCritical ? 'text-biohazard-700' : 'text-forest-700'}`}>
-                          {variancePercent}%
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 text-right">
-                        {isCritical ? (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-biohazard-100 text-biohazard-900 border border-biohazard-300">
-                            <AlertTriangle className="w-3 h-3 mr-1" />
-                            CRITICAL MISMATCH
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-forest-100 text-forest-900 border border-forest-300">
-                            <CheckCircle2 className="w-3 h-3 mr-1" />
-                            Rule 12 Compliant
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* MODAL 1: WEIGHBRIDGE INTAKE & RECONCILIATION */}

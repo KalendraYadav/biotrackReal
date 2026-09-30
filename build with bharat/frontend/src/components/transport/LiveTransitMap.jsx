@@ -414,30 +414,30 @@ export default function LiveTransitMap({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-panel border border-hazmat-200 overflow-hidden">
+    <div className="bg-white rounded-xl border border-slate-200/90 shadow-2xs overflow-hidden">
       {/* Map Control Bar */}
-      <div className="p-3.5 bg-hazmat-50 border-b border-hazmat-200 flex flex-wrap items-center justify-between gap-3">
+      <div className="p-3.5 bg-slate-50/80 border-b border-slate-200/80 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center space-x-3">
-          <div className={`p-2 rounded flex items-center justify-center border ${
+          <div className={`p-2 rounded-lg flex items-center justify-center border ${
             isDeviated 
-              ? 'bg-biohazard-50 border-biohazard-300 text-biohazard-700 animate-pulse' 
-              : 'bg-forest-50 border-forest-300 text-forest-800'
+              ? 'bg-red-50 border-red-200 text-red-700' 
+              : 'bg-emerald-50 border-emerald-200 text-emerald-700'
           }`}>
-            {isDeviated ? <ShieldAlert className="w-5 h-5" /> : <Navigation className="w-5 h-5" />}
+            {isDeviated ? <ShieldAlert className="w-4 h-4" /> : <Navigation className="w-4 h-4" />}
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <span className="font-mono font-bold text-steel-900 text-sm tracking-tight">{plateNo}</span>
-              <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-bold border ${
+              <span className="font-mono font-bold text-slate-900 text-sm tracking-tight">{plateNo}</span>
+              <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-bold border uppercase tracking-wider ${
                 isDeviated 
-                  ? 'bg-biohazard-100 text-biohazard-900 border-biohazard-300' 
-                  : 'bg-forest-100 text-forest-900 border-forest-300'
+                  ? 'bg-red-100 text-red-800 border-red-300' 
+                  : 'bg-emerald-100 text-emerald-800 border-emerald-300'
               }`}>
                 {isDeviated ? 'ROUTE DEVIATION ALERT' : 'CORRIDOR SECURE'}
               </span>
             </div>
-            <p className="text-xs text-steel-500 mt-0.5 font-mono">
-              Lat: <span>{currentPos.lat.toFixed(4)}</span> &bull; Lng: <span>{currentPos.lng.toFixed(4)}</span> &bull; Speed: <span className="font-bold text-steel-800">{speedKmh} km/h</span>
+            <p className="text-xs text-slate-500 mt-0.5 font-mono">
+              Lat: <span className="text-slate-700">{currentPos.lat.toFixed(4)}</span> &bull; Lng: <span className="text-slate-700">{currentPos.lng.toFixed(4)}</span> &bull; Speed: <span className="font-bold text-slate-900">{speedKmh} km/h</span>
             </p>
           </div>
         </div>
@@ -446,7 +446,7 @@ export default function LiveTransitMap({
         <div className="flex items-center flex-wrap gap-2">
           <button
             onClick={handleNextSimulationStep}
-            className="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-forest-700 hover:bg-forest-800 text-white text-xs font-mono font-bold rounded shadow-sm transition-all"
+            className="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium rounded-lg shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
             title="Move vehicle to next checkpoint along green corridor"
           >
             <Play className="w-3.5 h-3.5" />
@@ -455,19 +455,19 @@ export default function LiveTransitMap({
 
           <button
             onClick={handleTriggerDeviation}
-            className="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-biohazard-600 hover:bg-biohazard-700 text-white text-xs font-mono font-bold rounded shadow-sm transition-all"
+            className="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 border border-red-300/80 text-xs font-medium rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
             title="Simulate vehicle straying outside safe corridor to test real-time risk alert"
           >
-            <AlertTriangle className="w-3.5 h-3.5" />
+            <AlertTriangle className="w-3.5 h-3.5 text-red-600" />
             <span>Simulate Deviation</span>
           </button>
 
           <button
             onClick={handleResetToOrigin}
-            className="inline-flex items-center space-x-1 px-2.5 py-1.5 bg-hazmat-200 hover:bg-hazmat-300 text-steel-800 text-xs font-mono font-semibold rounded transition-all"
+            className="inline-flex items-center space-x-1 px-2.5 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-xs font-medium rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
             title="Reset position to AIIMS Central Hospital dock"
           >
-            <RotateCcw className="w-3.5 h-3.5" />
+            <RotateCcw className="w-3.5 h-3.5 text-slate-500" />
             <span>Reset Origin</span>
           </button>
         </div>
@@ -475,16 +475,16 @@ export default function LiveTransitMap({
 
       {/* Real-time Alert Toast inside map box when deviated */}
       {isDeviated && (
-        <div className="bg-biohazard-700 text-white px-4 py-2 flex items-center justify-between text-xs font-mono font-bold animate-pulse shadow-inner">
+        <div className="bg-red-600 text-white px-4 py-2 flex items-center justify-between text-xs font-mono font-medium">
           <div className="flex items-center space-x-2">
-            <AlertTriangle className="w-4 h-4 text-white flex-shrink-0" />
+            <AlertTriangle className="w-4 h-4 text-white shrink-0" />
             <span>
               GEOFENCE BREACH: Vehicle is {deviationKm} km outside approved CPCB Green Corridor. Telemetry logged as high risk.
             </span>
           </div>
           <button
             onClick={handleNextSimulationStep}
-            className="px-2.5 py-1 bg-white text-biohazard-900 rounded text-xs font-mono font-bold hover:bg-biohazard-50 transition"
+            className="px-2.5 py-1 bg-white text-red-700 rounded-md text-xs font-semibold hover:bg-red-50 transition-colors shadow-xs"
           >
             Return to Corridor
           </button>
@@ -495,7 +495,7 @@ export default function LiveTransitMap({
       <div 
         ref={mapContainerRef} 
         style={{ height: '420px', width: '100%', zIndex: 1 }}
-        className="relative bg-hazmat-100"
+        className="relative bg-slate-100"
       />
 
       {/* Map Footer Legend & Route Details */}

@@ -7,17 +7,18 @@ import {
   AlertOctagon, 
   Clock, 
   CheckCircle2, 
-  Search, 
-  FileText, 
-  Camera, 
-  ArrowUpRight, 
   ShieldAlert, 
   RefreshCw, 
-  Filter, 
   AlertTriangle,
   Eye,
-  SlidersHorizontal
+  ArrowUpRight,
+  Search
 } from 'lucide-react';
+import PageHeader from '../../components/ui/PageHeader';
+import Button from '../../components/ui/Button';
+import Badge from '../../components/ui/Badge';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../../components/ui/Card';
+import EmptyState from '../../components/ui/EmptyState';
 
 export default function InspectorDashboard() {
   const { user } = useAuth();
@@ -53,7 +54,7 @@ export default function InspectorDashboard() {
     loadCases();
 
     // Subscribe to real-time risk engine broadcast alerts via WebSocket
-    const unsubscribe = subscribeToRisk((incomingCase) => {
+    const unsubscribe = subscribeToRisk ? subscribeToRisk((incomingCase) => {
       if (!incomingCase) return;
       setLatestLiveAlert(incomingCase);
       setCases((prevCases) => {
@@ -68,7 +69,7 @@ export default function InspectorDashboard() {
           return [incomingCase, ...prevCases];
         }
       });
-    });
+    }) : null;
 
     // 4-second background polling fallback safeguard
     const pollTimer = setInterval(() => {
@@ -76,7 +77,7 @@ export default function InspectorDashboard() {
     }, 4000);
 
     return () => {
-      unsubscribe();
+      if (unsubscribe) unsubscribe();
       clearInterval(pollTimer);
     };
   }, [subscribeToRisk]);
@@ -138,300 +139,332 @@ export default function InspectorDashboard() {
   };
 
   return (
-    <div className="space-y-6 pb-12 font-sans">
-      {/* Role Banner */}
-      <div className="bg-white rounded-lg shadow-sm border border-hazmat-300 p-5 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center space-x-3.5">
-          <div className="w-12 h-12 rounded bg-steel-900 border border-steel-700 flex items-center justify-center text-hazmat-400">
-            <Scale className="w-6 h-6" />
+    <div className="space-y-6 max-w-7xl mx-auto">
+      {/* Page Header */}
+      <PageHeader
+        title="Biomedical Waste Compliance & Enforcement Portal"
+        description={`Inspector: ${user?.name || 'Amit Deshmukh'} • AI anomaly detection & statutory sanctions`}
+        icon={Scale}
+        badge={
+          <Badge variant="neutral">
+            CPCB Field Audit Enforcement
+          </Badge>
+        }
+        actions={
+          <div className="flex items-center gap-2">
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleSimulateBrokenChain}
+              loading={simulating}
+              icon={AlertTriangle}
+              title="Simulate an out-of-order broken chain incident"
+            >
+              Test Broken Chain
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => loadCases(true)}
+              loading={loading}
+              icon={RefreshCw}
+              aria-label="Refresh risk cases"
+            >
+              Refresh
+            </Button>
           </div>
-          <div>
-            <div className="flex items-center space-x-2">
-              <h1 className="text-xl font-serif font-black text-steel-950 tracking-tight">
-                Biomedical Waste Compliance &amp; Enforcement Portal
-              </h1>
-              <span className="text-[11px] px-2.5 py-0.5 rounded font-mono font-bold bg-steel-900 text-cream-50 border border-steel-800">
-                CPCB Field Audit Enforcement
-              </span>
-            </div>
-            <p className="text-xs font-mono text-steel-600 mt-0.5">
-              Inspector: <span className="font-bold text-steel-900">{user?.name || 'Amit Deshmukh'}</span> &bull; AI Anomaly Detection &amp; Statutory Sanctions
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={handleSimulateBrokenChain}
-            disabled={simulating}
-            className="px-3 py-1.5 bg-biohazard-700 hover:bg-biohazard-800 disabled:opacity-50 text-white rounded text-xs font-mono font-bold flex items-center space-x-1.5 transition shadow-sm"
-            title="Simulate an out-of-order broken chain incident"
-          >
-            <AlertTriangle className="w-3.5 h-3.5" />
-            <span>{simulating ? 'Simulating...' : 'Test Broken Chain'}</span>
-          </button>
-          <button
-            onClick={() => loadCases(true)}
-            className="p-2 border border-hazmat-300 rounded hover:bg-hazmat-50 text-steel-700 transition"
-            title="Refresh Cases"
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-          </button>
-        </div>
-      </div>
+        }
+      />
 
       {/* Real-Time Live AI Risk Engine Anomaly Alert Banner */}
       {latestLiveAlert && (
-        <div className="bg-biohazard-950 border-2 border-biohazard-600 rounded-lg p-4 shadow-modal text-cream-50 animate-fade-in flex flex-wrap items-start justify-between gap-4 font-sans">
-          <div className="flex items-start space-x-3.5">
-            <div className="p-2.5 bg-biohazard-700 text-white rounded mt-0.5 border border-biohazard-500 shadow-sm flex-shrink-0">
-              <ShieldAlert className="w-5 h-5 animate-pulse" />
+        <div 
+          role="alert" 
+          aria-live="assertive"
+          className="rounded-lg p-4 bg-danger-bg border border-danger-border flex flex-wrap items-start justify-between gap-4 text-danger-text"
+        >
+          <div className="flex items-start gap-3.5">
+            <div className="p-2.5 rounded bg-danger/10 text-danger mt-0.5 shrink-0">
+              <ShieldAlert className="w-5 h-5" aria-hidden="true" />
             </div>
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xs font-mono font-bold uppercase tracking-wider text-biohazard-300">
-                  Real-Time AI Anomaly Triggered
+                <span className="text-xs font-semibold uppercase tracking-wider text-danger">
+                  Real-time AI anomaly triggered
                 </span>
-                <span className="font-mono text-xs px-2 py-0.5 rounded bg-biohazard-800 text-biohazard-100 font-bold border border-biohazard-600">
-                  Risk Score: {latestLiveAlert.risk_score || latestLiveAlert.riskScore || 90}/100
-                </span>
-                <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-steel-900 text-cream-200 border border-steel-700">
+                <Badge variant="danger" size="sm">
+                  Risk score: {latestLiveAlert.risk_score || latestLiveAlert.riskScore || 90}/100
+                </Badge>
+                <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-surface border border-border text-text">
                   {latestLiveAlert.case_code || 'INS-ALERT'}
                 </span>
               </div>
-              <p className="text-sm font-serif font-bold text-white mt-1">
+              <p className="text-sm font-semibold text-text mt-1">
                 {latestLiveAlert.triggers?.[0] || 'Statutory chain-of-custody anomaly flagged by AI Risk Engine.'}
               </p>
-              <p className="text-xs font-mono text-cream-300 mt-0.5">
-                Batch: <span className="font-bold text-white">{latestLiveAlert.batch_code || latestLiveAlert.batch_id}</span> &bull; Status: <span className="text-amber-400 font-bold">{latestLiveAlert.status || 'ASSIGNED'}</span> &bull; Auto-assigned to Inspector
+              <p className="text-xs text-text-muted mt-0.5">
+                Batch: <span className="font-mono font-bold text-text">{latestLiveAlert.batch_code || latestLiveAlert.batch_id}</span> • Status: <span className="font-semibold text-warning-text">{latestLiveAlert.status || 'ASSIGNED'}</span> • Auto-assigned to Inspector
               </p>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <button
+          <div className="flex items-center gap-2">
+            <Button
+              variant="destructive"
+              size="sm"
               onClick={() => setSelectedCaseForModal(latestLiveAlert)}
-              className="px-3.5 py-1.5 bg-biohazard-600 hover:bg-biohazard-500 text-white text-xs font-mono font-bold rounded flex items-center space-x-1.5 transition shadow-sm"
+              icon={ArrowUpRight}
             >
-              <span>Investigate Dossier</span>
-              <ArrowUpRight className="w-3.5 h-3.5" />
-            </button>
-            <button
+              Investigate dossier
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => setLatestLiveAlert(null)}
-              className="p-1.5 text-cream-400 hover:text-white rounded hover:bg-white/10 transition text-xs font-mono"
-              title="Dismiss banner"
             >
               Dismiss
-            </button>
+            </Button>
           </div>
         </div>
       )}
 
       {/* 4 Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Card 1: Assigned Audits */}
-        <div 
+        <Card 
           onClick={() => setFilterTab('ASSIGNED')}
-          className={`bg-white rounded-lg p-4 shadow-sm border cursor-pointer transition ${
-            filterTab === 'ASSIGNED' ? 'border-steel-900 ring-2 ring-steel-300' : 'border-hazmat-300 hover:border-steel-400'
+          className={`cursor-pointer transition-colors shadow-2xs hover:shadow-xs ${
+            filterTab === 'ASSIGNED' ? 'ring-2 ring-primary border-primary bg-primary/5' : 'hover:border-slate-300'
           }`}
         >
-          <div className="flex items-center justify-between">
-            <p className="text-[10px] font-mono font-bold text-steel-500 uppercase tracking-wider">Assigned Audits</p>
-            <Clock className="w-4 h-4 text-steel-600" />
-          </div>
-          <p className="text-2xl font-mono font-bold text-steel-900 mt-2">{assignedCount}</p>
-          <p className="text-xs font-mono text-steel-500 mt-0.5">Awaiting initial inspection</p>
-        </div>
+          <CardContent className="p-3.5 sm:p-4 flex items-center justify-between">
+            <div>
+              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Assigned audits</p>
+              <p className="text-xl sm:text-2xl font-bold text-slate-900 mt-1 tabular-nums">{assignedCount}</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">Awaiting initial inspection</p>
+            </div>
+            <div className="w-9 h-9 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 shrink-0">
+              <Clock className="w-4 h-4" aria-hidden="true" />
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Card 2: High Priority Audits */}
-        <div 
+        <Card 
           onClick={() => setFilterTab('HIGH_PRIORITY')}
-          className={`bg-white rounded-lg p-4 shadow-sm border cursor-pointer transition ${
-            filterTab === 'HIGH_PRIORITY' ? 'border-biohazard-600 ring-2 ring-biohazard-200' : 'border-hazmat-300 hover:border-biohazard-400'
+          className={`cursor-pointer transition-colors shadow-2xs hover:shadow-xs ${
+            filterTab === 'HIGH_PRIORITY' ? 'ring-2 ring-rose-500 border-rose-500 bg-rose-50/20' : 'hover:border-slate-300'
           }`}
         >
-          <div className="flex items-center justify-between">
-            <p className="text-[10px] font-mono font-bold text-steel-500 uppercase tracking-wider">High Priority</p>
-            <AlertOctagon className="w-4 h-4 text-biohazard-700" />
-          </div>
-          <p className="text-2xl font-mono font-bold text-biohazard-700 mt-2">{highPriorityCount}</p>
-          <p className="text-xs font-mono text-biohazard-700 font-semibold mt-0.5">Risk score &ge; 75/100</p>
-        </div>
+          <CardContent className="p-3.5 sm:p-4 flex items-center justify-between">
+            <div>
+              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">High priority</p>
+              <p className="text-xl sm:text-2xl font-bold text-rose-600 mt-1 tabular-nums">{highPriorityCount}</p>
+              <p className="text-[11px] text-rose-600 font-medium mt-0.5">Risk score ≥ 75/100</p>
+            </div>
+            <div className="w-9 h-9 rounded-lg bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600 shrink-0">
+              <AlertOctagon className="w-4 h-4" aria-hidden="true" />
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Card 3: Under Investigation */}
-        <div 
+        <Card 
           onClick={() => setFilterTab('UNDER_INVESTIGATION')}
-          className={`bg-white rounded-lg p-4 shadow-sm border cursor-pointer transition ${
-            filterTab === 'UNDER_INVESTIGATION' ? 'border-amber-600 ring-2 ring-amber-200' : 'border-hazmat-300 hover:border-amber-400'
+          className={`cursor-pointer transition-colors shadow-2xs hover:shadow-xs ${
+            filterTab === 'UNDER_INVESTIGATION' ? 'ring-2 ring-amber-500 border-amber-500 bg-amber-50/20' : 'hover:border-slate-300'
           }`}
         >
-          <div className="flex items-center justify-between">
-            <p className="text-[10px] font-mono font-bold text-steel-500 uppercase tracking-wider">Under Investigation</p>
-            <AlertTriangle className="w-4 h-4 text-amber-700" />
-          </div>
-          <p className="text-2xl font-mono font-bold text-amber-800 mt-2">{underInvestigationCount}</p>
-          <p className="text-xs font-mono text-steel-500 mt-0.5">Field inquiry active</p>
-        </div>
+          <CardContent className="p-3.5 sm:p-4 flex items-center justify-between">
+            <div>
+              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Under inquiry</p>
+              <p className="text-xl sm:text-2xl font-bold text-amber-700 mt-1 tabular-nums">{underInvestigationCount}</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">Field inquiry active</p>
+            </div>
+            <div className="w-9 h-9 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 shrink-0">
+              <AlertTriangle className="w-4 h-4" aria-hidden="true" />
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Card 4: Resolved Audits */}
-        <div 
+        <Card 
           onClick={() => setFilterTab('RESOLVED')}
-          className={`bg-white rounded-lg p-4 shadow-sm border cursor-pointer transition ${
-            filterTab === 'RESOLVED' ? 'border-forest-600 ring-2 ring-forest-200' : 'border-hazmat-300 hover:border-forest-400'
+          className={`cursor-pointer transition-colors shadow-2xs hover:shadow-xs ${
+            filterTab === 'RESOLVED' ? 'ring-2 ring-emerald-600 border-emerald-600 bg-emerald-50/20' : 'hover:border-slate-300'
           }`}
         >
-          <div className="flex items-center justify-between">
-            <p className="text-[10px] font-mono font-bold text-steel-500 uppercase tracking-wider">Resolved Audits</p>
-            <CheckCircle2 className="w-4 h-4 text-forest-700" />
-          </div>
-          <p className="text-2xl font-mono font-bold text-forest-800 mt-2">{resolvedCount}</p>
-          <p className="text-xs font-mono text-steel-500 mt-0.5">Sanctions &amp; sign-off closed</p>
-        </div>
+          <CardContent className="p-3.5 sm:p-4 flex items-center justify-between">
+            <div>
+              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Resolved audits</p>
+              <p className="text-xl sm:text-2xl font-bold text-emerald-700 mt-1 tabular-nums">{resolvedCount}</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">Sanctions closed</p>
+            </div>
+            <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shrink-0">
+              <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Case Management Table */}
-      <div className="bg-white rounded-lg shadow-sm border border-hazmat-300 overflow-hidden">
-        <div className="p-3 border-b border-hazmat-300 flex flex-wrap items-center justify-between gap-3 bg-hazmat-50 font-mono">
-          <div className="flex bg-hazmat-200/80 p-1 rounded text-xs font-bold">
+      <div className="bg-white rounded-xl border border-slate-200/90 shadow-2xs overflow-hidden">
+        <div className="p-3.5 sm:p-4 border-b border-slate-200/80 bg-slate-50/40 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="inline-flex flex-wrap rounded-lg border border-slate-200 p-0.5 bg-slate-100/80" role="tablist" aria-label="Filter cases">
             <button
+              role="tab"
+              aria-selected={filterTab === 'ALL'}
               onClick={() => setFilterTab('ALL')}
-              className={`px-3 py-1 rounded transition ${
-                filterTab === 'ALL' ? 'bg-white text-steel-950 shadow-sm' : 'text-steel-700 hover:text-steel-950'
+              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${
+                filterTab === 'ALL' ? 'bg-white text-slate-900 shadow-2xs border border-slate-200/60' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              All Cases ({cases.length})
+              All cases ({cases.length})
             </button>
             <button
+              role="tab"
+              aria-selected={filterTab === 'ASSIGNED'}
               onClick={() => setFilterTab('ASSIGNED')}
-              className={`px-3 py-1 rounded transition ${
-                filterTab === 'ASSIGNED' ? 'bg-white text-steel-950 shadow-sm' : 'text-steel-700 hover:text-steel-950'
+              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${
+                filterTab === 'ASSIGNED' ? 'bg-white text-slate-900 shadow-2xs border border-slate-200/60' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Assigned ({assignedCount})
             </button>
             <button
+              role="tab"
+              aria-selected={filterTab === 'HIGH_PRIORITY'}
               onClick={() => setFilterTab('HIGH_PRIORITY')}
-              className={`px-3 py-1 rounded transition ${
-                filterTab === 'HIGH_PRIORITY' ? 'bg-white text-steel-950 shadow-sm' : 'text-steel-700 hover:text-steel-950'
+              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${
+                filterTab === 'HIGH_PRIORITY' ? 'bg-white text-slate-900 shadow-2xs border border-slate-200/60' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              High Priority ({highPriorityCount})
+              High priority ({highPriorityCount})
             </button>
             <button
+              role="tab"
+              aria-selected={filterTab === 'UNDER_INVESTIGATION'}
               onClick={() => setFilterTab('UNDER_INVESTIGATION')}
-              className={`px-3 py-1 rounded transition ${
-                filterTab === 'UNDER_INVESTIGATION' ? 'bg-white text-steel-950 shadow-sm' : 'text-steel-700 hover:text-steel-950'
+              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${
+                filterTab === 'UNDER_INVESTIGATION' ? 'bg-white text-slate-900 shadow-2xs border border-slate-200/60' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              In Progress ({underInvestigationCount})
+              In progress ({underInvestigationCount})
             </button>
             <button
+              role="tab"
+              aria-selected={filterTab === 'RESOLVED'}
               onClick={() => setFilterTab('RESOLVED')}
-              className={`px-3 py-1 rounded transition ${
-                filterTab === 'RESOLVED' ? 'bg-white text-steel-950 shadow-sm' : 'text-steel-700 hover:text-steel-950'
+              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${
+                filterTab === 'RESOLVED' ? 'bg-white text-slate-900 shadow-2xs border border-slate-200/60' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Resolved ({resolvedCount})
             </button>
           </div>
 
-          <div className="w-full sm:w-64">
+          <div className="relative w-full sm:w-64">
+            <Search className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-slate-400" aria-hidden="true" />
             <input
-              type="text"
+              type="search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search case code, batch..."
-              className="w-full px-3 py-1.5 bg-white border border-hazmat-300 rounded text-xs font-mono focus:outline-none focus:ring-2 focus:ring-hazmat-500"
+              className="w-full pl-8 pr-3 py-1.5 bg-white border border-slate-200 rounded-md text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+              aria-label="Search audit cases"
             />
           </div>
         </div>
 
-        {/* Cases Table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs font-mono">
-            <thead className="bg-hazmat-100 text-steel-700 uppercase font-bold border-b border-hazmat-300">
-              <tr>
-                <th className="py-2.5 px-4">Case Code</th>
-                <th className="py-2.5 px-4">Risk Score</th>
-                <th className="py-2.5 px-4">Target Batch</th>
-                <th className="py-2.5 px-4">Primary Triggers</th>
-                <th className="py-2.5 px-4">Audit Status</th>
-                <th className="py-2.5 px-4 text-right">Inspect Dossier</th>
+          <table className="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr className="bg-slate-50/80 text-slate-500 uppercase text-[11px] font-semibold border-b border-slate-200">
+                <th scope="col" className="py-3 px-4">Case code</th>
+                <th scope="col" className="py-3 px-4">Risk score</th>
+                <th scope="col" className="py-3 px-4">Target batch</th>
+                <th scope="col" className="py-3 px-4">Primary triggers</th>
+                <th scope="col" className="py-3 px-4">Audit status</th>
+                <th scope="col" className="py-3 px-4 text-right">Inspect dossier</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-hazmat-200">
-              {filteredCases.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="py-8 text-center text-steel-400">
-                    No risk audit cases match the selected filter.
-                  </td>
-                </tr>
-              ) : (
-                filteredCases.map((rc) => {
-                  const isHighRisk = rc.risk_score >= 75;
-                  return (
-                    <tr key={rc.id} className="hover:bg-hazmat-50/70 transition">
-                      <td className="py-3 px-4 font-bold text-steel-900">
-                        <div className="flex items-center space-x-1.5 flex-wrap gap-y-1">
-                          <span>{rc.case_code}</span>
-                          {(rc.case_type === 'BROKEN_CHAIN_OF_CUSTODY' || rc.type === 'BROKEN_CHAIN_OF_CUSTODY') && (
-                            <span className="px-1.5 py-0.5 rounded text-[9px] bg-biohazard-700 text-white font-mono font-bold tracking-tight">
-                              BROKEN CHAIN
-                            </span>
-                          )}
-                        </div>
-                      </td>
-
-                      <td className="py-3 px-4">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded text-xs font-bold border ${
-                          isHighRisk ? 'bg-biohazard-100 text-biohazard-950 border-biohazard-300' : 'bg-amber-100 text-amber-950 border-amber-300'
-                        }`}>
-                          {rc.risk_score}/100
-                        </span>
-                      </td>
-
-                      <td className="py-3 px-4 text-steel-800 font-bold">
-                        {rc.batch?.batch_code || rc.batch_id}
-                      </td>
-
-                      <td className="py-3 px-4 text-steel-700 max-w-sm font-sans">
-                        <div className="truncate font-semibold">{rc.triggers?.[0] || 'Chain of custody violation'}</div>
-                        {rc.triggers?.length > 1 && (
-                          <div className="text-[10px] text-steel-500 font-mono mt-0.5">
-                            +{rc.triggers.length - 1} additional triggers
+            <tbody className="divide-y divide-border">
+                {filteredCases.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="py-8">
+                      <EmptyState
+                        title="No risk audit cases found"
+                        description="No audit cases match the selected filter tab or search query."
+                      />
+                    </td>
+                  </tr>
+                ) : (
+                  filteredCases.map((rc) => {
+                    const isHighRisk = rc.risk_score >= 75;
+                    return (
+                      <tr key={rc.id} className="hover:bg-surface-alt/70 transition-colors">
+                        <td className="py-3 px-4 font-mono font-bold text-text">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span>{rc.case_code}</span>
+                            {(rc.case_type === 'BROKEN_CHAIN_OF_CUSTODY' || rc.type === 'BROKEN_CHAIN_OF_CUSTODY') && (
+                              <Badge variant="danger" size="sm">
+                                Broken chain
+                              </Badge>
+                            )}
                           </div>
-                        )}
-                      </td>
+                        </td>
 
-                      <td className="py-3 px-4">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-bold border ${
-                          rc.status === 'RESOLVED' 
-                            ? 'bg-forest-100 text-forest-900 border-forest-300' 
-                            : rc.status === 'UNDER_INVESTIGATION' 
-                              ? 'bg-amber-100 text-amber-950 border-amber-300' 
-                              : 'bg-steel-200 text-steel-900 border-steel-300'
-                        }`}>
-                          {rc.status}
-                        </span>
-                      </td>
+                        <td className="py-3 px-4">
+                          <Badge variant={isHighRisk ? 'danger' : 'warning'} size="sm">
+                            {rc.risk_score}/100
+                          </Badge>
+                        </td>
 
-                      <td className="py-3 px-4 text-right">
-                        <button
-                          onClick={() => setSelectedCaseForModal(rc)}
-                          className="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-steel-900 hover:bg-black text-white text-xs font-bold rounded shadow-sm transition font-mono"
-                        >
-                          <Eye className="w-3.5 h-3.5" />
-                          <span>Inspect Case</span>
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+                        <td className="py-3 px-4 text-text font-mono font-medium">
+                          {rc.batch?.batch_code || rc.batch_id}
+                        </td>
+
+                        <td className="py-3 px-4 text-text max-w-sm">
+                          <div className="truncate font-medium">{rc.triggers?.[0] || 'Chain of custody violation'}</div>
+                          {rc.triggers?.length > 1 && (
+                            <div className="text-[10px] text-text-muted mt-0.5">
+                              +{rc.triggers.length - 1} additional triggers
+                            </div>
+                          )}
+                        </td>
+
+                        <td className="py-3 px-4">
+                          <Badge 
+                            variant={
+                              rc.status === 'RESOLVED' 
+                                ? 'success' 
+                                : rc.status === 'UNDER_INVESTIGATION' 
+                                  ? 'warning' 
+                                  : 'neutral'
+                            } 
+                            size="sm"
+                          >
+                            {rc.status}
+                          </Badge>
+                        </td>
+
+                        <td className="py-3 px-4 text-right">
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => setSelectedCaseForModal(rc)}
+                            icon={Eye}
+                          >
+                            Inspect
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
 
       {/* Case Detail Inspection Modal */}
       {selectedCaseForModal && (
