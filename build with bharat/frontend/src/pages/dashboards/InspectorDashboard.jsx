@@ -379,12 +379,12 @@ export default function InspectorDashboard() {
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="bg-slate-50/80 text-slate-500 uppercase text-[11px] font-semibold border-b border-slate-200">
-                <th scope="col" className="py-3 px-4">Case code</th>
-                <th scope="col" className="py-3 px-4">Risk score</th>
-                <th scope="col" className="py-3 px-4">Target batch</th>
-                <th scope="col" className="py-3 px-4">Primary triggers</th>
-                <th scope="col" className="py-3 px-4">Audit status</th>
-                <th scope="col" className="py-3 px-4 text-right">Inspect dossier</th>
+                <th scope="col" className="py-3 px-4 whitespace-nowrap">Case code</th>
+                <th scope="col" className="py-3 px-4 whitespace-nowrap">Risk score</th>
+                <th scope="col" className="py-3 px-4 whitespace-nowrap">Target batch</th>
+                <th scope="col" className="py-3 px-4 whitespace-nowrap">Primary triggers</th>
+                <th scope="col" className="py-3 px-4 whitespace-nowrap">Audit status</th>
+                <th scope="col" className="py-3 px-4 text-right whitespace-nowrap">Inspect dossier</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -402,8 +402,8 @@ export default function InspectorDashboard() {
                     const isHighRisk = rc.risk_score >= 75;
                     return (
                       <tr key={rc.id} className="hover:bg-surface-alt/70 transition-colors">
-                        <td className="py-3 px-4 font-mono font-bold text-text">
-                          <div className="flex items-center gap-1.5 flex-wrap">
+                        <td className="py-3 px-4 font-mono font-bold text-text whitespace-nowrap">
+                          <div className="flex items-center gap-1.5 flex-nowrap whitespace-nowrap">
                             <span>{rc.case_code}</span>
                             {(rc.case_type === 'BROKEN_CHAIN_OF_CUSTODY' || rc.type === 'BROKEN_CHAIN_OF_CUSTODY') && (
                               <Badge variant="danger" size="sm">
@@ -413,13 +413,13 @@ export default function InspectorDashboard() {
                           </div>
                         </td>
 
-                        <td className="py-3 px-4">
+                        <td className="py-3 px-4 whitespace-nowrap">
                           <Badge variant={isHighRisk ? 'danger' : 'warning'} size="sm">
                             {rc.risk_score}/100
                           </Badge>
                         </td>
 
-                        <td className="py-3 px-4 text-text font-mono font-medium">
+                        <td className="py-3 px-4 text-text font-mono font-medium whitespace-nowrap">
                           {rc.batch?.batch_code || rc.batch_id}
                         </td>
 

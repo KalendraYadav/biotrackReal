@@ -494,32 +494,32 @@ export default function LiveTransitMap({
       {/* Leaflet Map Canvas */}
       <div 
         ref={mapContainerRef} 
-        style={{ height: '420px', width: '100%', zIndex: 1 }}
-        className="relative bg-slate-100"
+        style={{ width: '100%', zIndex: 1 }}
+        className="relative bg-slate-100 h-[320px] sm:h-[420px]"
       />
 
       {/* Map Footer Legend & Route Details */}
-      <div className="p-3 bg-white border-t border-hazmat-200 flex flex-wrap items-center justify-between gap-2 text-xs font-mono text-steel-600">
-        <div className="flex items-center space-x-4">
+      <div className="p-3 bg-white border-t border-slate-200 flex flex-wrap items-center justify-between gap-2.5 text-xs font-mono text-slate-600">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] sm:text-xs">
           <div className="flex items-center space-x-1.5">
-            <div className="w-3 h-3 rounded-full bg-forest-700 border border-white shadow-sm"></div>
+            <div className="w-3 h-3 rounded-full bg-forest-700 border border-white shadow-sm shrink-0"></div>
             <span>AIIMS Hospital (Origin)</span>
           </div>
           <div className="flex items-center space-x-1.5">
-            <div className="w-3 h-3 rounded bg-steel-700 border border-white shadow-sm"></div>
+            <div className="w-3 h-3 rounded bg-steel-700 border border-white shadow-sm shrink-0"></div>
             <span>EcoSafe CBWTF (Destination)</span>
           </div>
           <div className="flex items-center space-x-1.5">
-            <div className="w-4 h-2 bg-forest-600 bg-opacity-30 border border-forest-600 border-dashed"></div>
-            <span>Safe Corridor Geofence (±2.0km)</span>
+            <div className="w-4 h-2 bg-forest-600 bg-opacity-30 border border-forest-600 border-dashed shrink-0"></div>
+            <span>Corridor Geofence (&plusmn;2.0km)</span>
           </div>
           <div className="flex items-center space-x-1.5">
-            <div className="w-3 h-3 rounded-full bg-hazmat-600 border border-white shadow-sm"></div>
+            <div className="w-3 h-3 rounded-full bg-hazmat-600 border border-white shadow-sm shrink-0"></div>
             <span>Vehicle {plateNo}</span>
           </div>
         </div>
-        <div className="flex items-center space-x-2 font-mono text-steel-500">
-          <Radio className="w-3 h-3 text-forest-600 animate-pulse" />
+        <div className="flex items-center space-x-2 font-mono text-slate-500 text-[11px] sm:text-xs">
+          <Radio className="w-3 h-3 text-emerald-600 animate-pulse shrink-0" />
           <span>Live Pings: {breadcrumbTrail.length} recorded</span>
         </div>
       </div>

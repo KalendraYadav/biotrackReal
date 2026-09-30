@@ -375,13 +375,13 @@ export default function GovernmentDashboard() {
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
                   <tr className="bg-surface-alt text-text-muted uppercase text-[11px] font-semibold border-b border-border">
-                    <th scope="col" className="py-2.5 px-4">Facility name</th>
-                    <th scope="col" className="py-2.5 px-4">Type</th>
-                    <th scope="col" className="py-2.5 px-4">City / State</th>
-                    <th scope="col" className="py-2.5 px-4">Bed capacity</th>
-                    <th scope="col" className="py-2.5 px-4">CPCB registration</th>
-                    <th scope="col" className="py-2.5 px-4">Active batches</th>
-                    <th scope="col" className="py-2.5 px-4 text-right">Audit action</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">Facility name</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">Type</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">City / State</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">Bed capacity</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">CPCB registration</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">Active batches</th>
+                    <th scope="col" className="py-2.5 px-4 text-right whitespace-nowrap">Audit action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -389,27 +389,27 @@ export default function GovernmentDashboard() {
                     const isHosp = fac.type === 'HOSPITAL';
                     return (
                       <tr key={fac.id} className="hover:bg-surface-alt/70 transition-colors">
-                        <td className="py-3 px-4 font-semibold text-text">
+                        <td className="py-3 px-4 font-semibold text-text whitespace-nowrap">
                           {fac.name}
                         </td>
-                        <td className="py-3 px-4">
+                        <td className="py-3 px-4 whitespace-nowrap">
                           <Badge variant={isHosp ? 'primary' : 'neutral'} size="sm">
                             {fac.type}
                           </Badge>
                         </td>
-                        <td className="py-3 px-4 text-text-muted">
+                        <td className="py-3 px-4 text-text-muted whitespace-nowrap">
                           {fac.city}
                         </td>
-                        <td className="py-3 px-4 font-medium text-text tabular-nums">
+                        <td className="py-3 px-4 font-medium text-text tabular-nums whitespace-nowrap">
                           {fac.bed_count ? `${fac.bed_count} beds` : 'N/A (CBWTF)'}
                         </td>
-                        <td className="py-3 px-4 font-mono text-text-muted">
+                        <td className="py-3 px-4 font-mono text-text-muted whitespace-nowrap">
                           {fac.cpcb_registration_no}
                         </td>
-                        <td className="py-3 px-4 font-semibold text-text tabular-nums">
+                        <td className="py-3 px-4 font-semibold text-text tabular-nums whitespace-nowrap">
                           {fac.active_batches_count || 0} batches
                         </td>
-                        <td className="py-3 px-4 text-right">
+                        <td className="py-3 px-4 text-right whitespace-nowrap">
                           <Button
                             variant="secondary"
                             size="sm"
@@ -528,12 +528,12 @@ export default function GovernmentDashboard() {
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
                   <tr className="bg-surface-alt text-text-muted uppercase text-[11px] font-semibold border-b border-border">
-                    <th scope="col" className="py-2.5 px-4">Case code</th>
-                    <th scope="col" className="py-2.5 px-4">Risk score</th>
-                    <th scope="col" className="py-2.5 px-4">Target batch</th>
-                    <th scope="col" className="py-2.5 px-4">Trigger violations</th>
-                    <th scope="col" className="py-2.5 px-4">Investigation status</th>
-                    <th scope="col" className="py-2.5 px-4">Assigned inspector</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">Case code</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">Risk score</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">Target batch</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">Trigger violations</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">Investigation status</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">Assigned inspector</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -551,15 +551,15 @@ export default function GovernmentDashboard() {
                       const isCritical = rc.risk_score >= 80;
                       return (
                         <tr key={rc.id} className="hover:bg-surface-alt/70 transition-colors">
-                          <td className="py-3 px-4 font-mono font-bold text-text">
+                          <td className="py-3 px-4 font-mono font-bold text-text whitespace-nowrap">
                             {rc.case_code}
                           </td>
-                          <td className="py-3 px-4">
+                          <td className="py-3 px-4 whitespace-nowrap">
                             <Badge variant={isCritical ? 'danger' : 'warning'} size="sm">
                               {rc.risk_score}/100
                             </Badge>
                           </td>
-                          <td className="py-3 px-4 font-mono text-text">
+                          <td className="py-3 px-4 font-mono text-text whitespace-nowrap">
                             {rc.batch?.batch_code || rc.batch_id}
                           </td>
                           <td className="py-3 px-4 text-text max-w-xs">
@@ -569,12 +569,12 @@ export default function GovernmentDashboard() {
                               ))}
                             </ul>
                           </td>
-                          <td className="py-3 px-4">
+                          <td className="py-3 px-4 whitespace-nowrap">
                             <Badge variant={rc.status === 'RESOLVED' ? 'success' : 'neutral'} size="sm">
                               {rc.status}
                             </Badge>
                           </td>
-                          <td className="py-3 px-4 text-text">
+                          <td className="py-3 px-4 text-text whitespace-nowrap">
                             {rc.assigned_inspector?.name || rc.assigned_inspector_id || 'Inspector Amit Deshmukh'}
                           </td>
                         </tr>

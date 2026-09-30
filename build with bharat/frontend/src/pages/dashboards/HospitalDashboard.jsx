@@ -395,18 +395,18 @@ export default function HospitalDashboard() {
       </div>
 
       {/* 3. Section Navigation Tabs per Section 8.7 */}
-      <div className="border-b border-steel-200 flex items-center gap-6 text-sm" role="tablist" aria-label="Hospital sections">
+      <div className="border-b border-steel-200 flex items-center gap-4 sm:gap-6 text-sm overflow-x-auto" role="tablist" aria-label="Hospital sections">
         <button
           role="tab"
           aria-selected={activeTab === 'track'}
           onClick={() => setActiveTab('track')}
-          className={`pb-3 font-medium transition-colors flex items-center gap-2 border-b-2 -mb-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#07559B] rounded-t ${
+          className={`pb-3 font-medium transition-colors flex items-center gap-2 border-b-2 -mb-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#07559B] rounded-t shrink-0 whitespace-nowrap ${
             activeTab === 'track'
               ? 'border-[#07559B] text-[#07559B] font-semibold'
               : 'border-transparent text-steel-600 hover:text-steel-900 hover:border-steel-300'
           }`}
         >
-          <Layers className="w-4 h-4" aria-hidden="true" />
+          <Layers className="w-4 h-4 shrink-0" aria-hidden="true" />
           <span>Waste Tracking ({batches.length})</span>
         </button>
 
@@ -414,13 +414,13 @@ export default function HospitalDashboard() {
           role="tab"
           aria-selected={activeTab === 'register'}
           onClick={() => setActiveTab('register')}
-          className={`pb-3 font-medium transition-colors flex items-center gap-2 border-b-2 -mb-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#07559B] rounded-t ${
+          className={`pb-3 font-medium transition-colors flex items-center gap-2 border-b-2 -mb-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#07559B] rounded-t shrink-0 whitespace-nowrap ${
             activeTab === 'register'
               ? 'border-[#07559B] text-[#07559B] font-semibold'
               : 'border-transparent text-steel-600 hover:text-steel-900 hover:border-steel-300'
           }`}
         >
-          <PlusCircle className="w-4 h-4" aria-hidden="true" />
+          <PlusCircle className="w-4 h-4 shrink-0" aria-hidden="true" />
           <span>Register New Batch</span>
         </button>
 
@@ -428,13 +428,13 @@ export default function HospitalDashboard() {
           role="tab"
           aria-selected={activeTab === 'correlation'}
           onClick={() => setActiveTab('correlation')}
-          className={`pb-3 font-medium transition-colors flex items-center gap-2 border-b-2 -mb-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#07559B] rounded-t ${
+          className={`pb-3 font-medium transition-colors flex items-center gap-2 border-b-2 -mb-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#07559B] rounded-t shrink-0 whitespace-nowrap ${
             activeTab === 'correlation'
               ? 'border-[#07559B] text-[#07559B] font-semibold'
               : 'border-transparent text-steel-600 hover:text-steel-900 hover:border-steel-300'
           }`}
         >
-          <Activity className="w-4 h-4" aria-hidden="true" />
+          <Activity className="w-4 h-4 shrink-0" aria-hidden="true" />
           <span>Activity Correlation</span>
         </button>
       </div>
@@ -488,14 +488,14 @@ export default function HospitalDashboard() {
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-50/80 text-slate-500 font-semibold border-b border-slate-200/80 text-[11px] uppercase tracking-wider">
                 <tr>
-                  <th scope="col" className="px-4 py-2.5">Batch Code</th>
-                  <th scope="col" className="px-4 py-2.5">Category</th>
-                  <th scope="col" className="px-4 py-2.5">Department</th>
-                  <th scope="col" className="px-4 py-2.5 text-right">Quantity</th>
-                  <th scope="col" className="px-4 py-2.5">Assigned Facility</th>
-                  <th scope="col" className="px-4 py-2.5">Status</th>
-                  <th scope="col" className="px-4 py-2.5">Deadline</th>
-                  <th scope="col" className="px-4 py-2.5 text-right">Action</th>
+                  <th scope="col" className="px-4 py-2.5 whitespace-nowrap">Batch Code</th>
+                  <th scope="col" className="px-4 py-2.5 whitespace-nowrap">Category</th>
+                  <th scope="col" className="px-4 py-2.5 whitespace-nowrap">Department</th>
+                  <th scope="col" className="px-4 py-2.5 text-right whitespace-nowrap">Quantity</th>
+                  <th scope="col" className="px-4 py-2.5 whitespace-nowrap">Assigned Facility</th>
+                  <th scope="col" className="px-4 py-2.5 whitespace-nowrap">Status</th>
+                  <th scope="col" className="px-4 py-2.5 whitespace-nowrap">Deadline</th>
+                  <th scope="col" className="px-4 py-2.5 text-right whitespace-nowrap">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-steel-100">
@@ -529,23 +529,23 @@ export default function HospitalDashboard() {
 
                     return (
                       <tr key={b.id} className="hover:bg-steel-50/80 transition-colors">
-                        <td className="px-4 py-3 font-mono font-semibold text-steel-900">
+                        <td className="px-4 py-3 font-mono font-semibold text-steel-900 whitespace-nowrap">
                           {b.batch_code}
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-4 py-3 whitespace-nowrap">
                           <CategoryBadge category={b.cpcb_waste_category} />
                         </td>
-                        <td className="px-4 py-3 text-steel-700">{b.generating_department}</td>
-                        <td className="px-4 py-3 text-right font-semibold text-steel-900 tabular-nums">
+                        <td className="px-4 py-3 text-steel-700 whitespace-nowrap">{b.generating_department}</td>
+                        <td className="px-4 py-3 text-right font-semibold text-steel-900 tabular-nums whitespace-nowrap">
                           {b.quantity_kg} kg
                         </td>
-                        <td className="px-4 py-3 text-steel-600 truncate max-w-[160px]">
+                        <td className="px-4 py-3 text-steel-600 truncate max-w-[160px] whitespace-nowrap">
                           {b.assigned_cbwtf?.name || 'EcoSafe Waste Handlers'}
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-4 py-3 whitespace-nowrap">
                           <StatusPill status={b.status} size="sm" />
                         </td>
-                        <td className="px-4 py-3 tabular-nums">
+                        <td className="px-4 py-3 tabular-nums whitespace-nowrap">
                           <span className={`inline-flex items-center text-xs ${
                             isOverdue ? 'text-biohazard-700 font-semibold' : 'text-steel-600'
                           }`}>
@@ -553,7 +553,7 @@ export default function HospitalDashboard() {
                             {deadline.toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-right">
+                        <td className="px-4 py-3 text-right whitespace-nowrap">
                           <Button
                             variant="secondary"
                             size="sm"
@@ -706,13 +706,13 @@ export default function HospitalDashboard() {
 
             {/* Step 5: Verification & Authentication Stamp Banner with GPS Telemetry */}
             <div className="space-y-2">
-              <div className="bg-steel-50 rounded p-3.5 border border-steel-200 flex items-start justify-between gap-3">
+              <div className="bg-steel-50 rounded p-3.5 border border-steel-200 flex flex-col sm:flex-row items-stretch sm:items-start justify-between gap-3">
                 <div className="flex items-start space-x-3">
                   <ShieldCheck className="w-5 h-5 text-[#07559B] shrink-0 mt-0.5" aria-hidden="true" />
                   <div className="text-xs text-steel-800">
                     <span className="font-semibold">Digital Gate Verification Stamp:</span> Logged by{' '}
                     <strong className="font-semibold">{user?.name || 'Dr. Aarav Mehta'}</strong> ({user?.role || 'HOSPITAL_AUTHORITY'}).
-                    <div className="mt-1 flex items-center space-x-1.5 font-mono text-[11px] text-steel-600 tabular-nums">
+                    <div className="mt-1 flex flex-wrap items-center gap-1.5 font-mono text-[11px] text-steel-600 tabular-nums">
                       <MapPin className="w-3.5 h-3.5 text-[#07559B] shrink-0" aria-hidden="true" />
                       <span>
                         Locking GPS: {gpsCoords.latitude.toFixed(4)}&deg; N, {gpsCoords.longitude.toFixed(4)}&deg; E
@@ -729,6 +729,7 @@ export default function HospitalDashboard() {
                   onClick={requestLiveGps}
                   isLoading={fetchingGps}
                   icon={RefreshCw}
+                  className="shrink-0 self-start sm:self-auto"
                 >
                   Refresh GPS
                 </Button>
@@ -920,9 +921,9 @@ export default function HospitalDashboard() {
           role="dialog"
           aria-modal="true"
           aria-labelledby="qr-modal-title"
-          className="fixed inset-0 z-50 bg-steel-950/70 flex items-center justify-center p-4 animate-fade-in font-sans"
+          className="fixed inset-0 z-50 bg-steel-950/70 flex items-center justify-center p-3 sm:p-4 animate-fade-in font-sans"
         >
-          <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 border border-steel-300 text-center relative overflow-hidden">
+          <div className="bg-white rounded-lg shadow-lg max-w-md w-full max-h-[92vh] overflow-y-auto p-4 sm:p-6 border border-steel-300 text-center relative">
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-steel-200 pb-3 mb-4">
               <div className="flex items-center space-x-2">

@@ -102,7 +102,7 @@ export default function CaseDetailModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-steel-950/80 backdrop-blur-sm animate-fade-in font-sans">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-steel-950/80 backdrop-blur-sm animate-fade-in font-sans">
       <div 
         role="dialog"
         aria-modal="true"
@@ -110,32 +110,32 @@ export default function CaseDetailModal({
         className="bg-white w-full max-w-3xl rounded-lg shadow-modal border-2 border-steel-800 overflow-hidden flex flex-col max-h-[92vh]"
       >
         {/* Header */}
-        <div className="px-6 py-4 bg-steel-950 text-cream-50 border-b border-steel-800 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-biohazard-950 border border-biohazard-600/50 text-biohazard-400 rounded">
-              <ShieldAlert className="w-5 h-5" />
+        <div className="px-4 sm:px-6 py-3 sm:py-4 bg-steel-950 text-cream-50 border-b border-steel-800 flex items-center justify-between gap-3">
+          <div className="flex items-center space-x-2.5 sm:space-x-3 min-w-0 pr-2">
+            <div className="p-1.5 sm:p-2 bg-biohazard-950 border border-biohazard-600/50 text-biohazard-400 rounded shrink-0">
+              <ShieldAlert className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            <div>
-              <div className="flex items-center space-x-2">
-                <h3 id="case-dossier-title" className="font-serif font-bold text-base text-cream-100 tracking-wide">
-                  Audit Inspection Dossier: {riskCase?.case_code}
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                <h3 id="case-dossier-title" className="font-serif font-bold text-sm sm:text-base text-cream-100 tracking-wide truncate">
+                  Audit Dossier: {riskCase?.case_code}
                 </h3>
-                <span className={`px-2 py-0.5 rounded text-[11px] font-mono font-bold tracking-tight ${
+                <span className={`px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-mono font-bold tracking-tight shrink-0 ${
                   riskCase?.risk_score >= 80 
                     ? 'bg-biohazard-700 text-white border border-biohazard-600' 
                     : 'bg-hazmat-500 text-steel-950 border border-hazmat-600'
                 }`}>
-                  Risk Score: {riskCase?.risk_score}/100
+                  Risk: {riskCase?.risk_score}/100
                 </span>
               </div>
-              <p className="text-xs text-cream-300/80 font-mono mt-0.5">
+              <p className="text-[11px] sm:text-xs text-cream-300/80 font-mono mt-0.5 truncate">
                 Linked Batch: <span className="text-hazmat-300 font-bold">{batch?.batch_code || riskCase?.batch_id}</span> &bull; Status: {riskCase?.status}
               </p>
             </div>
           </div>
           <button 
             onClick={onClose} 
-            className="p-1.5 text-cream-300 hover:text-white rounded hover:bg-steel-800 transition"
+            className="p-1.5 text-cream-300 hover:text-white rounded hover:bg-steel-800 transition shrink-0"
             aria-label="Close dossier"
           >
             <X className="w-5 h-5" />

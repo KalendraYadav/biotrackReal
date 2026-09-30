@@ -282,12 +282,12 @@ export default function PersonnelDirectory() {
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
                   <tr className="border-b border-slate-200 bg-slate-50/80 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-                    <th scope="col" className="py-3 px-4">Personnel member</th>
-                    <th scope="col" className="py-3 px-4">Role</th>
-                    <th scope="col" className="py-3 px-4">Contact phone</th>
-                    <th scope="col" className="py-3 px-4">Assigned facility / Fleet</th>
-                    <th scope="col" className="py-3 px-4">Verification status</th>
-                    <th scope="col" className="py-3 px-4 text-right">Actions</th>
+                    <th scope="col" className="py-3 px-4 whitespace-nowrap">Personnel member</th>
+                    <th scope="col" className="py-3 px-4 whitespace-nowrap">Role</th>
+                    <th scope="col" className="py-3 px-4 whitespace-nowrap">Contact phone</th>
+                    <th scope="col" className="py-3 px-4 whitespace-nowrap">Assigned facility / Fleet</th>
+                    <th scope="col" className="py-3 px-4 whitespace-nowrap">Verification status</th>
+                    <th scope="col" className="py-3 px-4 text-right whitespace-nowrap">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -295,25 +295,25 @@ export default function PersonnelDirectory() {
                     const isUpdating = updatingId === person.id;
                     return (
                       <tr key={person.id} className="hover:bg-surface-alt/70 transition-colors">
-                        <td className="py-3.5 px-4">
+                        <td className="py-3.5 px-4 whitespace-nowrap">
                           <div className="font-semibold text-text">{person.name}</div>
                           <div className="text-[11px] text-text-muted">{person.email}</div>
                         </td>
 
-                        <td className="py-3.5 px-4">
+                        <td className="py-3.5 px-4 whitespace-nowrap">
                           <Badge variant="neutral" size="sm">
                             {getRoleLabel(person.role)}
                           </Badge>
                         </td>
 
-                        <td className="py-3.5 px-4">
+                        <td className="py-3.5 px-4 whitespace-nowrap">
                           <div className="flex items-center gap-1.5 font-mono text-text">
                             <Phone className="w-3 h-3 text-text-muted shrink-0" aria-hidden="true" />
                             <span>{person.phone_number || '+91 98100 00000'}</span>
                           </div>
                         </td>
 
-                        <td className="py-3.5 px-4">
+                        <td className="py-3.5 px-4 whitespace-nowrap">
                           <div className="flex items-center gap-1.5 text-text">
                             {person.assigned_vehicle ? (
                               <>
@@ -331,7 +331,7 @@ export default function PersonnelDirectory() {
                           </div>
                         </td>
 
-                        <td className="py-3.5 px-4">
+                        <td className="py-3.5 px-4 whitespace-nowrap">
                           {getStatusBadge(person.verification_status)}
                         </td>
 

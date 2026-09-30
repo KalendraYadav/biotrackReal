@@ -95,26 +95,26 @@ export default function AppLayout({ children }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-15">
             {/* Logo & Product Name */}
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-6 min-w-0">
               <Link 
                 to={ROLE_ROUTES[role] || '/'} 
-                className="flex items-center gap-2.5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 rounded-lg py-1"
+                className="flex items-center gap-2.5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 rounded-lg py-1 min-w-0"
                 aria-label="BioTrace home dashboard"
               >
                 <div className="p-1 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center shrink-0 shadow-xs group-hover:border-cyan-400 transition-colors">
                   <BioTraceMark className="w-5 h-8 drop-shadow" />
                 </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg font-bold tracking-tight text-white leading-none">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <span className="text-base sm:text-lg font-bold tracking-tight text-white leading-none">
                       <strong className="font-extrabold text-white">BIO</strong>
                       <span className="font-light text-[#D9E9FB] ml-[0.04em]">TRACE</span>
                     </span>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded font-mono font-bold uppercase tracking-wider bg-[#0C477D] text-cyan-300 border border-[#36B9EE]/50">
+                    <span className="text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded font-mono font-bold uppercase tracking-wider bg-[#0C477D] text-cyan-300 border border-[#36B9EE]/50 shrink-0">
                       NidusClean
                     </span>
                   </div>
-                  <p className="text-[10px] text-cyan-200/80 font-mono leading-none mt-1">CPCB BMW Chain of Custody</p>
+                  <p className="text-[10px] text-cyan-200/80 font-mono leading-none mt-1 hidden sm:block truncate">CPCB BMW Chain of Custody</p>
                 </div>
               </Link>
 
@@ -150,7 +150,7 @@ export default function AppLayout({ children }) {
             </div>
 
             {/* Right Controls: Unified Status, Role Switcher, Profile */}
-            <div className="flex items-center gap-2.5 sm:gap-3.5">
+            <div className="flex items-center gap-2 sm:gap-3.5 shrink-0">
               {/* Executive System Health Indicator */}
               <div className="hidden lg:flex items-center gap-2 px-2.5 py-1 rounded-full bg-[#083569]/90 border border-[#1E5692] text-[11px] font-mono text-cyan-200">
                 <span className="relative flex h-2 w-2">
@@ -162,8 +162,8 @@ export default function AppLayout({ children }) {
                 </span>
               </div>
 
-              {/* Role Switcher Dropdown (for testing and quick demo navigation) */}
-              <div className="relative" ref={switcherRef}>
+              {/* Role Switcher Dropdown (for desktop / tablet viewports; on mobile accessible via drawer menu) */}
+              <div className="relative hidden md:block" ref={switcherRef}>
                 <button
                   type="button"
                   onClick={() => setRoleSwitcherOpen(!roleSwitcherOpen)}
@@ -227,9 +227,8 @@ export default function AppLayout({ children }) {
                 )}
               </div>
 
-
-              {/* User Profile & Logout */}
-              <div className="flex items-center pl-2 border-l border-slate-800/80 gap-2">
+              {/* User Profile & Actions */}
+              <div className="flex items-center pl-1.5 sm:pl-2 border-l border-slate-800/80 gap-1.5 sm:gap-2">
                 <div className="text-right hidden sm:block">
                   <div className="text-xs font-semibold text-white leading-tight">{user?.name}</div>
                   <div className="text-[10px] text-slate-400 font-mono leading-tight truncate max-w-[140px]">
@@ -240,7 +239,7 @@ export default function AppLayout({ children }) {
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="p-2 rounded-lg bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 text-slate-300 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                  className="p-2 rounded-lg bg-[#083569]/90 hover:bg-[#0C477D] border border-[#1E5692] text-slate-300 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
                   aria-label="Sign out of BioTrace"
                   title="Sign out"
                 >
@@ -251,7 +250,7 @@ export default function AppLayout({ children }) {
                 <button
                   type="button"
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="md:hidden p-2 rounded-lg bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 text-slate-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                  className="md:hidden p-2 rounded-lg bg-[#083569]/90 hover:bg-[#0C477D] border border-[#1E5692] text-slate-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
                   aria-expanded={mobileMenuOpen}
                   aria-label="Toggle navigation menu"
                   title="Toggle mobile menu"
@@ -265,16 +264,16 @@ export default function AppLayout({ children }) {
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="md:hidden bg-[#0F172A] border-t border-slate-800 px-4 py-3 space-y-3 animate-in fade-in text-xs">
-            <div className="space-y-1 pb-2 border-b border-slate-800">
+          <div className="md:hidden bg-[#03275D] border-t border-[#104F89] px-4 py-3 space-y-3 animate-in fade-in text-xs text-white shadow-xl">
+            <div className="space-y-1 pb-2 border-b border-[#104F89]">
               <Link
                 to={ROLE_ROUTES[role] || '/'}
                 onClick={() => setMobileMenuOpen(false)}
                 aria-current={isDashboardActive ? 'page' : undefined}
-                className={`block px-3 py-2 rounded-lg text-xs font-medium ${
+                className={`block px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
                   isDashboardActive
-                    ? 'bg-slate-800 text-white font-semibold'
-                    : 'text-slate-300 hover:text-white hover:bg-slate-800/50'
+                    ? 'bg-[#083569] text-white font-semibold border-l-2 border-[#00C49E]'
+                    : 'text-slate-300 hover:text-white hover:bg-white/5'
                 }`}
               >
                 Dashboard
@@ -284,10 +283,10 @@ export default function AppLayout({ children }) {
                   to="/personnel"
                   onClick={() => setMobileMenuOpen(false)}
                   aria-current={isPersonnelActive ? 'page' : undefined}
-                  className={`block px-3 py-2 rounded-lg text-xs font-medium ${
+                  className={`block px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
                     isPersonnelActive
-                      ? 'bg-slate-800 text-white font-semibold'
-                      : 'text-slate-300 hover:text-white hover:bg-slate-800/50'
+                      ? 'bg-[#083569] text-white font-semibold border-l-2 border-[#00C49E]'
+                      : 'text-slate-300 hover:text-white hover:bg-white/5'
                   }`}
                 >
                   Personnel Directory
@@ -296,9 +295,12 @@ export default function AppLayout({ children }) {
             </div>
 
             <div className="pt-1">
-              <p className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider mb-2">
-                Switch Operational Context
-              </p>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-[10px] font-mono font-bold text-cyan-300 uppercase tracking-wider">
+                  Switch Operational Context
+                </p>
+                <span className="text-[10px] font-mono text-cyan-400/80">6 Statutory Roles</span>
+              </div>
               <div className="grid grid-cols-2 gap-1.5">
                 {DEMO_ROLES_LIST.map((r) => (
                   <button
@@ -307,22 +309,28 @@ export default function AppLayout({ children }) {
                     onClick={() => handleSwitchRole(r.role)}
                     className={`p-2 rounded-lg border text-left text-[11px] font-medium transition-colors ${
                       r.role === role
-                        ? 'bg-emerald-950/60 border-emerald-700 text-emerald-300 font-bold'
-                        : 'bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800'
+                        ? 'bg-[#0C477D] border-[#00C49E] text-cyan-200 font-bold shadow-xs'
+                        : 'bg-[#083569]/80 border-[#1E5692] text-slate-200 hover:bg-[#0C477D]/60'
                     }`}
                   >
-                    {r.title}
+                    <div className="truncate font-semibold">{r.title}</div>
+                    <div className="text-[9px] text-cyan-300/70 truncate">{r.facility}</div>
                   </button>
                 ))}
               </div>
             </div>
 
-            <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-slate-400 text-xs">
-              <span className="truncate max-w-[200px]">{user?.name} ({user?.facility_name || 'CPCB'})</span>
+            <div className="pt-2 border-t border-[#104F89] flex items-center justify-between text-xs">
+              <div className="min-w-0 pr-2">
+                <span className="truncate block font-medium text-white">{user?.name}</span>
+                <span className="text-[10px] text-cyan-200/70 font-mono truncate block">
+                  {user?.facility_name || user?.facility?.name || 'CPCB Regulatory Office'}
+                </span>
+              </div>
               <button
                 type="button"
                 onClick={handleLogout}
-                className="text-red-400 font-semibold hover:text-red-300"
+                className="text-red-400 font-semibold hover:text-red-300 shrink-0 px-2.5 py-1 rounded bg-red-950/40 border border-red-800/40"
               >
                 Sign out
               </button>
@@ -365,13 +373,13 @@ export default function AppLayout({ children }) {
 
       {/* Enterprise Regulatory Footer */}
       <footer className="bg-white border-t border-slate-200 mt-auto py-5 text-slate-500 text-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-[11px]">
-          <div className="flex items-center gap-2">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-[11px] text-center sm:text-left">
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
             <span className="font-bold text-slate-800">BioTrace (NidusClean)</span>
             <span>&bull;</span>
             <span>Central Pollution Control Board BMW Rules 2016 Compliant</span>
           </div>
-          <div className="flex items-center gap-4 text-slate-400">
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-4 text-slate-400">
             <span>Server-side PostGIS & RBAC Enforced</span>
             <span>&bull;</span>
             <span>Cryptographic Form IV Ledger</span>

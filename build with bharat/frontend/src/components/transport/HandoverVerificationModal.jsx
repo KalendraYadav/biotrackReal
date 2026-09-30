@@ -709,35 +709,35 @@ export default function HandoverVerificationModal({
   const isHighVariance = diffPercent > 5.0;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-steel-950/70 backdrop-blur-xs animate-fade-in font-sans">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-steel-950/70 backdrop-blur-xs animate-fade-in font-sans">
       <div 
         role="dialog"
         aria-modal="true"
         aria-labelledby="handover-modal-title"
-        className="bg-white w-full max-w-2xl rounded-lg shadow-modal border-2 border-steel-800 overflow-hidden flex flex-col max-h-[90vh]"
+        className="bg-white w-full max-w-2xl rounded-lg shadow-modal border-2 border-steel-800 overflow-hidden flex flex-col max-h-[92vh]"
       >
         {/* Header */}
-        <div className="px-6 py-4 bg-steel-900 text-cream flex items-center justify-between border-b border-hazmat-800">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-hazmat-500/20 text-hazmat-400 rounded border border-hazmat-600/40">
-              <Truck className="w-5 h-5" />
+        <div className="px-4 sm:px-6 py-3.5 sm:py-4 bg-steel-900 text-cream flex items-center justify-between border-b border-hazmat-800">
+          <div className="flex items-center space-x-2.5 sm:space-x-3 min-w-0 pr-2">
+            <div className="p-1.5 sm:p-2 bg-hazmat-500/20 text-hazmat-400 rounded border border-hazmat-600/40 shrink-0">
+              <Truck className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            <div>
-              <h3 id="handover-modal-title" className="font-serif font-black text-base text-cream tracking-tight">
+            <div className="min-w-0">
+              <h3 id="handover-modal-title" className="font-serif font-black text-sm sm:text-base text-cream tracking-tight truncate">
                 {stage === 'COLLECTION' 
                   ? 'Hospital Gate Collection Handover' 
                   : stage === 'TRANSPORT_PICKUP' 
                     ? 'Vehicle Pickup Handover Protocol' 
                     : 'CBWTF Gate Intake & Drop-off Handover'}
               </h3>
-              <p className="text-xs text-steel-400 font-mono">
+              <p className="text-[11px] sm:text-xs text-steel-400 font-mono truncate">
                 Batch: <span className="text-hazmat-300 font-bold">{batch?.batch_code}</span> &bull; {stage === 'COLLECTION' ? `Officer: ${officer?.name || 'Priya Sharma'}` : `Vehicle: ${vehicle?.plate_no}`}
               </p>
             </div>
           </div>
           <button 
             onClick={onClose}
-            className="p-1.5 text-steel-400 hover:text-cream rounded transition"
+            className="p-1.5 text-steel-400 hover:text-cream rounded transition shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
@@ -745,32 +745,33 @@ export default function HandoverVerificationModal({
 
         {/* Progress Stepper (1 to 5) */}
         {!successReceipt && (
-          <div className="px-6 py-3 bg-hazmat-50 border-b border-hazmat-200">
+          <div className="px-3 sm:px-6 py-2.5 sm:py-3 bg-hazmat-50 border-b border-hazmat-200">
             <div className="flex items-center justify-between max-w-lg mx-auto">
               {[
-                { step: 1, label: 'QR Scan', icon: QrCode },
-                { step: 2, label: 'Officer Auth', icon: ShieldCheck },
-                { step: 3, label: 'Live Camera', icon: Camera },
-                { step: 4, label: 'GPS + Time', icon: MapPin },
-                { step: 5, label: 'Quantity', icon: Scale }
-              ].map(({ step, label, icon: StepIcon }) => {
+                { step: 1, label: 'QR Scan', short: 'QR', icon: QrCode },
+                { step: 2, label: 'Officer Auth', short: 'Auth', icon: ShieldCheck },
+                { step: 3, label: 'Live Camera', short: 'Photo', icon: Camera },
+                { step: 4, label: 'GPS + Time', short: 'GPS', icon: MapPin },
+                { step: 5, label: 'Quantity', short: 'Weight', icon: Scale }
+              ].map(({ step, label, short, icon: StepIcon }) => {
                 const isCurrent = currentStep === step;
                 const isComplete = currentStep > step;
                 return (
-                  <div key={step} className="flex flex-col items-center">
-                    <div className={`w-8 h-8 rounded flex items-center justify-center text-xs font-mono font-bold transition-all border ${
+                  <div key={step} className="flex flex-col items-center text-center px-0.5">
+                    <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded flex items-center justify-center text-xs font-mono font-bold transition-all border ${
                       isComplete 
                         ? 'bg-forest-700 text-white border-forest-800' 
                         : isCurrent 
                           ? 'bg-hazmat-900 text-white border-hazmat-900 shadow-sm' 
                           : 'bg-hazmat-200 text-steel-600 border-hazmat-300'
                     }`}>
-                      {isComplete ? <CheckCircle2 className="w-4 h-4" /> : step}
+                      {isComplete ? <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : step}
                     </div>
-                    <span className={`text-[10px] mt-1 font-mono font-bold uppercase ${
+                    <span className={`text-[9px] sm:text-[10px] mt-1 font-mono font-bold uppercase whitespace-nowrap ${
                       isCurrent ? 'text-steel-900' : 'text-steel-500'
                     }`}>
-                      {label}
+                      <span className="hidden sm:inline">{label}</span>
+                      <span className="sm:hidden">{short}</span>
                     </span>
                   </div>
                 );
@@ -780,7 +781,7 @@ export default function HandoverVerificationModal({
         )}
 
         {/* Body Content */}
-        <div className="p-6 overflow-y-auto flex-1">
+        <div className="p-4 sm:p-6 overflow-y-auto flex-1">
           {error && (
             <div className="mb-4 p-3 bg-biohazard-50 border border-biohazard-300 rounded text-xs text-biohazard-900 flex items-center space-x-2 font-mono">
               <AlertTriangle className="w-4 h-4 flex-shrink-0 text-biohazard-700" />

@@ -362,13 +362,13 @@ export default function TransportDashboard() {
             <table className="w-full text-left text-xs border-collapse">
               <thead>
                 <tr className="border-b border-border bg-surface-alt text-[11px] font-semibold text-text-muted uppercase tracking-wider">
-                  <th scope="col" className="py-3 px-4">Batch code</th>
-                  <th scope="col" className="py-3 px-4">CPCB category</th>
-                  <th scope="col" className="py-3 px-4">Origin facility</th>
-                  <th scope="col" className="py-3 px-4">Destination CBWTF</th>
-                  <th scope="col" className="py-3 px-4">Manifest weight</th>
-                  <th scope="col" className="py-3 px-4">Current status</th>
-                  <th scope="col" className="py-3 px-4 text-right">Handover action</th>
+                  <th scope="col" className="py-3 px-4 whitespace-nowrap">Batch code</th>
+                  <th scope="col" className="py-3 px-4 whitespace-nowrap">CPCB category</th>
+                  <th scope="col" className="py-3 px-4 whitespace-nowrap">Origin facility</th>
+                  <th scope="col" className="py-3 px-4 whitespace-nowrap">Destination CBWTF</th>
+                  <th scope="col" className="py-3 px-4 whitespace-nowrap">Manifest weight</th>
+                  <th scope="col" className="py-3 px-4 whitespace-nowrap">Current status</th>
+                  <th scope="col" className="py-3 px-4 text-right whitespace-nowrap">Handover action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -390,38 +390,38 @@ export default function TransportDashboard() {
                     return (
                       <tr key={batch.id} className="hover:bg-surface-alt/70 transition-colors">
                         {/* Batch Code */}
-                        <td className="py-3 px-4 font-mono font-bold text-text">
+                        <td className="py-3 px-4 font-mono font-bold text-text whitespace-nowrap">
                           {batch.batch_code}
                         </td>
 
                         {/* CPCB Category */}
-                        <td className="py-3 px-4">
+                        <td className="py-3 px-4 whitespace-nowrap">
                           <CategoryBadge category={batch.cpcb_waste_category} />
                         </td>
 
                         {/* Origin Hospital */}
-                        <td className="py-3 px-4 text-text">
+                        <td className="py-3 px-4 text-text whitespace-nowrap">
                           <div className="font-medium">{batch.hospital?.name || 'AIIMS Central Hospital'}</div>
                           <div className="text-[10px] text-text-muted">{batch.generating_department}</div>
                         </td>
 
                         {/* Destination CBWTF */}
-                        <td className="py-3 px-4 text-text-muted">
+                        <td className="py-3 px-4 text-text-muted whitespace-nowrap">
                           {batch.assigned_cbwtf?.name || 'EcoSafe Waste Handlers CBWTF'}
                         </td>
 
                         {/* Weight */}
-                        <td className="py-3 px-4 font-semibold text-text tabular-nums">
+                        <td className="py-3 px-4 font-semibold text-text tabular-nums whitespace-nowrap">
                           {batch.quantity_kg} kg
                         </td>
 
                         {/* Status */}
-                        <td className="py-3 px-4">
+                        <td className="py-3 px-4 whitespace-nowrap">
                           <StatusPill status={batch.status} />
                         </td>
 
                         {/* Handover Action */}
-                        <td className="py-3 px-4 text-right">
+                        <td className="py-3 px-4 text-right whitespace-nowrap">
                           <div className="flex items-center justify-end gap-2">
                             {isReadyForPickup && (
                               <Button

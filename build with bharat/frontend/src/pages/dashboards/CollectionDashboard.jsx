@@ -247,9 +247,9 @@ export default function CollectionDashboard() {
                     className="p-4 rounded-xl border border-slate-200/90 bg-white hover:border-slate-300 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between"
                   >
                     <div className="space-y-3">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono font-bold text-xs text-slate-900 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded">
+                      <div className="flex flex-wrap items-start justify-between gap-2">
+                        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                          <span className="font-mono font-bold text-xs text-slate-900 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded whitespace-nowrap">
                             {b.batch_code}
                           </span>
                           <CategoryBadge category={b.cpcb_waste_category} />

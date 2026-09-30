@@ -258,12 +258,12 @@ export default function TreatmentDashboard() {
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
                   <tr className="bg-surface-alt text-text-muted uppercase text-[11px] font-semibold border-b border-border">
-                    <th scope="col" className="py-2.5 px-4">Batch code</th>
-                    <th scope="col" className="py-2.5 px-4">CPCB category</th>
-                    <th scope="col" className="py-2.5 px-4">Generating hospital</th>
-                    <th scope="col" className="py-2.5 px-4">Manifest weight</th>
-                    <th scope="col" className="py-2.5 px-4">Transit status</th>
-                    <th scope="col" className="py-2.5 px-4 text-right">Weighbridge action</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">Batch code</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">CPCB category</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">Generating hospital</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">Manifest weight</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">Transit status</th>
+                    <th scope="col" className="py-2.5 px-4 text-right whitespace-nowrap">Weighbridge action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -279,10 +279,10 @@ export default function TreatmentDashboard() {
                   ) : (
                     filterList(incomingBatches).map((batch) => (
                       <tr key={batch.id} className="hover:bg-surface-alt/70 transition-colors">
-                        <td className="py-3 px-4 font-mono font-bold text-text">
+                        <td className="py-3 px-4 font-mono font-bold text-text whitespace-nowrap">
                           {batch.batch_code}
                         </td>
-                        <td className="py-3 px-4">
+                        <td className="py-3 px-4 whitespace-nowrap">
                           <CategoryBadge category={batch.cpcb_waste_category} />
                         </td>
                         <td className="py-3 px-4 text-text font-medium">
@@ -329,12 +329,12 @@ export default function TreatmentDashboard() {
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
                   <tr className="bg-surface-alt text-text-muted uppercase text-[11px] font-semibold border-b border-border">
-                    <th scope="col" className="py-2.5 px-4">Batch code</th>
-                    <th scope="col" className="py-2.5 px-4">Category & waste type</th>
-                    <th scope="col" className="py-2.5 px-4">Received weight</th>
-                    <th scope="col" className="py-2.5 px-4">Recommended treatment</th>
-                    <th scope="col" className="py-2.5 px-4">Holding status</th>
-                    <th scope="col" className="py-2.5 px-4 text-right">Treatment action</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">Batch code</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">Category & waste type</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">Received weight</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">Recommended treatment</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">Holding status</th>
+                    <th scope="col" className="py-2.5 px-4 text-right whitespace-nowrap">Treatment action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -354,10 +354,10 @@ export default function TreatmentDashboard() {
 
                       return (
                         <tr key={batch.id} className="hover:bg-surface-alt/70 transition-colors">
-                          <td className="py-3 px-4 font-mono font-bold text-text">
+                          <td className="py-3 px-4 font-mono font-bold text-text whitespace-nowrap">
                             {batch.batch_code}
                           </td>
-                          <td className="py-3 px-4">
+                          <td className="py-3 px-4 whitespace-nowrap">
                             <div className="flex items-center gap-2">
                               <CategoryBadge category={batch.cpcb_waste_category} />
                               <span className="text-text-muted">{batch.cpcb_waste_type}</span>
@@ -408,12 +408,12 @@ export default function TreatmentDashboard() {
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
                   <tr className="bg-surface-alt text-text-muted uppercase text-[11px] font-semibold border-b border-border">
-                    <th scope="col" className="py-2.5 px-4">Batch code</th>
-                    <th scope="col" className="py-2.5 px-4">Category</th>
-                    <th scope="col" className="py-2.5 px-4">Origin hospital</th>
-                    <th scope="col" className="py-2.5 px-4">Treated weight</th>
-                    <th scope="col" className="py-2.5 px-4">Lifecycle state</th>
-                    <th scope="col" className="py-2.5 px-4 text-right">Disposal action</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">Batch code</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">Category</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">Origin hospital</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">Treated weight</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">Lifecycle state</th>
+                    <th scope="col" className="py-2.5 px-4 text-right whitespace-nowrap">Disposal action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -433,10 +433,10 @@ export default function TreatmentDashboard() {
 
                       return (
                         <tr key={batch.id} className="hover:bg-surface-alt/70 transition-colors">
-                          <td className="py-3 px-4 font-mono font-bold text-text">
+                          <td className="py-3 px-4 font-mono font-bold text-text whitespace-nowrap">
                             {batch.batch_code}
                           </td>
-                          <td className="py-3 px-4">
+                          <td className="py-3 px-4 whitespace-nowrap">
                             <CategoryBadge category={batch.cpcb_waste_category} />
                           </td>
                           <td className="py-3 px-4 text-text font-medium">
@@ -505,14 +505,14 @@ export default function TreatmentDashboard() {
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
                   <tr className="bg-surface-alt text-text-muted uppercase text-[11px] font-semibold border-b border-border">
-                    <th scope="col" className="py-2.5 px-4">Batch code</th>
-                    <th scope="col" className="py-2.5 px-4">Origin hospital</th>
-                    <th scope="col" className="py-2.5 px-4">Category</th>
-                    <th scope="col" className="py-2.5 px-4">Gen weight</th>
-                    <th scope="col" className="py-2.5 px-4">Rec weight</th>
-                    <th scope="col" className="py-2.5 px-4">Variance (Δ kg)</th>
-                    <th scope="col" className="py-2.5 px-4">Discrepancy %</th>
-                    <th scope="col" className="py-2.5 px-4 text-right">CPCB compliance</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">Batch code</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">Origin hospital</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">Category</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">Gen weight</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">Rec weight</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">Variance (Δ kg)</th>
+                    <th scope="col" className="py-2.5 px-4 whitespace-nowrap">Discrepancy %</th>
+                    <th scope="col" className="py-2.5 px-4 text-right whitespace-nowrap">CPCB compliance</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -526,7 +526,7 @@ export default function TreatmentDashboard() {
 
                     return (
                       <tr key={batch.id} className="hover:bg-surface-alt/70 transition-colors">
-                        <td className="py-3 px-4 font-mono font-bold text-text">
+                        <td className="py-3 px-4 font-mono font-bold text-text whitespace-nowrap">
                           {batch.batch_code}
                         </td>
                         <td className="py-3 px-4 text-text font-medium">
