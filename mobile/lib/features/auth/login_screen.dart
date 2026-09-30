@@ -7,6 +7,8 @@ import '../../core/socket/socket_service.dart';
 import '../../core/storage/secure_storage_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../shared/models/user_model.dart';
+import '../../shared/widgets/biotrace_mark.dart';
+import '../../shared/widgets/india_silhouette.dart';
 import '../navigation/main_shell_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -24,6 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   String _loadingMessage = 'Authenticating...';
   String? _errorMessage;
+  bool _showManualLogin = false;
 
   @override
   void dispose() {
@@ -137,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
           content: Text(res.isSuccess
               ? 'Backend is online & reachable: 200 OK (${res.data?['database'] ?? 'connected'})'
               : 'Probe failed: ${res.errorMessage}'),
-          backgroundColor: res.isSuccess ? const Color(0xFF14462A) : AppColors.danger,
+          backgroundColor: res.isSuccess ? AppColors.primary : AppColors.danger,
           duration: const Duration(seconds: 4),
         ),
       );
@@ -167,10 +170,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     RadioListTile<AppEnvironment>(
-                      activeColor: const Color(0xFF14462A),
+                      activeColor: AppColors.primary,
                       title: const Text(
                         'Production Cloud (Default)',
-                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF14462A)),
+                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.primary),
                       ),
                       subtitle: const Text('biotrace-backend-aniv.onrender.com/api', style: TextStyle(fontSize: 11)),
                       value: AppEnvironment.production,
@@ -181,7 +184,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       }),
                     ),
                     RadioListTile<AppEnvironment>(
-                      activeColor: const Color(0xFF14462A),
+                      activeColor: AppColors.primary,
                       title: const Text('Local WiFi / LAN IP', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
                       subtitle: const Text('Physical phone on same WiFi as PC', style: TextStyle(fontSize: 11)),
                       value: AppEnvironment.localLan,
@@ -192,7 +195,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       }),
                     ),
                     RadioListTile<AppEnvironment>(
-                      activeColor: const Color(0xFF14462A),
+                      activeColor: AppColors.primary,
                       title: const Text('Android Emulator (10.0.2.2:5000)', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
                       subtitle: const Text('Only for Android Studio PC emulator', style: TextStyle(fontSize: 11)),
                       value: AppEnvironment.emulator,
@@ -227,7 +230,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           probeResult!,
                           style: TextStyle(
                             fontSize: 11,
-                            color: probeResult!.startsWith('OK') ? const Color(0xFF14462A) : const Color(0xFF991B1B),
+                            color: probeResult!.startsWith('OK') ? AppColors.primary : const Color(0xFF991B1B),
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -255,7 +258,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             }
                           });
                         },
-                  child: const Text('Test Connection', style: TextStyle(color: Color(0xFF14462A))),
+                  child: const Text('Test Connection', style: TextStyle(color: AppColors.primary)),
                 ),
                 TextButton(
                   onPressed: () => Navigator.pop(ctx),
@@ -263,7 +266,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF14462A),
+                    backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
                   ),
                   onPressed: () async {
@@ -284,39 +287,261 @@ class _LoginScreenState extends State<LoginScreen> {
   IconData _getRoleIcon(String role) {
     switch (role) {
       case AppRoles.hospitalAuthority:
-        return Icons.domain_rounded;
+        return Icons.local_hospital_rounded;
       case AppRoles.collectionOfficer:
-        return Icons.verified_user_rounded;
+        return Icons.local_shipping_outlined;
       case AppRoles.transportOfficer:
         return Icons.local_shipping_rounded;
       case AppRoles.treatmentFacility:
-        return Icons.local_fire_department_rounded;
+        return Icons.factory_rounded;
       case AppRoles.governmentAuthority:
-        return Icons.show_chart_rounded;
+        return Icons.account_balance_rounded;
       case AppRoles.complianceInspector:
-        return Icons.balance_rounded;
+        return Icons.fact_check_rounded;
       default:
-        return Icons.shield_outlined;
+        return Icons.person_rounded;
     }
   }
 
   Color _getRoleAccentColor(String role) {
     switch (role) {
       case AppRoles.hospitalAuthority:
-        return const Color(0xFF14462A); // Forest Green
+        return const Color(0xFF00CA92); // Emerald / Mint (Web tone)
       case AppRoles.collectionOfficer:
-        return const Color(0xFF103823); // Dark Forest
+        return const Color(0xFFF59E0B); // Amber
       case AppRoles.transportOfficer:
-        return const Color(0xFFB45309); // Hazmat Amber
+        return const Color(0xFF3B82F6); // Blue
       case AppRoles.treatmentFacility:
-        return const Color(0xFFC2410C); // Biohazard Orange
+        return const Color(0xFFF97316); // Orange
       case AppRoles.governmentAuthority:
-        return const Color(0xFF1E293B); // Slate Navy
+        return const Color(0xFF8B5CF6); // Violet
       case AppRoles.complianceInspector:
-        return const Color(0xFFD97706); // Gold Amber
+        return const Color(0xFF06B6D4); // Cyan
       default:
-        return const Color(0xFF14462A);
+        return const Color(0xFF07559B);
     }
+  }
+
+  String _getRoleSubtitle(String role) {
+    switch (role) {
+      case AppRoles.hospitalAuthority:
+        return 'Generate & Manage Waste';
+      case AppRoles.collectionOfficer:
+        return 'Collect from Generators';
+      case AppRoles.transportOfficer:
+        return 'Track Waste Movement';
+      case AppRoles.treatmentFacility:
+        return 'Process & Treat Waste';
+      case AppRoles.governmentAuthority:
+        return 'Regulate & Monitor Compliance';
+      case AppRoles.complianceInspector:
+        return 'Audit & Field Inspection';
+      default:
+        return 'Authorized Personnel';
+    }
+  }
+
+  void _showRoleSelectionSheet() {
+    final accounts = AppConstants.demoAccounts;
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.85,
+          ),
+          decoration: BoxDecoration(
+            color: const Color(0xFF0A3464),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            border: Border.all(color: const Color(0xFF83B7E7).withValues(alpha: 0.8), width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.6),
+                blurRadius: 30,
+                offset: const Offset(0, -10),
+              ),
+            ],
+          ),
+          child: SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Handle bar
+                  Center(
+                    child: Container(
+                      width: 44,
+                      height: 4,
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+
+                  // Header with title, subtitle, and close icon
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF0C477D),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: const Color(0xFF7BA7D1).withValues(alpha: 0.8)),
+                        ),
+                        child: const Icon(
+                          Icons.person_outline_rounded,
+                          color: Color(0xFF91F1CC),
+                          size: 22,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            Text(
+                              'Select Your Role',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              'Choose your statutory role to access BioTrace.',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Color(0xFFA8C9E9),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        icon: const Icon(Icons.close_rounded, color: Color(0xFFC9E1FA)),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Roles List
+                  Flexible(
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      itemCount: accounts.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 10),
+                      itemBuilder: (context, index) {
+                        final account = accounts[index];
+                        final isSelected = account.role == _selectedRole;
+                        final accentColor = _getRoleAccentColor(account.role);
+                        final iconData = _getRoleIcon(account.role);
+                        final subtitle = _getRoleSubtitle(account.role);
+
+                        return Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              _onSelectRole(account);
+                              Navigator.pop(ctx);
+                            },
+                            onDoubleTap: () {
+                              Navigator.pop(ctx);
+                              _onInstantLogin(account);
+                            },
+                            borderRadius: BorderRadius.circular(16),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 150),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? const Color(0xFF0E5B9B)
+                                    : const Color(0xFF0B4E85).withValues(alpha: 0.7),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: isSelected ? accentColor : const Color(0xFF78AADB).withValues(alpha: 0.4),
+                                  width: isSelected ? 2 : 1,
+                                ),
+                                boxShadow: isSelected
+                                    ? [
+                                        BoxShadow(
+                                          color: accentColor.withValues(alpha: 0.25),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ]
+                                    : null,
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 44,
+                                    height: 44,
+                                    decoration: BoxDecoration(
+                                      color: accentColor.withValues(alpha: 0.22),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Icon(iconData, color: accentColor, size: 22),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          account.title,
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          subtitle,
+                                          style: const TextStyle(
+                                            fontSize: 11.5,
+                                            color: Color(0xFFA8C7E5),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  if (isSelected)
+                                    const Icon(
+                                      Icons.check_circle_rounded,
+                                      color: Color(0xFF00CA92),
+                                      size: 22,
+                                    )
+                                  else
+                                    const Icon(
+                                      Icons.arrow_forward_ios_rounded,
+                                      color: Color(0xFFE0EFFF),
+                                      size: 15,
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -328,25 +553,54 @@ class _LoginScreenState extends State<LoginScreen> {
     );
 
     final screenWidth = MediaQuery.of(context).size.width;
-    final horizontalPadding = screenWidth < 360 ? 12.0 : 16.0;
+    final horizontalPadding = screenWidth < 360 ? 14.0 : 18.0;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF090D16), // Dark institutional navy (#090D16 / #0B132B)
+      backgroundColor: const Color(0xFF03275D),
       body: Stack(
         children: [
-          // Subtle ambient radial glow at the top center
+          // 1. Environmental Background Graphic (Hospital left, Truck right)
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/biotrace_login_bg.jpg',
+              fit: BoxFit.cover,
+              alignment: Alignment.bottomCenter,
+              errorBuilder: (context, error, stackTrace) => Container(
+                color: const Color(0xFF03275D),
+              ),
+            ),
+          ),
+
+          // 2. Dark Deep-Navy Atmosphere Gradient
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    const Color(0xF003275D),
+                    const Color(0xD6043277),
+                    const Color(0xF8021B3D),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // 3. Ambient Blue/Teal Glow
           Positioned(
-            top: -100,
+            top: -60,
             left: 0,
             right: 0,
-            height: 380,
+            height: 340,
             child: Container(
               decoration: const BoxDecoration(
                 gradient: RadialGradient(
                   center: Alignment.topCenter,
-                  radius: 0.85,
+                  radius: 0.9,
                   colors: [
-                    Color(0x1A10B981), // Emerald glow
+                    Color(0x5500C49E),
                     Colors.transparent,
                   ],
                 ),
@@ -354,654 +608,634 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
+          // 4. Main Scrollable Content
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 20),
+                padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 16),
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 480),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // Shield Identity Mark (Web reference squircle)
-                      Container(
-                        width: 52,
-                        height: 52,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF0F172A),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: const Color(0xFF1E293B), width: 1.5),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.45),
-                              blurRadius: 14,
-                              offset: const Offset(0, 4),
+                      // Top Right Environment Chip
+                      Align(
+                        alignment: Alignment.topRight,
+                        child: InkWell(
+                          onTap: _showEnvironmentDialog,
+                          borderRadius: BorderRadius.circular(20),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF0C477D).withValues(alpha: 0.8),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: const Color(0xFF83B4E2).withValues(alpha: 0.5),
+                              ),
                             ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.shield_outlined,
-                          color: Color(0xFFF03E3E), // Biohazard coral red accent
-                          size: 28,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.cloud_outlined,
+                                  size: 15,
+                                  color: Color(0xFF91F1CC),
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  AppConfig.environmentLabel,
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFFD9E9FB),
+                                  ),
+                                ),
+                                const SizedBox(width: 3),
+                                const Icon(
+                                  Icons.keyboard_arrow_down_rounded,
+                                  size: 16,
+                                  color: Color(0xFF94A3B8),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 12),
 
-                      // Brand Wordmark + NIDUSCLEAN Badge
-                      Wrap(
-                        alignment: WrapAlignment.center,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        spacing: 8,
-                        runSpacing: 4,
-                        children: [
-                          const Text(
-                            'BIOTrace',
+                      // Authentic 4-Quadrant Geometric BioTrace "B" Mark
+                      const BioTraceMark(width: 62, height: 98),
+                      const SizedBox(height: 12),
+
+                      // Institutional Wordmark: BIO TRACE
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Text(
+                            'BIO',
                             style: TextStyle(
-                              fontSize: 26,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: -0.5,
+                              fontSize: 32,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 2.0,
                               color: Colors.white,
                             ),
                           ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFB91C1C), // Red badge matching web
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(color: const Color(0xFFDC2626), width: 1),
-                            ),
-                            child: const Text(
-                              'NIDUSCLEAN',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.8,
-                                fontFamily: 'monospace',
-                              ),
+                          SizedBox(width: 3),
+                          Text(
+                            'TRACE',
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.w300,
+                              letterSpacing: 2.0,
+                              color: Color(0xFFD9E9FB),
                             ),
                           ),
                         ],
                       ),
+                      const SizedBox(height: 8),
+
+                      // Restrained Tricolor Accent (Saffron, White, Green)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 42,
+                            height: 3.5,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFF881B),
+                              borderRadius: BorderRadius.circular(3),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Container(
+                            width: 42,
+                            height: 3.5,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF5F9FF),
+                              borderRadius: BorderRadius.circular(3),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Container(
+                            width: 42,
+                            height: 3.5,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF00CA92),
+                              borderRadius: BorderRadius.circular(3),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+
+                      // Primary Tagline
+                      const Text(
+                        'MAKE INDIA CLEAN',
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 2.4,
+                          color: Color(0xFFC6E2FB),
+                        ),
+                      ),
                       const SizedBox(height: 6),
 
-                      // Institutional Subtitle
+                      // Secondary Subtitle
                       const Text(
-                        'BIOMEDICAL WASTE DIGITAL CHAIN OF CUSTODY & REAL-TIME STATUTORY MONITORING',
+                        'Digital Chain of Custody for\nBiomedical Waste Management',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: 10.5,
-                          fontWeight: FontWeight.w500,
-                          color: Color(0xFF94A3B8),
-                          fontFamily: 'monospace',
-                          letterSpacing: 0.5,
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xFF9CC5EC),
                           height: 1.35,
                         ),
                       ),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 22),
 
-                      // Statutory Compliance Rule Line
-                      Wrap(
-                        alignment: WrapAlignment.center,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        spacing: 6,
-                        runSpacing: 2,
-                        children: const [
-                          Text(
-                            'CPCB Rule 2016 Compliant',
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: Color(0xFF64748B),
-                              fontFamily: 'monospace',
-                            ),
-                          ),
-                          Text(
-                            '•',
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: Color(0xFF475569),
-                            ),
-                          ),
-                          Text(
-                            'Server-Side RBAC Enforced',
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: Color(0xFF64748B),
-                              fontFamily: 'monospace',
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Production Cloud / Environment Selector Chip
-                      InkWell(
-                        onTap: _showEnvironmentDialog,
-                        borderRadius: BorderRadius.circular(20),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF0F172A),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: AppConfig.isProduction ? const Color(0xFF166534) : const Color(0xFF334155),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                width: 8,
-                                height: 8,
-                                decoration: BoxDecoration(
-                                  color: AppConfig.isProduction ? const Color(0xFF22C55E) : AppColors.accent,
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    if (AppConfig.isProduction)
-                                      BoxShadow(
-                                        color: const Color(0xFF22C55E).withValues(alpha: 0.6),
-                                        blurRadius: 6,
-                                        spreadRadius: 1,
-                                      ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                AppConfig.environmentLabel,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppConfig.isProduction ? const Color(0xFF86EFAC) : const Color(0xFFCBD5E1),
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              const Icon(Icons.arrow_drop_down_rounded, size: 18, color: Color(0xFF94A3B8)),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        AppConfig.apiBaseUrl,
-                        style: const TextStyle(
-                          fontSize: 9.5,
-                          color: Color(0xFF64748B),
-                          fontFamily: 'monospace',
-                        ),
-                      ),
-                      const SizedBox(height: 18),
-
-                      // Main Institutional Authentication Card
+                      // Central Glass Entry Panel (Matching Web 1:1)
                       Container(
-                        clipBehavior: Clip.antiAlias,
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(18),
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: const Color(0xFF334155).withValues(alpha: 0.35)),
+                          color: const Color(0xB8104F89),
+                          borderRadius: BorderRadius.circular(22),
+                          border: Border.all(
+                            color: const Color(0xFF78AADB).withValues(alpha: 0.6),
+                            width: 1.5,
+                          ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.4),
-                              blurRadius: 28,
-                              offset: const Offset(0, 12),
+                              color: const Color(0xFF021838).withValues(alpha: 0.7),
+                              blurRadius: 24,
+                              offset: const Offset(0, 10),
                             ),
                           ],
                         ),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            // ─── Section A: Quick Duty Role Selector ───
-                            Container(
-                              padding: EdgeInsets.all(screenWidth < 360 ? 12 : 16),
-                              decoration: const BoxDecoration(
-                                color: Color(0xFFF8FAFC),
-                                border: Border(
-                                  bottom: BorderSide(color: Color(0xFFE2E8F0)),
+                            // Role Selector Trigger Button
+                            Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: _showRoleSelectionSheet,
+                                borderRadius: BorderRadius.circular(16),
+                                child: Container(
+                                  height: 72,
+                                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF0C477D).withValues(alpha: 0.85),
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: const Color(0xFF83B4E2),
+                                      width: 1.8,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: 44,
+                                        height: 44,
+                                        decoration: BoxDecoration(
+                                          color: _getRoleAccentColor(selectedAccount.role).withValues(alpha: 0.22),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: Icon(
+                                          _getRoleIcon(selectedAccount.role),
+                                          color: _getRoleAccentColor(selectedAccount.role),
+                                          size: 22,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              selectedAccount.title,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            const SizedBox(height: 2),
+                                            Text(
+                                              _getRoleSubtitle(selectedAccount.role),
+                                              style: const TextStyle(
+                                                color: Color(0xFFA8C7E5),
+                                                fontSize: 11.5,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const Icon(
+                                        Icons.keyboard_arrow_down_rounded,
+                                        color: Color(0xFFC9E1FA),
+                                        size: 24,
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      const Icon(
-                                        Icons.sensors_rounded,
-                                        color: Color(0xFF059669),
-                                        size: 15,
-                                      ),
-                                      const SizedBox(width: 6),
-                                      Flexible(
-                                        child: Text(
-                                          'DUTY ROLE TERMINAL ACCESS',
-                                          style: const TextStyle(
-                                            fontSize: 11.5,
-                                            fontWeight: FontWeight.w800,
-                                            letterSpacing: 0.6,
-                                            color: Color(0xFF0F172A),
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 3),
-                                  RichText(
-                                    text: const TextSpan(
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        color: Color(0xFF64748B),
-                                        fontFamily: 'monospace',
-                                      ),
-                                      children: [
-                                        TextSpan(text: 'Select role for instant evaluation (demo password: '),
-                                        TextSpan(
-                                          text: 'password123',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Color(0xFF334155),
-                                          ),
-                                        ),
-                                        TextSpan(text: ')'),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 12),
-
-                                  // Responsive 2-Column Grid (3 rows)
-                                  for (int i = 0; i < accounts.length; i += 2)
-                                    Padding(
-                                      padding: EdgeInsets.only(bottom: i < accounts.length - 2 ? 8.0 : 0.0),
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            child: _buildRoleCard(
-                                              accounts[i],
-                                              isSelected: _selectedRole == accounts[i].role,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          if (i + 1 < accounts.length)
-                                            Expanded(
-                                              child: _buildRoleCard(
-                                                accounts[i + 1],
-                                                isSelected: _selectedRole == accounts[i + 1].role,
-                                              ),
-                                            )
-                                          else
-                                            const Spacer(),
-                                        ],
-                                      ),
-                                    ),
-                                ],
-                              ),
                             ),
+                            const SizedBox(height: 16),
 
-                            // ─── Section B: Authentication Form & Action Area ───
-                            Padding(
-                              padding: EdgeInsets.all(screenWidth < 360 ? 14 : 20),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Error Banner
-                                  if (_errorMessage != null) ...[
-                                    Container(
-                                      padding: const EdgeInsets.all(12),
-                                      margin: const EdgeInsets.only(bottom: 16),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFFFF1F2),
-                                        borderRadius: BorderRadius.circular(10),
-                                        border: Border.all(color: const Color(0xFFFDA4AF)),
-                                      ),
-                                      child: Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          const Icon(
-                                            Icons.error_outline_rounded,
-                                            color: Color(0xFFE11D48),
-                                            size: 18,
-                                          ),
-                                          const SizedBox(width: 10),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                const Text(
-                                                  'Authentication failed',
-                                                  style: TextStyle(
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w700,
-                                                    color: Color(0xFF9F1239),
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 2),
-                                                Text(
-                                                  _errorMessage!,
-                                                  style: const TextStyle(
-                                                    fontSize: 11,
-                                                    color: Color(0xFF881337),
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 6),
-                                                InkWell(
-                                                  onTap: _probeServer,
-                                                  child: const Text(
-                                                    'Probe Server Health',
-                                                    style: TextStyle(
-                                                      fontSize: 11,
-                                                      fontWeight: FontWeight.w600,
-                                                      color: Color(0xFFBE123C),
-                                                      decoration: TextDecoration.underline,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-
-                                  // Official Registered Email Field
-                                  RichText(
-                                    text: const TextSpan(
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                        color: Color(0xFF334155),
-                                      ),
-                                      children: [
-                                        TextSpan(text: 'Official Registered Email'),
-                                        TextSpan(
-                                          text: ' *',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w700,
-                                            color: Color(0xFFDC2626),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                            // Primary ENTER Button (Web 1:1 match)
+                            SizedBox(
+                              width: double.infinity,
+                              height: 64,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF07559B),
+                                  foregroundColor: Colors.white,
+                                  elevation: 6,
+                                  shadowColor: const Color(0xFF021B3D),
+                                  side: const BorderSide(color: Color(0xFF36B9EE), width: 1.8),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
                                   ),
-                                  const SizedBox(height: 6),
-                                  TextFormField(
-                                    controller: _emailController,
-                                    keyboardType: TextInputType.emailAddress,
-                                    textInputAction: TextInputAction.next,
-                                    onChanged: (val) {
-                                      final match = accounts.where(
-                                        (a) => a.email.toLowerCase() == val.trim().toLowerCase(),
-                                      );
-                                      if (match.isNotEmpty && _selectedRole != match.first.role) {
-                                        setState(() => _selectedRole = match.first.role);
-                                      }
-                                    },
-                                    decoration: InputDecoration(
-                                      hintText: 'e.g. hospital@demo.com',
-                                      prefixIcon: const Icon(
-                                        Icons.mail_outline_rounded,
-                                        size: 18,
-                                        color: Color(0xFF64748B),
-                                      ),
-                                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                                      fillColor: Colors.white,
-                                      filled: true,
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        borderSide: const BorderSide(color: Color(0xFF14462A), width: 1.5),
-                                      ),
-                                    ),
-                                    style: const TextStyle(fontSize: 13, color: Color(0xFF0F172A)),
-                                  ),
-                                  const SizedBox(height: 14),
-
-                                  // Access Password Field
-                                  RichText(
-                                    text: const TextSpan(
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                        color: Color(0xFF334155),
-                                      ),
-                                      children: [
-                                        TextSpan(text: 'Access Password'),
-                                        TextSpan(
-                                          text: ' *',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w700,
-                                            color: Color(0xFFDC2626),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 6),
-                                  TextFormField(
-                                    controller: _passwordController,
-                                    obscureText: _obscurePassword,
-                                    textInputAction: TextInputAction.done,
-                                    onFieldSubmitted: (_) => _handleLogin(),
-                                    decoration: InputDecoration(
-                                      hintText: 'Enter password',
-                                      prefixIcon: const Icon(
-                                        Icons.lock_outline_rounded,
-                                        size: 18,
-                                        color: Color(0xFF64748B),
-                                      ),
-                                      suffixIcon: IconButton(
-                                        icon: Icon(
-                                          _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                                          size: 18,
-                                          color: const Color(0xFF64748B),
-                                        ),
-                                        onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
-                                      ),
-                                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                                      fillColor: Colors.white,
-                                      filled: true,
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        borderSide: const BorderSide(color: Color(0xFF14462A), width: 1.5),
-                                      ),
-                                    ),
-                                    style: const TextStyle(fontSize: 13, color: Color(0xFF0F172A)),
-                                  ),
-                                  const SizedBox(height: 16),
-
-                                  // Selected Authority Indicator
-                                  Wrap(
-                                    crossAxisAlignment: WrapCrossAlignment.center,
-                                    spacing: 6,
-                                    runSpacing: 4,
-                                    children: [
-                                      const Text(
-                                        'Selected authority: ',
-                                        style: TextStyle(fontSize: 11.5, color: Color(0xFF64748B)),
-                                      ),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2.5),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFFF1F5F9),
-                                          borderRadius: BorderRadius.circular(6),
-                                          border: Border.all(color: const Color(0xFFE2E8F0)),
-                                        ),
-                                        child: Text(
-                                          selectedAccount.title,
-                                          style: const TextStyle(
-                                            fontSize: 11.5,
-                                            fontWeight: FontWeight.w700,
-                                            color: Color(0xFF0F172A),
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 16),
-
-                                  // Primary Button: Authenticate & Enter (Strong Green)
-                                  SizedBox(
-                                    width: double.infinity,
-                                    height: 48,
-                                    child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(0xFF14462A), // Forest-900 web brand green
-                                        foregroundColor: Colors.white,
-                                        elevation: 0,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                      ),
-                                      onPressed: _isLoading ? null : () => _handleLogin(),
-                                      child: _isLoading
-                                          ? Row(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [
-                                                const SizedBox(
-                                                  width: 16,
-                                                  height: 16,
-                                                  child: CircularProgressIndicator(
-                                                    color: Colors.white,
-                                                    strokeWidth: 2,
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 10),
-                                                Flexible(
-                                                  child: Text(
-                                                    _loadingMessage,
-                                                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                                                    overflow: TextOverflow.ellipsis,
-                                                  ),
-                                                ),
-                                              ],
-                                            )
-                                          : Row(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: const [
-                                                Icon(Icons.arrow_forward_rounded, size: 16),
-                                                SizedBox(width: 8),
-                                                Flexible(
-                                                  child: Text(
-                                                    'Authenticate & Enter',
-                                                    style: TextStyle(
-                                                      fontSize: 13,
-                                                      fontWeight: FontWeight.w700,
-                                                      letterSpacing: 0.2,
-                                                    ),
-                                                    overflow: TextOverflow.ellipsis,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 10),
-
-                                  // Secondary Button: 1-Click Demo Login
-                                  SizedBox(
-                                    width: double.infinity,
-                                    height: 44,
-                                    child: OutlinedButton(
-                                      style: OutlinedButton.styleFrom(
-                                        foregroundColor: const Color(0xFF0F172A),
-                                        backgroundColor: Colors.white,
-                                        side: const BorderSide(color: Color(0xFFCBD5E1)),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                      ),
-                                      onPressed: _isLoading ? null : () => _onInstantLogin(selectedAccount),
-                                      child: Row(
+                                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                                ),
+                                onPressed: _isLoading ? null : () => _handleLogin(),
+                                child: _isLoading
+                                    ? Row(
                                         mainAxisAlignment: MainAxisAlignment.center,
-                                        children: const [
-                                          Icon(
-                                            Icons.bolt_rounded,
-                                            size: 16,
-                                            color: Color(0xFFD97706),
+                                        children: [
+                                          const SizedBox(
+                                            width: 20,
+                                            height: 20,
+                                            child: CircularProgressIndicator(
+                                              color: Colors.white,
+                                              strokeWidth: 2.2,
+                                            ),
                                           ),
-                                          SizedBox(width: 6),
+                                          const SizedBox(width: 12),
                                           Flexible(
                                             child: Text(
-                                              '1-Click Demo Login',
-                                              style: TextStyle(
-                                                fontSize: 12.5,
-                                                fontWeight: FontWeight.w600,
-                                                color: Color(0xFF334155),
+                                              _loadingMessage,
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w700,
                                               ),
                                               overflow: TextOverflow.ellipsis,
                                             ),
                                           ),
                                         ],
+                                      )
+                                    : Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          const Text(
+                                            'ENTER',
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w900,
+                                              letterSpacing: 1.5,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                          Row(
+                                            children: [
+                                              Container(
+                                                width: 1,
+                                                height: 28,
+                                                color: const Color(0xFFB5F2FF).withValues(alpha: 0.4),
+                                              ),
+                                              const SizedBox(width: 14),
+                                              const Icon(
+                                                Icons.arrow_forward_rounded,
+                                                size: 24,
+                                                color: Colors.white,
+                                              ),
+                                            ],
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                  ),
-                                ],
                               ),
                             ),
+                            const SizedBox(height: 10),
+
+                            // Secondary 1-Click Quick Demo Login Button
+                            SizedBox(
+                              width: double.infinity,
+                              height: 44,
+                              child: OutlinedButton(
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: Colors.white,
+                                  side: BorderSide(color: const Color(0xFF83B4E2).withValues(alpha: 0.5)),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                  backgroundColor: const Color(0x330C477D),
+                                ),
+                                onPressed: _isLoading ? null : () => _onInstantLogin(selectedAccount),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: const [
+                                    Icon(Icons.bolt_rounded, size: 16, color: Color(0xFFFF881B)),
+                                    SizedBox(width: 6),
+                                    Text(
+                                      '1-Click Quick Demo Login',
+                                      style: TextStyle(
+                                        fontSize: 12.5,
+                                        fontWeight: FontWeight.w600,
+                                        color: Color(0xFFD9E9FB),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+
+                            // Error Banner (if any)
+                            if (_errorMessage != null) ...[
+                              const SizedBox(height: 14),
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xDD881337),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: const Color(0xFFFDA4AF)),
+                                ),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Icon(Icons.error_outline_rounded, color: Colors.white, size: 18),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const Text(
+                                            'Statutory Authentication Error',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 2),
+                                          Text(
+                                            _errorMessage!,
+                                            style: const TextStyle(fontSize: 11, color: Color(0xFFFECDD3)),
+                                          ),
+                                          const SizedBox(height: 6),
+                                          InkWell(
+                                            onTap: _probeServer,
+                                            child: const Text(
+                                              'Probe Server Health',
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w600,
+                                                color: Color(0xFFFFD6E0),
+                                                decoration: TextDecoration.underline,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+
+                            // Discreet Staff Credentials Form Toggle
+                            const SizedBox(height: 16),
+                            Divider(color: const Color(0xFF83B4E2).withValues(alpha: 0.3)),
+                            const SizedBox(height: 8),
+                            InkWell(
+                              onTap: () => setState(() => _showManualLogin = !_showManualLogin),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 4),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(Icons.vpn_key_outlined, size: 14, color: Color(0xFFA8C9E9)),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      _showManualLogin
+                                          ? 'Hide Custom Credentials Form'
+                                          : 'Staff Login: Enter with Custom Credentials',
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Color(0xFFA8C9E9),
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Icon(
+                                      _showManualLogin ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
+                                      size: 16,
+                                      color: const Color(0xFFA8C9E9),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+
+                            // Expandable Custom Credentials Area
+                            if (_showManualLogin) ...[
+                              const SizedBox(height: 12),
+                              Container(
+                                padding: const EdgeInsets.all(14),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xCC092B54),
+                                  borderRadius: BorderRadius.circular(14),
+                                  border: Border.all(color: const Color(0xFF83B4E2).withValues(alpha: 0.5)),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'STATUTORY STAFF AUTHENTICATION',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0.8,
+                                        color: Color(0xFF91F1CC),
+                                        fontFamily: 'monospace',
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    TextFormField(
+                                      controller: _emailController,
+                                      style: const TextStyle(fontSize: 13, color: Colors.white),
+                                      decoration: InputDecoration(
+                                        labelText: 'Official Registered Email',
+                                        labelStyle: const TextStyle(color: Color(0xFFA8C9E9), fontSize: 12),
+                                        fillColor: const Color(0xFF03275D).withValues(alpha: 0.7),
+                                        filled: true,
+                                        prefixIcon: const Icon(Icons.mail_outline_rounded, size: 18, color: Color(0xFF83B4E2)),
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(8),
+                                          borderSide: const BorderSide(color: Color(0xFF83B4E2)),
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(8),
+                                          borderSide: BorderSide(color: const Color(0xFF83B4E2).withValues(alpha: 0.5)),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(8),
+                                          borderSide: const BorderSide(color: Color(0xFF36B9EE), width: 1.5),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    TextFormField(
+                                      controller: _passwordController,
+                                      obscureText: _obscurePassword,
+                                      style: const TextStyle(fontSize: 13, color: Colors.white),
+                                      decoration: InputDecoration(
+                                        labelText: 'Access Password',
+                                        labelStyle: const TextStyle(color: Color(0xFFA8C9E9), fontSize: 12),
+                                        fillColor: const Color(0xFF03275D).withValues(alpha: 0.7),
+                                        filled: true,
+                                        prefixIcon: const Icon(Icons.lock_outline_rounded, size: 18, color: Color(0xFF83B4E2)),
+                                        suffixIcon: IconButton(
+                                          icon: Icon(
+                                            _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                                            size: 18,
+                                            color: const Color(0xFF83B4E2),
+                                          ),
+                                          onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                                        ),
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(8),
+                                          borderSide: const BorderSide(color: Color(0xFF83B4E2)),
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(8),
+                                          borderSide: BorderSide(color: const Color(0xFF83B4E2).withValues(alpha: 0.5)),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(8),
+                                          borderSide: const BorderSide(color: Color(0xFF36B9EE), width: 1.5),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    SizedBox(
+                                      width: double.infinity,
+                                      height: 44,
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color(0xFF0284C7),
+                                          foregroundColor: Colors.white,
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                        ),
+                                        onPressed: _isLoading ? null : () => _handleLogin(),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: const [
+                                            Text(
+                                              'Authenticate & Enter Portal',
+                                              style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
+                                            ),
+                                            SizedBox(width: 6),
+                                            Icon(Icons.arrow_forward_rounded, size: 15),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                       ),
                       const SizedBox(height: 24),
 
-                      // ─── Footer Institutional Legal & Security Messaging ───
-                      const Text(
-                        'Protected by BioTrace JWT & Bcrypt Authentication • Monitored by Real-Time Statutory Risk Engine',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: Color(0xFF64748B),
-                          fontFamily: 'monospace',
-                          height: 1.4,
+                      // Dual-Sided Institutional Legal & Geographic Footer
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            // Left Side: Institutional Pillars
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'SAFE\nTRACEABLE\nCOMPLIANT\nCLEANER INDIA',
+                                  style: TextStyle(
+                                    fontSize: 10.5,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 2.2,
+                                    color: Color(0xFFC6E2FB),
+                                    height: 1.35,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Container(
+                                  width: 48,
+                                  height: 2,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF83B4E2).withValues(alpha: 0.6),
+                                    borderRadius: BorderRadius.circular(1),
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            // Right Side: India Silhouette & People-Process-Technology
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const IndiaSilhouette(
+                                  width: 32,
+                                  height: 44,
+                                  color: Color(0xFF9CC5EC),
+                                ),
+                                const SizedBox(width: 8),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'PEOPLE\nPROCESS\nTECHNOLOGY',
+                                      style: TextStyle(
+                                        fontSize: 10.5,
+                                        fontWeight: FontWeight.w600,
+                                        letterSpacing: 1.0,
+                                        color: Color(0xFFC6E2FB),
+                                        height: 1.25,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    const Text(
+                                      'A CLEANER TOMORROW',
+                                      style: TextStyle(
+                                        fontSize: 9,
+                                        letterSpacing: 1.2,
+                                        color: Color(0xFF83B4E2),
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 3),
+                                    Container(
+                                      width: 48,
+                                      height: 2,
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF83B4E2).withValues(alpha: 0.6),
+                                        borderRadius: BorderRadius.circular(1),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(height: 6),
-                      Wrap(
-                        alignment: WrapAlignment.center,
-                        spacing: 8,
-                        children: const [
-                          Text(
-                            'CPCB Compliance Terms of Service',
-                            style: TextStyle(
-                              fontSize: 9.5,
-                              color: Color(0xFF475569),
-                              fontFamily: 'monospace',
-                            ),
-                          ),
-                          Text(
-                            '•',
-                            style: TextStyle(
-                              fontSize: 9.5,
-                              color: Color(0xFF334155),
-                            ),
-                          ),
-                          Text(
-                            'Statutory Data Privacy Policy',
-                            style: TextStyle(
-                              fontSize: 9.5,
-                              color: Color(0xFF475569),
-                              fontFamily: 'monospace',
-                            ),
-                          ),
-                        ],
                       ),
                     ],
                   ),
@@ -1010,111 +1244,6 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildRoleCard(DemoAccount account, {required bool isSelected}) {
-    final iconData = _getRoleIcon(account.role);
-    final accentColor = _getRoleAccentColor(account.role);
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: _isLoading ? null : () => _onSelectRole(account),
-        onDoubleTap: _isLoading ? null : () => _onInstantLogin(account),
-        borderRadius: BorderRadius.circular(10),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8.5),
-          decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFFF0FDF4) : Colors.white,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: isSelected ? const Color(0xFF16A34A) : const Color(0xFFE2E8F0),
-              width: isSelected ? 1.5 : 1.0,
-            ),
-            boxShadow: isSelected
-                ? [
-                    BoxShadow(
-                      color: const Color(0xFF16A34A).withValues(alpha: 0.12),
-                      blurRadius: 4,
-                      offset: const Offset(0, 1),
-                    ),
-                  ]
-                : null,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      color: accentColor,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Icon(iconData, size: 15, color: Colors.white),
-                  ),
-                  if (isSelected)
-                    const Icon(
-                      Icons.check_circle_rounded,
-                      size: 15,
-                      color: Color(0xFF16A34A),
-                    )
-                  else
-                    Container(
-                      width: 6,
-                      height: 6,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFCBD5E1),
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Text(
-                account.title,
-                style: const TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFF0F172A),
-                  height: 1.2,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 1.5),
-              Text(
-                account.name,
-                style: const TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF475569),
-                  height: 1.2,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 1.5),
-              Text(
-                account.facility,
-                style: const TextStyle(
-                  fontSize: 9,
-                  color: Color(0xFF94A3B8),
-                  height: 1.2,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

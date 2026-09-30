@@ -184,10 +184,6 @@ export default function Login() {
 
   return (
     <div className="biotrace-page min-h-screen flex flex-col justify-between relative selection:bg-emerald-500/30 selection:text-white">
-      {/* Dual-Sided Institutional Environment: Hospital on Left, Transport Vehicle on Right */}
-      <div className="biotrace-bg-left" aria-hidden="true" />
-      <div className="biotrace-bg-right" aria-hidden="true" />
-
       {/* Atmospheric lighting and depth gradient overlays */}
       <div className="biotrace-atmosphere" aria-hidden="true" />
 
@@ -473,7 +469,7 @@ export default function Login() {
 
         {/* Right Side: India Silhouette & People-Process-Technology */}
         <div className="flex items-center gap-3.5 text-center sm:text-left">
-          <IndiaSilhouette className="w-8 h-12 text-[#9cc5ec]/80 shrink-0" />
+          <IndiaSilhouette className="w-9 h-13 text-[#9cc5ec] shrink-0" />
           <div className="tracking-[0.1em] leading-tight font-medium">
             <div>PEOPLE</div>
             <div>PROCESS</div>
@@ -481,6 +477,7 @@ export default function Login() {
             <div className="text-[10px] text-[#83b4e2] font-normal tracking-[0.15em] mt-0.5">
               A CLEANER TOMORROW
             </div>
+            <div className="w-14 h-0.5 bg-[#83b4e2]/60 mt-1 mx-auto sm:mx-0" aria-hidden="true" />
           </div>
         </div>
       </footer>

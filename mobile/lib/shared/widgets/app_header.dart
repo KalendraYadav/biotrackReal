@@ -3,6 +3,7 @@ import '../../core/constants/app_constants.dart';
 import '../../core/socket/socket_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../models/user_model.dart';
+import 'biotrace_mark.dart';
 
 class AppHeader extends StatelessWidget implements PreferredSizeWidget {
   final UserModel? user;
@@ -42,10 +43,8 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: AppColors.primaryLight.withValues(alpha: 0.5)),
             ),
-            child: const Icon(
-              Icons.verified_user_rounded,
-              color: AppColors.accentTeal,
-              size: 20,
+            child: const Center(
+              child: BioTraceMark(width: 16, height: 25),
             ),
           ),
           const SizedBox(width: 10),
