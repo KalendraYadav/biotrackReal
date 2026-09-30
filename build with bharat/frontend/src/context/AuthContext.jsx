@@ -25,8 +25,8 @@ export const DEMO_ROLES_LIST = [
     name: 'Dr. Aarav Mehta',
     email: 'hospital@demo.com',
     facility: 'AIIMS Central Hospital',
-    badgeColor: 'bg-forest-100 text-forest-900 border-forest-300',
-    accentColor: '#14462a',
+    badgeColor: 'bg-blue-50 text-blue-900 border-blue-200',
+    accentColor: '#07559B',
     desc: 'Waste manifest registration & bed activity correlation'
   },
   {
@@ -35,8 +35,8 @@ export const DEMO_ROLES_LIST = [
     name: 'Meera Iyer',
     email: 'collection@demo.com',
     facility: 'EcoSafe Waste Handlers',
-    badgeColor: 'bg-forest-100 text-forest-900 border-forest-300',
-    accentColor: '#103823',
+    badgeColor: 'bg-teal-50 text-teal-900 border-teal-200',
+    accentColor: '#00C49E',
     desc: 'QR scan handover & bag barcode verification'
   },
   {

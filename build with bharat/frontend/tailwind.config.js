@@ -7,6 +7,19 @@ export default {
   theme: {
     extend: {
       colors: {
+        biotrace: {
+          50: "#f5f9ff",
+          100: "#e6f1fc",
+          200: "#cce3f9",
+          300: "#99c6f2",
+          400: "#55a3e8",
+          500: "#1185c6", // Secondary blue
+          600: "#07559b", // Primary blue
+          700: "#054179",
+          800: "#043460",
+          900: "#03275d", // Primary dark navy
+          950: "#0b1f3a", // Dark navy text
+        },
         biohazard: {
           50: "#fff1f0",
           100: "#ffe1df",
@@ -73,16 +86,18 @@ export default {
           950: "#34291e",
         },
         brand: {
-          orange: "#b45309",
-          orangeHover: "#92400e",
-          orangeLight: "#fef3c7",
-          orangeDark: "#78350f",
-          green: "#14462a",
-          greenHover: "#0f3520",
+          blue: "#07559b",
+          blueHover: "#03275d",
+          blueLight: "#f0f7ff",
+          blueDark: "#043460",
+          teal: "#00c49e",
+          tealLight: "#e6fbf7",
+          green: "#00ca92",
+          greenHover: "#059669",
           greenLight: "#dcfce7",
-          greenDark: "#0b2e1b",
-          teal: "#0f766e",
-          tealLight: "#ccfbf1",
+          orange: "#ff881b",
+          orangeHover: "#ea580c",
+          orangeLight: "#fff7ed",
         }
       },
       fontFamily: {

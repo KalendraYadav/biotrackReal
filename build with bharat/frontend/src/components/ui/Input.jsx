@@ -67,7 +67,7 @@ export function Input({
           className={cn(
             'w-full h-10 px-3 bg-white text-steel-950 placeholder:text-steel-400 text-sm rounded border transition-colors duration-100',
             'border-steel-300 hover:border-steel-400',
-            'focus:outline-none focus:ring-2 focus:ring-forest-700 focus:border-forest-700',
+            'focus:outline-none focus:ring-2 focus:ring-[#07559B] focus:border-[#07559B]',
             'disabled:bg-steel-50 disabled:text-steel-400 disabled:border-steel-200 disabled:cursor-not-allowed',
             LeftIcon && 'pl-9',
             (RightIcon || isPassword) && 'pr-9',
@@ -83,7 +83,7 @@ export function Input({
             onClick={() => setShowPassword(!showPassword)}
             disabled={disabled}
             aria-label={showPassword ? 'Hide password' : 'Show password'}
-            className="absolute right-3 p-1 text-steel-400 hover:text-steel-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-700 rounded"
+            className="absolute right-3 p-1 text-steel-400 hover:text-steel-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#07559B] rounded"
           >
             {showPassword ? (
               <EyeOff className="w-4 h-4" aria-hidden="true" />

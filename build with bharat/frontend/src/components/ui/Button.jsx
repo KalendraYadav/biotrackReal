@@ -19,20 +19,24 @@ export function Button({
 }) {
   const baseClasses = 
     'inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded font-sans transition-colors duration-150 ' +
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest-700 focus-visible:ring-offset-2 ' +
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#07559B] focus-visible:ring-offset-2 ' +
     'disabled:pointer-events-none disabled:opacity-50 active:scale-[0.99] motion-reduce:active:scale-100';
 
   const variants = {
     primary:
-      'bg-forest-900 text-white hover:bg-forest-950 active:bg-forest-950 border border-forest-900 font-semibold shadow-xs',
+      'bg-[#07559B] text-white hover:bg-[#03275D] active:bg-[#043460] border border-[#07559B] font-semibold shadow-xs',
+    gradient:
+      'biotrace-enter-btn text-white border border-[#36B9EE] font-semibold shadow-xs',
     secondary:
-      'bg-white text-steel-900 border border-steel-300 hover:bg-steel-50 active:bg-steel-100 font-medium',
+      'bg-white text-steel-900 border border-steel-300 hover:bg-blue-50/50 hover:border-blue-300 active:bg-steel-100 font-medium',
     ghost:
       'bg-transparent text-steel-600 hover:text-steel-900 hover:bg-steel-100 active:bg-steel-200 font-medium',
     destructive:
       'bg-biohazard-700 text-white hover:bg-biohazard-800 active:bg-biohazard-900 border border-biohazard-700 font-semibold shadow-xs',
+    success:
+      'bg-emerald-700 text-white hover:bg-emerald-800 active:bg-emerald-900 border border-emerald-700 font-semibold shadow-xs',
     outline:
-      'bg-transparent text-steel-800 border border-steel-300 hover:bg-steel-50 font-medium'
+      'bg-transparent text-steel-800 border border-steel-300 hover:bg-blue-50/50 hover:border-blue-300 font-medium'
   };
 
   const sizes = {

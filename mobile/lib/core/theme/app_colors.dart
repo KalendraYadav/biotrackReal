@@ -1,34 +1,39 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Brand Primary & Accent
-  static const Color primary = Color(0xFF1F5C3B); // Forest Green
-  static const Color primaryLight = Color(0xFF2E8553);
-  static const Color primaryBg = Color(0xFFEBF6F0);
+  // Brand Primary & Secondary Blue (BioTrace Global Identity)
+  static const Color primaryDark = Color(0xFF03275D); // Deep Navy
+  static const Color primary = Color(0xFF07559B); // BioTrace Primary Blue
+  static const Color primaryLight = Color(0xFF1185C6); // Secondary Blue
+  static const Color primaryBg = Color(0xFFF0F6FF); // Soft Cool Blue Tint
   
-  static const Color accent = Color(0xFFF1602A); // Amber / Hazmat Orange
+  // Brand Accents
+  static const Color accentTeal = Color(0xFF00C49E); // BioTrace Cyan/Teal
+  static const Color accentGreen = Color(0xFF00CA92); // BioTrace Emerald
+  static const Color brandSaffron = Color(0xFFFF881B); // Brand Saffron
+  static const Color accent = Color(0xFFFF881B); // Amber / Hazmat Orange / Saffron
   static const Color accentLight = Color(0xFFFFF7ED);
   static const Color accentDark = Color(0xFFC2410C);
 
-  // Executive Navy Surfaces
-  static const Color navyHeader = Color(0xFF0B132B);
-  static const Color navyCard = Color(0xFF0F172A);
-  static const Color navyBorder = Color(0xFF1E293B);
+  // Executive Navy Surfaces (Deep Institutional Navy)
+  static const Color navyHeader = Color(0xFF03275D);
+  static const Color navyCard = Color(0xFF091E42);
+  static const Color navyBorder = Color(0xFF163E75);
 
-  // Backgrounds & Neutrals
-  static const Color canvas = Color(0xFFF8FAFC);
+  // Backgrounds & Neutrals (Enterprise Surfaces)
+  static const Color canvas = Color(0xFFF5F9FF);
   static const Color card = Color(0xFFFFFFFF);
-  static const Color surfaceAlt = Color(0xFFF1F5F9);
-  static const Color border = Color(0xFFE2E8F0);
-  static const Color borderLight = Color(0xFFF1F5F9);
+  static const Color surfaceAlt = Color(0xFFEEF4FC);
+  static const Color border = Color(0xFFD6E4F0);
+  static const Color borderLight = Color(0xFFEAF1F9);
 
   // Text Hierarchy
-  static const Color textPrimary = Color(0xFF0F172A);
+  static const Color textPrimary = Color(0xFF0B1F3A); // Dark Navy Text
   static const Color textSecondary = Color(0xFF475569);
-  static const Color textMuted = Color(0xFF64748B);
+  static const Color textMuted = Color(0xFF647A96); // Cool Blue-Gray
   static const Color textLight = Color(0xFF94A3B8);
 
-  // Status Tints
+  // Status Tints (Controlled Semantics)
   static const Color success = Color(0xFF059669);
   static const Color successBg = Color(0xFFECFDF5);
   static const Color successBorder = Color(0xFFA7F3D0);
@@ -41,11 +46,11 @@ class AppColors {
   static const Color dangerBg = Color(0xFFFEF2F2);
   static const Color dangerBorder = Color(0xFFFECACA);
 
-  static const Color info = Color(0xFF0284C7);
-  static const Color infoBg = Color(0xFFF0F9FF);
+  static const Color info = Color(0xFF07559B);
+  static const Color infoBg = Color(0xFFF0F6FF);
   static const Color infoBorder = Color(0xFFBAE6FD);
 
-  // CPCB Bio-Medical Waste Category Colors
+  // CPCB Bio-Medical Waste Category Colors (Statutory Preserved)
   static const Color catYellowBg = Color(0xFFFEF08A);
   static const Color catYellowText = Color(0xFF854D0E);
   static const Color catYellowBorder = Color(0xFFFDE047);

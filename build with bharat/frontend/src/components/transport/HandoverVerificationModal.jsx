@@ -841,7 +841,7 @@ export default function HandoverVerificationModal({
               <div className="pt-2">
                 <button
                   onClick={onClose}
-                  className="px-6 py-2.5 bg-forest-700 hover:bg-forest-800 text-white text-xs font-mono font-bold rounded shadow-sm transition"
+                  className="px-6 py-2.5 bg-[#07559B] hover:bg-[#03275D] text-white text-xs font-mono font-bold rounded shadow-sm transition"
                 >
                   Done &bull; Return to Fleet Dashboard
                 </button>

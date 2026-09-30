@@ -400,9 +400,9 @@ export default function HospitalDashboard() {
           role="tab"
           aria-selected={activeTab === 'track'}
           onClick={() => setActiveTab('track')}
-          className={`pb-3 font-medium transition-colors flex items-center gap-2 border-b-2 -mb-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest-700 rounded-t ${
+          className={`pb-3 font-medium transition-colors flex items-center gap-2 border-b-2 -mb-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#07559B] rounded-t ${
             activeTab === 'track'
-              ? 'border-forest-900 text-forest-900 font-semibold'
+              ? 'border-[#07559B] text-[#07559B] font-semibold'
               : 'border-transparent text-steel-600 hover:text-steel-900 hover:border-steel-300'
           }`}
         >
@@ -414,9 +414,9 @@ export default function HospitalDashboard() {
           role="tab"
           aria-selected={activeTab === 'register'}
           onClick={() => setActiveTab('register')}
-          className={`pb-3 font-medium transition-colors flex items-center gap-2 border-b-2 -mb-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest-700 rounded-t ${
+          className={`pb-3 font-medium transition-colors flex items-center gap-2 border-b-2 -mb-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#07559B] rounded-t ${
             activeTab === 'register'
-              ? 'border-forest-900 text-forest-900 font-semibold'
+              ? 'border-[#07559B] text-[#07559B] font-semibold'
               : 'border-transparent text-steel-600 hover:text-steel-900 hover:border-steel-300'
           }`}
         >
@@ -428,9 +428,9 @@ export default function HospitalDashboard() {
           role="tab"
           aria-selected={activeTab === 'correlation'}
           onClick={() => setActiveTab('correlation')}
-          className={`pb-3 font-medium transition-colors flex items-center gap-2 border-b-2 -mb-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest-700 rounded-t ${
+          className={`pb-3 font-medium transition-colors flex items-center gap-2 border-b-2 -mb-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#07559B] rounded-t ${
             activeTab === 'correlation'
-              ? 'border-forest-900 text-forest-900 font-semibold'
+              ? 'border-[#07559B] text-[#07559B] font-semibold'
               : 'border-transparent text-steel-600 hover:text-steel-900 hover:border-steel-300'
           }`}
         >
@@ -503,7 +503,7 @@ export default function HospitalDashboard() {
                   <tr>
                     <td colSpan="8" className="px-6 py-12 text-center text-steel-500">
                       <div className="flex flex-col items-center space-y-2">
-                        <div className="w-6 h-6 border-2 border-forest-800 border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-6 h-6 border-2 border-[#07559B] border-t-transparent rounded-full animate-spin"></div>
                         <span>Loading waste manifests...</span>
                       </div>
                     </td>
@@ -577,7 +577,7 @@ export default function HospitalDashboard() {
       {activeTab === 'register' && (
         <div className="bg-white rounded-lg border border-steel-200 p-6 animate-fade-in max-w-2xl mx-auto">
           <div className="flex items-center space-x-3 mb-6 pb-4 border-b border-steel-100">
-            <div className="w-10 h-10 rounded bg-forest-50 border border-forest-200 text-forest-800 flex items-center justify-center font-bold shrink-0">
+            <div className="w-10 h-10 rounded bg-blue-50 border border-blue-200 text-[#07559B] flex items-center justify-center font-bold shrink-0">
               <PlusCircle className="w-5 h-5" aria-hidden="true" />
             </div>
             <div>
@@ -598,7 +598,7 @@ export default function HospitalDashboard() {
                 id="dept-select"
                 value={formData.generating_department}
                 onChange={e => setFormData({ ...formData, generating_department: e.target.value })}
-                className="w-full border border-steel-300 rounded px-3 py-2 text-sm text-steel-900 bg-white focus:outline-none focus:ring-2 focus:ring-forest-700"
+                className="w-full border border-steel-300 rounded px-3 py-2 text-sm text-steel-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#07559B]"
               >
                 {DEPARTMENTS.map(dept => (
                   <option key={dept} value={dept}>{dept}</option>
@@ -624,7 +624,7 @@ export default function HospitalDashboard() {
                       })}
                       className={`cursor-pointer p-3 rounded border transition-colors flex flex-col justify-between ${
                         isSelected 
-                          ? 'border-forest-800 bg-forest-50/50 ring-1 ring-forest-800' 
+                          ? 'border-[#07559B] bg-blue-50/50 ring-1 ring-[#07559B]' 
                           : 'border-steel-200 bg-white hover:bg-steel-50'
                       }`}
                     >
@@ -633,7 +633,7 @@ export default function HospitalDashboard() {
                           <span className={`px-2 py-0.5 rounded font-mono font-semibold text-xs border ${cat.badgeClass}`}>
                             {cat.code}
                           </span>
-                          {isSelected && <CheckCircle2 className="w-4 h-4 text-forest-800" aria-hidden="true" />}
+                          {isSelected && <CheckCircle2 className="w-4 h-4 text-[#07559B]" aria-hidden="true" />}
                         </div>
                         <div className="font-semibold text-xs text-steel-900">{cat.name}</div>
                         <p className="text-[11px] text-steel-500 mt-1 line-clamp-2">{cat.examples}</p>
@@ -660,7 +660,7 @@ export default function HospitalDashboard() {
                   placeholder="e.g. Soiled cotton pads"
                   value={formData.cpcb_waste_type}
                   onChange={e => setFormData({ ...formData, cpcb_waste_type: e.target.value })}
-                  className="w-full border border-steel-300 rounded px-3 py-2 text-sm text-steel-900 bg-white focus:outline-none focus:ring-2 focus:ring-forest-700"
+                  className="w-full border border-steel-300 rounded px-3 py-2 text-sm text-steel-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#07559B]"
                 />
               </div>
 
@@ -678,7 +678,7 @@ export default function HospitalDashboard() {
                     placeholder="e.g. 18.5"
                     value={formData.quantity_kg}
                     onChange={e => setFormData({ ...formData, quantity_kg: e.target.value })}
-                    className="w-full border border-steel-300 rounded px-3 py-2 text-sm text-steel-900 bg-white focus:outline-none focus:ring-2 focus:ring-forest-700 pr-10 tabular-nums"
+                    className="w-full border border-steel-300 rounded px-3 py-2 text-sm text-steel-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#07559B] pr-10 tabular-nums"
                   />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-steel-400">
                     KG
@@ -696,7 +696,7 @@ export default function HospitalDashboard() {
                 id="facility-select"
                 value={formData.assigned_cbwtf_id}
                 onChange={e => setFormData({ ...formData, assigned_cbwtf_id: e.target.value })}
-                className="w-full border border-steel-300 rounded px-3 py-2 text-sm text-steel-900 bg-white focus:outline-none focus:ring-2 focus:ring-forest-700"
+                className="w-full border border-steel-300 rounded px-3 py-2 text-sm text-steel-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#07559B]"
               >
                 {CBWTF_FACILITIES.map(fac => (
                   <option key={fac.id} value={fac.id}>{fac.name}</option>
@@ -708,12 +708,12 @@ export default function HospitalDashboard() {
             <div className="space-y-2">
               <div className="bg-steel-50 rounded p-3.5 border border-steel-200 flex items-start justify-between gap-3">
                 <div className="flex items-start space-x-3">
-                  <ShieldCheck className="w-5 h-5 text-forest-700 shrink-0 mt-0.5" aria-hidden="true" />
+                  <ShieldCheck className="w-5 h-5 text-[#07559B] shrink-0 mt-0.5" aria-hidden="true" />
                   <div className="text-xs text-steel-800">
                     <span className="font-semibold">Digital Gate Verification Stamp:</span> Logged by{' '}
                     <strong className="font-semibold">{user?.name || 'Dr. Aarav Mehta'}</strong> ({user?.role || 'HOSPITAL_AUTHORITY'}).
                     <div className="mt-1 flex items-center space-x-1.5 font-mono text-[11px] text-steel-600 tabular-nums">
-                      <MapPin className="w-3.5 h-3.5 text-forest-700 shrink-0" aria-hidden="true" />
+                      <MapPin className="w-3.5 h-3.5 text-[#07559B] shrink-0" aria-hidden="true" />
                       <span>
                         Locking GPS: {gpsCoords.latitude.toFixed(4)}&deg; N, {gpsCoords.longitude.toFixed(4)}&deg; E
                         {gpsCoords.accuracy ? ` (Accuracy &plusmn;${gpsCoords.accuracy}m)` : ' (Facility Gateway)'}
@@ -776,7 +776,7 @@ export default function HospitalDashboard() {
           {/* Overview Callout */}
           <div className="bg-white rounded-lg p-6 border border-steel-200">
             <div className="flex items-start space-x-3">
-              <div className="w-10 h-10 rounded bg-forest-50 border border-forest-200 text-forest-800 flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded bg-blue-50 border border-blue-200 text-[#07559B] flex items-center justify-center shrink-0">
                 <Activity className="w-5 h-5" aria-hidden="true" />
               </div>
               <div>
@@ -926,7 +926,7 @@ export default function HospitalDashboard() {
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-steel-200 pb-3 mb-4">
               <div className="flex items-center space-x-2">
-                <div className="w-7 h-7 rounded bg-forest-50 text-forest-800 flex items-center justify-center border border-forest-200">
+                <div className="w-7 h-7 rounded bg-blue-50 text-[#07559B] flex items-center justify-center border border-blue-200">
                   <QrCode className="w-4 h-4" aria-hidden="true" />
                 </div>
                 <h3 id="qr-modal-title" className="font-semibold text-sm text-steel-900">
@@ -936,7 +936,7 @@ export default function HospitalDashboard() {
               <button
                 onClick={() => setQrModalBatch(null)}
                 aria-label="Close tag modal"
-                className="p-1 rounded text-steel-400 hover:text-steel-600 hover:bg-steel-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest-700"
+                className="p-1 rounded text-steel-400 hover:text-steel-600 hover:bg-steel-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#07559B]"
               >
                 <X className="w-5 h-5" aria-hidden="true" />
               </button>

@@ -381,7 +381,7 @@ class _TransportDashboardScreenState extends State<TransportDashboardScreen> {
                         width: 26,
                         height: 26,
                         child: Container(
-                          decoration: const BoxDecoration(color: Color(0xFF1F5C3B), shape: BoxShape.circle),
+                          decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
                           child: const Center(child: Text('H', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold))),
                         ),
                       ),

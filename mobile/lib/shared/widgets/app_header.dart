@@ -38,13 +38,13 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
             width: 34,
             height: 34,
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.2),
+              color: AppColors.primary.withValues(alpha: 0.35),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppColors.primaryLight.withValues(alpha: 0.4)),
+              border: Border.all(color: AppColors.primaryLight.withValues(alpha: 0.5)),
             ),
             child: const Icon(
               Icons.verified_user_rounded,
-              color: Color(0xFF34D399),
+              color: AppColors.accentTeal,
               size: 20,
             ),
           ),
@@ -56,27 +56,42 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
               children: [
                 Row(
                   children: [
-                    const Text(
-                      'BIOTrace',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.3,
+                    RichText(
+                      text: const TextSpan(
+                        style: TextStyle(
+                          fontSize: 16,
+                          letterSpacing: -0.3,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: 'BIO',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          TextSpan(
+                            text: 'Trace',
+                            style: TextStyle(
+                              color: Color(0xFFB8D2EA),
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(width: 6),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF064E3B),
+                        color: const Color(0xFF07559B).withValues(alpha: 0.4),
                         borderRadius: BorderRadius.circular(4),
-                        border: Border.all(color: const Color(0xFF047857), width: 0.8),
+                        border: Border.all(color: AppColors.accentTeal.withValues(alpha: 0.5), width: 0.8),
                       ),
                       child: const Text(
                         'NIDUSCLEAN',
                         style: TextStyle(
-                          color: Color(0xFF6EE7B7),
+                          color: AppColors.accentTeal,
                           fontSize: 9,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0.5,

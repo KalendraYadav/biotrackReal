@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth, ROLE_ROUTES, DEMO_ROLES_LIST } from '../../context/AuthContext';
 import { useSocket } from '../../context/SocketContext';
 import { SkipToContent } from '../ui/SkipToContent';
+import BioTraceMark from '../brand/BioTraceMark';
 import { 
   ShieldCheck, 
   LogOut, 
@@ -90,39 +91,42 @@ export default function AppLayout({ children }) {
       <SkipToContent targetId="main-content" />
 
       {/* Top Enterprise Navigation Bar */}
-      <header className="bg-[#0B132B] text-white border-b border-slate-800/80 sticky top-0 z-50 shadow-xs">
+      <header className="bg-[#03275D] text-white border-b border-[#104F89]/80 sticky top-0 z-50 shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-15">
             {/* Logo & Product Name */}
             <div className="flex items-center gap-6">
               <Link 
                 to={ROLE_ROUTES[role] || '/'} 
-                className="flex items-center gap-3 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg py-1"
+                className="flex items-center gap-2.5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 rounded-lg py-1"
                 aria-label="BioTrace home dashboard"
               >
-                <div className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0 shadow-xs group-hover:border-emerald-400 transition-colors">
-                  <ShieldCheck className="w-5 h-5 text-emerald-400" aria-hidden="true" />
+                <div className="p-1 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center shrink-0 shadow-xs group-hover:border-cyan-400 transition-colors">
+                  <BioTraceMark className="w-5 h-8 drop-shadow" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-lg font-bold tracking-tight text-white leading-none">BioTrace</span>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded font-mono font-bold uppercase tracking-wider bg-emerald-950 text-emerald-300 border border-emerald-800/60">
+                    <span className="text-lg font-bold tracking-tight text-white leading-none">
+                      <strong className="font-extrabold text-white">BIO</strong>
+                      <span className="font-light text-[#D9E9FB] ml-[0.04em]">TRACE</span>
+                    </span>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded font-mono font-bold uppercase tracking-wider bg-[#0C477D] text-cyan-300 border border-[#36B9EE]/50">
                       NidusClean
                     </span>
                   </div>
-                  <p className="text-[10px] text-slate-400 font-mono leading-none mt-1">CPCB BMW Chain of Custody</p>
+                  <p className="text-[10px] text-cyan-200/80 font-mono leading-none mt-1">CPCB BMW Chain of Custody</p>
                 </div>
               </Link>
 
               {/* Navigation Tabs */}
-              <nav aria-label="Main navigation" className="hidden md:flex items-center gap-1 pl-4 border-l border-slate-800/80">
+              <nav aria-label="Main navigation" className="hidden md:flex items-center gap-1 pl-4 border-l border-white/15">
                 <Link
                   to={ROLE_ROUTES[role] || '/'}
                   aria-current={isDashboardActive ? 'page' : undefined}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 ${
                     isDashboardActive
-                      ? 'bg-slate-800/90 text-white font-semibold shadow-xs'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                      ? 'bg-white/15 text-white font-semibold border-b-2 border-[#00C49E] shadow-xs'
+                      : 'text-slate-300 hover:text-white hover:bg-white/10'
                   }`}
                 >
                   Dashboard
@@ -132,13 +136,13 @@ export default function AppLayout({ children }) {
                   <Link
                     to="/personnel"
                     aria-current={isPersonnelActive ? 'page' : undefined}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 ${
                       isPersonnelActive
-                        ? 'bg-slate-800/90 text-white font-semibold shadow-xs'
-                        : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                        ? 'bg-white/15 text-white font-semibold border-b-2 border-[#00C49E] shadow-xs'
+                        : 'text-slate-300 hover:text-white hover:bg-white/10'
                     }`}
                   >
-                    <Users className="w-3.5 h-3.5 text-slate-400" aria-hidden="true" />
+                    <Users className="w-3.5 h-3.5 text-cyan-300" aria-hidden="true" />
                     <span>Personnel</span>
                   </Link>
                 )}
@@ -148,7 +152,7 @@ export default function AppLayout({ children }) {
             {/* Right Controls: Unified Status, Role Switcher, Profile */}
             <div className="flex items-center gap-2.5 sm:gap-3.5">
               {/* Executive System Health Indicator */}
-              <div className="hidden lg:flex items-center gap-2 px-2.5 py-1 rounded-full bg-slate-900/80 border border-slate-800 text-[11px] font-mono text-slate-300">
+              <div className="hidden lg:flex items-center gap-2 px-2.5 py-1 rounded-full bg-[#083569]/90 border border-[#1E5692] text-[11px] font-mono text-cyan-200">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -163,27 +167,27 @@ export default function AppLayout({ children }) {
                 <button
                   type="button"
                   onClick={() => setRoleSwitcherOpen(!roleSwitcherOpen)}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 text-xs font-medium text-slate-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#083569]/90 hover:bg-[#0C477D] border border-[#1E5692] text-xs font-medium text-slate-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
                   aria-expanded={roleSwitcherOpen}
                   aria-label="Switch demonstration duty role"
                 >
-                  <RoleIcon className="w-3.5 h-3.5 text-emerald-400 shrink-0" aria-hidden="true" />
+                  <RoleIcon className="w-3.5 h-3.5 text-[#00C49E] shrink-0" aria-hidden="true" />
                   <span className="font-semibold text-white truncate max-w-[130px] sm:max-w-[160px]">
                     {currentRoleMeta?.title || role}
                   </span>
-                  <ChevronDown className="w-3 h-3 text-slate-400" aria-hidden="true" />
+                  <ChevronDown className="w-3 h-3 text-cyan-200/80" aria-hidden="true" />
                 </button>
 
                 {roleSwitcherOpen && (
                   <div 
                     role="menu"
-                    className="absolute right-0 mt-1.5 w-72 rounded-xl bg-[#0F172A] border border-slate-700 shadow-xl py-1.5 z-50 text-xs animate-in fade-in slide-in-from-top-1"
+                    className="absolute right-0 mt-1.5 w-72 rounded-xl bg-[#072B57] border border-[#1E5692] shadow-2xl py-1.5 z-50 text-xs animate-in fade-in slide-in-from-top-1"
                   >
-                    <div className="px-3 py-2 border-b border-slate-800">
-                      <p className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider">
+                    <div className="px-3 py-2 border-b border-[#1E5692]/60">
+                      <p className="text-[10px] font-mono font-bold text-cyan-300 uppercase tracking-wider">
                         Switch Operational Context
                       </p>
-                      <p className="text-[11px] text-slate-500 mt-0.5">
+                      <p className="text-[11px] text-slate-300 mt-0.5">
                         Test RBAC & workflows across all 6 statutory roles:
                       </p>
                     </div>
@@ -199,21 +203,21 @@ export default function AppLayout({ children }) {
                             type="button"
                             role="menuitem"
                             onClick={() => handleSwitchRole(r.role)}
-                            className={`w-full text-left px-3 py-2 flex items-center justify-between hover:bg-slate-800 transition-colors ${
-                              isCurrent ? 'bg-emerald-950/40 text-emerald-300 font-semibold' : 'text-slate-300'
+                            className={`w-full text-left px-3 py-2 flex items-center justify-between hover:bg-white/10 transition-colors ${
+                              isCurrent ? 'bg-blue-900/60 text-cyan-200 font-semibold border-l-2 border-[#00C49E]' : 'text-slate-200'
                             }`}
                           >
                             <div className="flex items-center gap-2.5 min-w-0">
-                              <div className={`p-1.5 rounded-md ${isCurrent ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-800 text-slate-400'}`}>
+                              <div className={`p-1.5 rounded-md ${isCurrent ? 'bg-cyan-500/20 text-cyan-300' : 'bg-slate-800 text-slate-400'}`}>
                                 <Icon className="w-3.5 h-3.5" aria-hidden="true" />
                               </div>
                               <div className="min-w-0">
                                 <div className="text-xs truncate text-white">{r.title}</div>
-                                <div className="text-[10px] text-slate-500 truncate">{r.name} • {r.facility}</div>
+                                <div className="text-[10px] text-slate-400 truncate">{r.name} • {r.facility}</div>
                               </div>
                             </div>
                             {isCurrent && (
-                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 ml-2" aria-hidden="true" />
+                              <CheckCircle2 className="w-3.5 h-3.5 text-[#00C49E] shrink-0 ml-2" aria-hidden="true" />
                             )}
                           </button>
                         );
@@ -222,6 +226,7 @@ export default function AppLayout({ children }) {
                   </div>
                 )}
               </div>
+
 
               {/* User Profile & Logout */}
               <div className="flex items-center pl-2 border-l border-slate-800/80 gap-2">

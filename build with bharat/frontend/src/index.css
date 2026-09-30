@@ -7,6 +7,18 @@
    WCAG 2.2 AA compliant tokens per rulebook.md Section 7.2 & 18.2
    ========================================================================== */
 :root {
+  /* BioTrace Institutional Design Tokens */
+  --bio-deep-blue: #03275D;
+  --bio-blue: #07559B;
+  --bio-light-blue: #1185C6;
+  --bio-cyan: #36B9EE;
+  --bio-teal: #00C49E;
+  --bio-green: #00CA92;
+  --bio-saffron: #FF881B;
+  --bio-white: #F5F9FF;
+  --glass-border: #78AADB;
+  --panel-radius: 1.7rem;
+
   /* Surfaces & Backgrounds */
   --bg: #f8fafc;                  /* steel-50 */
   --surface: #ffffff;
@@ -20,45 +32,45 @@
   --border-input: #94a3b8;         /* steel-400, >= 3:1 against white */
 
   /* Typography / Text Colors (Contrast >= 4.5:1 for body and labels) */
-  --text: #0f172a;                 /* steel-900 / 950 */
+  --text: #0b1f3a;                 /* BioTrace dark navy text */
   --text-muted: #475569;           /* steel-600, contrast 5.7:1 */
   --text-subtle: #64748b;          /* steel-500, for metadata/placeholders */
 
-  /* Brand Primary: Deep Forest Green (CPCB/BioTrace Authority) */
-  --primary: #14462a;              /* forest-900 */
-  --primary-hover: #0f3520;        /* forest-950 */
-  --primary-active: #0b2e1b;
+  /* Brand Primary: Deep Institutional Navy/Blue */
+  --primary: #07559b;              /* BioTrace primary blue */
+  --primary-hover: #03275d;        /* BioTrace deep navy */
+  --primary-active: #043460;
   --primary-fg: #ffffff;
-  --primary-subtle: #f0fdf4;       /* forest-50 */
-  --ring: #15803d;                 /* forest-700 / 2px focus ring */
+  --primary-subtle: #f0f7ff;       /* light cool blue */
+  --ring: #07559b;                 /* 2px focus ring */
 
-  /* Brand Accent: Statutory Amber / Ochre */
-  --color-brand-orange: #b45309;
-  --color-brand-green: #14462a;
-  --color-brand-teal: #0f766e;
+  /* Brand Accent */
+  --color-brand-orange: #ff881b;   /* Saffron */
+  --color-brand-green: #00ca92;    /* BioTrace emerald green */
+  --color-brand-teal: #00c49e;     /* BioTrace cyan/teal */
 
-  /* Semantic Status Colors */
+  /* Semantic Status Colors (Controlled green for SUCCESS/COMPLIANCE per Section 7 & 15) */
   --success-bg: #f0fdf4;
   --success-border: #bbf7d0;
-  --success-fg: #15803d;
-  --success: #15803d;
+  --success-fg: #059669;
+  --success: #059669;
 
   --warning-bg: #fffbeb;
   --warning-border: #fde68a;
-  --warning-fg: #92400e;
-  --warning: #b45309;
+  --warning-fg: #d97706;
+  --warning: #d97706;
 
   --danger-bg: #fef2f2;
   --danger-border: #fecaca;
-  --danger-fg: #b91c1c;
-  --danger: #b91c1c;
-  --danger-hover: #991b1b;
+  --danger-fg: #dc2626;
+  --danger: #dc2626;
+  --danger-hover: #b91c1c;
   --danger-fg-on: #ffffff;
 
-  --info-bg: #f0fdfa;
-  --info-border: #99f6e4;
-  --info-fg: #0f766e;
-  --info: #0f766e;
+  --info-bg: #f0f9ff;
+  --info-border: #bae6fd;
+  --info-fg: #0284c7;
+  --info: #0284c7;
 }
 
 /* ==========================================================================
@@ -150,3 +162,100 @@
     transform: translateY(0);
   }
 }
+
+/* ==========================================================================
+   BIOTRACE INSTITUTIONAL ENTRY PAGE STYLES
+   ========================================================================== */
+.biotrace-page {
+  min-height: 100vh;
+  min-height: 100svh;
+  position: relative;
+  overflow-x: hidden;
+  color: var(--bio-white);
+  background: linear-gradient(135deg, #03275d 0%, #07559b 52%, #1185c6 100%);
+  font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.biotrace-bg-left {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 50%;
+  background-image: url('/assets/biotrace-hero-bg.png');
+  background-size: cover;
+  background-position: left bottom;
+  opacity: 0.32;
+  mix-blend-mode: luminosity;
+  pointer-events: none;
+  mask-image: linear-gradient(to right, black 40%, transparent 95%), linear-gradient(to bottom, transparent 0%, transparent 54%, black 74%, black 86%, transparent 96%);
+  -webkit-mask-image: linear-gradient(to right, black 40%, transparent 95%), linear-gradient(to bottom, transparent 0%, transparent 54%, black 74%, black 86%, transparent 96%);
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
+}
+
+.biotrace-bg-right {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 50%;
+  background-image: url('/assets/biotrace-hero-bg.png');
+  background-size: cover;
+  background-position: right bottom;
+  opacity: 0.32;
+  mix-blend-mode: luminosity;
+  pointer-events: none;
+  mask-image: linear-gradient(to left, black 40%, transparent 95%), linear-gradient(to bottom, transparent 0%, transparent 54%, black 74%, black 86%, transparent 96%);
+  -webkit-mask-image: linear-gradient(to left, black 40%, transparent 95%), linear-gradient(to bottom, transparent 0%, transparent 54%, black 74%, black 86%, transparent 96%);
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
+}
+
+.biotrace-atmosphere {
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(circle at 80% 12%, rgba(54, 177, 255, 0.32), transparent 42%),
+    radial-gradient(circle at 15% 85%, rgba(0, 35, 93, 0.45), transparent 50%),
+    linear-gradient(180deg, rgba(4, 46, 104, 0.45) 0%, rgba(2, 38, 84, 0.82) 100%);
+  pointer-events: none;
+}
+
+/* Modal animation (200-280ms duration per specification) */
+@keyframes bioModalEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-bio-modal {
+  animation: bioModalEnter 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Glass panel glow and hover states */
+.biotrace-enter-btn {
+  background: linear-gradient(100deg, #0757b5, #00c49e);
+  transition: transform 0.22s ease, box-shadow 0.22s ease, filter 0.22s ease;
+}
+
+.biotrace-enter-btn:not(:disabled):hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+  box-shadow: 0 12px 28px rgba(0, 196, 158, 0.35), 0 0 0 4px rgba(66, 215, 243, 0.15);
+}
+
+.biotrace-enter-btn:not(:disabled):hover .biotrace-arrow {
+  transform: translateX(4px);
+}
+
+.biotrace-enter-btn:not(:disabled):active {
+  transform: translateY(0);
+  filter: brightness(0.98);
+}
+

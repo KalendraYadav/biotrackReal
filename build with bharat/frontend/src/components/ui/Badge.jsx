@@ -19,20 +19,20 @@ export function Badge({
 
   const variants = {
     neutral: 'bg-steel-100 text-steel-800 border-steel-200',
-    primary: 'bg-forest-50 text-forest-900 border-forest-200',
-    success: 'bg-forest-50 text-forest-800 border-forest-300',
+    primary: 'bg-blue-50 text-blue-900 border-blue-200',
+    success: 'bg-emerald-50 text-emerald-800 border-emerald-300',
     warning: 'bg-amber-50 text-amber-900 border-amber-300',
     danger: 'bg-biohazard-50 text-biohazard-950 border-biohazard-300',
-    info: 'bg-teal-50 text-teal-900 border-teal-200'
+    info: 'bg-sky-50 text-sky-900 border-sky-200'
   };
 
   const dotColors = {
     neutral: 'bg-steel-500',
-    primary: 'bg-forest-700',
-    success: 'bg-forest-600',
+    primary: 'bg-blue-600',
+    success: 'bg-emerald-600',
     warning: 'bg-amber-600',
     danger: 'bg-biohazard-700',
-    info: 'bg-teal-600'
+    info: 'bg-sky-600'
   };
 
   const sizes = {

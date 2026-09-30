@@ -333,7 +333,7 @@ export default function DisposalCertificateModal({
               type="button"
               onClick={handleSubmitDisposal}
               disabled={loading}
-              className="px-5 py-2 bg-forest-800 hover:bg-forest-900 disabled:opacity-50 text-white text-xs font-bold rounded shadow-sm flex items-center space-x-2 transition"
+              className="px-5 py-2 bg-[#07559B] hover:bg-[#03275D] disabled:opacity-50 text-white text-xs font-bold rounded shadow-sm flex items-center space-x-2 transition"
             >
               {loading ? (
                 <>
