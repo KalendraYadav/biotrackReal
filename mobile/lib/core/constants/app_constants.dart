@@ -92,7 +92,7 @@ class AppConstants {
       role: AppRoles.governmentAuthority,
       title: 'Government Authority',
       name: 'Sunita Sharma',
-      email: 'government@demo.com',
+      email: 'regulator@demo.com',
       password: 'password123',
       facility: 'CPCB Regulatory Board',
       desc: 'Statewide BMW chain oversight & SLA breach monitoring',

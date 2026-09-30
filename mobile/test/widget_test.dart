@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:biotrace/core/constants/app_constants.dart';
 import 'package:biotrace/shared/models/user_model.dart';
@@ -83,5 +84,67 @@ void main() {
     await tester.pumpWidget(const BIOTraceApp());
     expect(find.text('BIOTrace'), findsWidgets);
     expect(find.text('NIDUSCLEAN'), findsOneWidget);
+    expect(find.text('DUTY ROLE TERMINAL ACCESS'), findsOneWidget);
+    expect(find.text('Authenticate & Enter'), findsOneWidget);
+    expect(find.text('1-Click Demo Login'), findsOneWidget);
+  });
+
+  final testWidths = [320.0, 360.0, 375.0, 390.0, 412.0, 430.0, 600.0];
+  for (final width in testWidths) {
+    testWidgets('LoginScreen renders without overflow at ${width.toInt()}px width', (WidgetTester tester) async {
+      tester.view.physicalSize = Size(width, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() => tester.view.resetPhysicalSize());
+
+      await tester.pumpWidget(const BIOTraceApp());
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('BIOTrace'), findsWidgets);
+      expect(find.text('NIDUSCLEAN'), findsOneWidget);
+      expect(find.text('Hospital Authority'), findsWidgets);
+      expect(find.text('Collection Officer'), findsOneWidget);
+      expect(find.text('Transport Officer'), findsOneWidget);
+      expect(find.text('Treatment Facility (CBWTF)'), findsOneWidget);
+      expect(find.text('Government Authority'), findsOneWidget);
+      expect(find.text('Compliance Inspector'), findsOneWidget);
+      expect(find.text('Authenticate & Enter'), findsOneWidget);
+    });
+  }
+
+  testWidgets('Role selection updates email and selected authority', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() => tester.view.resetPhysicalSize());
+
+    await tester.pumpWidget(const BIOTraceApp());
+    await tester.pumpAndSettle();
+
+    // Default email in EditableText is hospital@demo.com
+    expect(
+      find.byWidgetPredicate((w) => w is EditableText && w.controller.text == 'hospital@demo.com'),
+      findsOneWidget,
+    );
+
+    // Tap on Transport Officer card
+    await tester.tap(find.text('Transport Officer'));
+    await tester.pump(const Duration(milliseconds: 350));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byWidgetPredicate((w) => w is EditableText && w.controller.text == 'transport@demo.com'),
+      findsOneWidget,
+    );
+
+    // Tap on Collection Officer card
+    await tester.tap(find.text('Collection Officer'));
+    await tester.pump(const Duration(milliseconds: 350));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byWidgetPredicate((w) => w is EditableText && w.controller.text == 'collection@demo.com'),
+      findsOneWidget,
+    );
   });
 }
+
