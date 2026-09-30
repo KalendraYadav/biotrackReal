@@ -1,0 +1,64 @@
+import 'package:flutter/material.dart';
+
+class AppColors {
+  // Brand Primary & Accent
+  static const Color primary = Color(0xFF1F5C3B); // Forest Green
+  static const Color primaryLight = Color(0xFF2E8553);
+  static const Color primaryBg = Color(0xFFEBF6F0);
+  
+  static const Color accent = Color(0xFFF1602A); // Amber / Hazmat Orange
+  static const Color accentLight = Color(0xFFFFF7ED);
+  static const Color accentDark = Color(0xFFC2410C);
+
+  // Executive Navy Surfaces
+  static const Color navyHeader = Color(0xFF0B132B);
+  static const Color navyCard = Color(0xFF0F172A);
+  static const Color navyBorder = Color(0xFF1E293B);
+
+  // Backgrounds & Neutrals
+  static const Color canvas = Color(0xFFF8FAFC);
+  static const Color card = Color(0xFFFFFFFF);
+  static const Color surfaceAlt = Color(0xFFF1F5F9);
+  static const Color border = Color(0xFFE2E8F0);
+  static const Color borderLight = Color(0xFFF1F5F9);
+
+  // Text Hierarchy
+  static const Color textPrimary = Color(0xFF0F172A);
+  static const Color textSecondary = Color(0xFF475569);
+  static const Color textMuted = Color(0xFF64748B);
+  static const Color textLight = Color(0xFF94A3B8);
+
+  // Status Tints
+  static const Color success = Color(0xFF059669);
+  static const Color successBg = Color(0xFFECFDF5);
+  static const Color successBorder = Color(0xFFA7F3D0);
+
+  static const Color warning = Color(0xFFD97706);
+  static const Color warningBg = Color(0xFFFFFBEB);
+  static const Color warningBorder = Color(0xFFFDE68A);
+
+  static const Color danger = Color(0xFFDC2626);
+  static const Color dangerBg = Color(0xFFFEF2F2);
+  static const Color dangerBorder = Color(0xFFFECACA);
+
+  static const Color info = Color(0xFF0284C7);
+  static const Color infoBg = Color(0xFFF0F9FF);
+  static const Color infoBorder = Color(0xFFBAE6FD);
+
+  // CPCB Bio-Medical Waste Category Colors
+  static const Color catYellowBg = Color(0xFFFEF08A);
+  static const Color catYellowText = Color(0xFF854D0E);
+  static const Color catYellowBorder = Color(0xFFFDE047);
+
+  static const Color catRedBg = Color(0xFFFECDD3);
+  static const Color catRedText = Color(0xFF9F1239);
+  static const Color catRedBorder = Color(0xFFFDA4AF);
+
+  static const Color catWhiteBg = Color(0xFFF1F5F9);
+  static const Color catWhiteText = Color(0xFF334155);
+  static const Color catWhiteBorder = Color(0xFFCBD5E1);
+
+  static const Color catBlueBg = Color(0xFFBAE6FD);
+  static const Color catBlueText = Color(0xFF0369A1);
+  static const Color catBlueBorder = Color(0xFF7DD3FC);
+}
