@@ -302,7 +302,7 @@ export async function findUserById(id) {
  * @param {string} password 
  * @returns {Promise<{success: boolean, token?: string, user?: object, code?: string, error?: string}>}
  */
-export async function authenticateCredentials(email, password) {
+export async function authenticateCredentials(email, password, options = {}) {
   if (!email || !password) {
     return { success: false, code: 'MISSING_CREDENTIALS', error: 'Both email and password are required' };
   }
@@ -325,6 +325,44 @@ export async function authenticateCredentials(email, password) {
   const isMatch = await comparePassword(password, user.password_hash);
   if (!isMatch) {
     return { success: false, code: 'INCORRECT_PASSWORD', error: 'Incorrect password' };
+  }
+
+  // Account Lifecycle Status Verification
+  const verificationStatus = user.verification_status || 'VERIFIED';
+  if (verificationStatus === 'SUSPENDED') {
+    return {
+      success: false,
+      status: 403,
+      code: 'ACCOUNT_SUSPENDED',
+      error: 'Account temporarily suspended by regulatory authority. Contact your statutory administrator.'
+    };
+  }
+
+  if (verificationStatus === 'REVOKED') {
+    return {
+      success: false,
+      status: 403,
+      code: 'ACCOUNT_REVOKED',
+      error: 'Account authorization permanently revoked by Government Authority.'
+    };
+  }
+
+  if (verificationStatus === 'REJECTED') {
+    return {
+      success: false,
+      status: 403,
+      code: 'ACCOUNT_REJECTED',
+      error: 'Account verification request was reviewed and rejected.'
+    };
+  }
+
+  if (verificationStatus === 'PENDING' && !options.allowPending) {
+    return {
+      success: false,
+      status: 403,
+      code: 'ACCOUNT_PENDING',
+      error: 'Account pending official verification. An authorized facility or government administrator must verify your credentials before operational access is granted.'
+    };
   }
 
   const token = generateToken(user);

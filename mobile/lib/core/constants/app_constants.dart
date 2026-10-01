@@ -48,7 +48,7 @@ class DemoAccount {
 
 class AppConstants {
   static const String appName = 'BIOTrace';
-  static const String appSubtitle = 'NidusClean';
+  static const String appSubtitle = 'Digital Chain of Custody';
   static const String statutoryAct = 'Bio-Medical Waste Management Rules 2016';
 
   static const List<DemoAccount> demoAccounts = [

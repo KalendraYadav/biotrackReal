@@ -10,8 +10,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
-        name: 'BioTrace — Biomedical Waste Compliance & Risk Tracking',
-        short_name: 'BioTrace',
+        name: 'BIOTrace — Biomedical Waste Compliance & Risk Tracking',
+        short_name: 'BIOTrace',
         description: 'Verifiable digital chain-of-custody platform for biomedical waste compliance and risk inspection',
         theme_color: '#1F5C3B',
         background_color: '#F8FAFC',

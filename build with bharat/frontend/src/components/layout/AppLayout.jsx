@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth, ROLE_ROUTES, DEMO_ROLES_LIST } from '../../context/AuthContext';
+import { useAuth, ROLE_ROUTES } from '../../context/AuthContext';
 import { useSocket } from '../../context/SocketContext';
 import { SkipToContent } from '../ui/SkipToContent';
 import BioTraceMark from '../brand/BioTraceMark';
+import Button from '../ui/Button';
 import { 
   ShieldCheck, 
   LogOut, 
@@ -37,15 +38,17 @@ const ROLE_ICONS = {
 };
 
 export default function AppLayout({ children }) {
-  const { user, role, logout, loginAsDemoRole, demoRoles } = useAuth();
+  const { user, role, logout, demoRoles } = useAuth();
   const { isConnected, syncMode, alerts, dismissAlert } = useSocket();
   const navigate = useNavigate();
   const location = useLocation();
 
   const [backendStatus, setBackendStatus] = useState('checking');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [roleSwitcherOpen, setRoleSwitcherOpen] = useState(false);
-  const switcherRef = useRef(null);
+  const [identityCardOpen, setIdentityCardOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const identityRef = useRef(null);
 
   useEffect(() => {
     fetch('/api/health')
@@ -54,30 +57,30 @@ export default function AppLayout({ children }) {
       .catch(() => setBackendStatus('disconnected'));
   }, []);
 
-  // Close switcher on click outside
+  // Close identity card on click outside
   useEffect(() => {
-    if (!roleSwitcherOpen) return;
+    if (!identityCardOpen) return;
     function handleClickOutside(event) {
-      if (switcherRef.current && !switcherRef.current.contains(event.target)) {
-        setRoleSwitcherOpen(false);
+      if (identityRef.current && !identityRef.current.contains(event.target)) {
+        setIdentityCardOpen(false);
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [roleSwitcherOpen]);
+  }, [identityCardOpen]);
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
+  const handleLogoutClick = () => {
+    setIdentityCardOpen(false);
+    setMobileMenuOpen(false);
+    setShowLogoutModal(true);
   };
 
-  const handleSwitchRole = async (targetRole) => {
-    setRoleSwitcherOpen(false);
-    setMobileMenuOpen(false);
-    const res = await loginAsDemoRole(targetRole);
-    if (res.success) {
-      navigate(res.dashboardRoute);
-    }
+  const confirmLogout = () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+    setShowLogoutModal(false);
+    logout();
+    navigate('/login');
   };
 
   const currentRoleMeta = demoRoles.find(r => r.role === role) || demoRoles[0];
@@ -111,7 +114,7 @@ export default function AppLayout({ children }) {
                       <span className="font-light text-[#D9E9FB] ml-[0.04em]">TRACE</span>
                     </span>
                     <span className="text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded font-mono font-bold uppercase tracking-wider bg-[#0C477D] text-cyan-300 border border-[#36B9EE]/50 shrink-0">
-                      NidusClean
+                      CPCB BMW
                     </span>
                   </div>
                   <p className="text-[10px] text-cyan-200/80 font-mono leading-none mt-1 hidden sm:block truncate">CPCB BMW Chain of Custody</p>
@@ -132,7 +135,7 @@ export default function AppLayout({ children }) {
                   Dashboard
                 </Link>
 
-                {(role === 'HOSPITAL_AUTHORITY' || role === 'GOVERNMENT_AUTHORITY') && (
+                {(role === 'HOSPITAL_AUTHORITY' || role === 'GOVERNMENT_AUTHORITY' || role === 'TREATMENT_FACILITY' || role === 'COMPLIANCE_INSPECTOR') && (
                   <Link
                     to="/personnel"
                     aria-current={isPersonnelActive ? 'page' : undefined}
@@ -162,66 +165,83 @@ export default function AppLayout({ children }) {
                 </span>
               </div>
 
-              {/* Role Switcher Dropdown (for desktop / tablet viewports; on mobile accessible via drawer menu) */}
-              <div className="relative hidden md:block" ref={switcherRef}>
+              {/* Server-Authoritative Operational Identity Display (RBAC Bound) */}
+              <div className="relative hidden md:block" ref={identityRef}>
                 <button
                   type="button"
-                  onClick={() => setRoleSwitcherOpen(!roleSwitcherOpen)}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#083569]/90 hover:bg-[#0C477D] border border-[#1E5692] text-xs font-medium text-slate-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
-                  aria-expanded={roleSwitcherOpen}
-                  aria-label="Switch demonstration duty role"
+                  onClick={() => setIdentityCardOpen(!identityCardOpen)}
+                  className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg bg-[#083569]/90 hover:bg-[#0C477D] border border-[#1E5692] text-xs font-medium text-slate-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 group"
+                  aria-expanded={identityCardOpen}
+                  aria-label="View authenticated statutory operational identity"
+                  title="Operational Duty Identity"
                 >
-                  <RoleIcon className="w-3.5 h-3.5 text-[#00C49E] shrink-0" aria-hidden="true" />
-                  <span className="font-semibold text-white truncate max-w-[130px] sm:max-w-[160px]">
-                    {currentRoleMeta?.title || role}
-                  </span>
-                  <ChevronDown className="w-3 h-3 text-cyan-200/80" aria-hidden="true" />
+                  <div className="p-1 rounded bg-[#00C49E]/15 text-[#00C49E]">
+                    <RoleIcon className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                  </div>
+                  <div className="text-left min-w-0">
+                    <div className="text-[9px] font-mono uppercase tracking-wider text-cyan-300 font-bold leading-none">
+                      OPERATIONAL IDENTITY
+                    </div>
+                    <div className="font-semibold text-white truncate max-w-[130px] sm:max-w-[160px] leading-tight mt-0.5">
+                      {currentRoleMeta?.title || role}
+                    </div>
+                  </div>
+                  <ChevronDown className={`w-3 h-3 text-cyan-200/80 transition-transform duration-200 ${identityCardOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
                 </button>
 
-                {roleSwitcherOpen && (
+                {identityCardOpen && (
                   <div 
-                    role="menu"
-                    className="absolute right-0 mt-1.5 w-72 rounded-xl bg-[#072B57] border border-[#1E5692] shadow-2xl py-1.5 z-50 text-xs animate-in fade-in slide-in-from-top-1"
+                    role="dialog"
+                    aria-label="Statutory Identity Details"
+                    className="absolute right-0 mt-1.5 w-80 rounded-xl bg-[#072B57] border border-[#1E5692] shadow-2xl p-3 z-50 text-xs animate-in fade-in slide-in-from-top-1"
                   >
-                    <div className="px-3 py-2 border-b border-[#1E5692]/60">
-                      <p className="text-[10px] font-mono font-bold text-cyan-300 uppercase tracking-wider">
-                        Switch Operational Context
+                    <div className="pb-2.5 border-b border-[#1E5692]/60">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-mono font-bold text-cyan-300 uppercase tracking-wider">
+                          SIGNED IN AS
+                        </span>
+                        <span className="inline-flex items-center gap-1 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                          <CheckCircle2 className="w-2.5 h-2.5" />
+                          {user?.verification_status || 'VERIFIED'}
+                        </span>
+                      </div>
+                      <h4 className="text-sm font-bold text-white mt-1">
+                        {currentRoleMeta?.title || role}
+                      </h4>
+                      <p className="text-[11px] text-cyan-100 font-medium">
+                        {user?.name}
                       </p>
-                      <p className="text-[11px] text-slate-300 mt-0.5">
-                        Test RBAC & workflows across all 6 statutory roles:
+                      <p className="text-[10px] text-slate-300 mt-0.5">
+                        {user?.facility_name || user?.facility?.name || 'CPCB Regulatory Authority'}
                       </p>
                     </div>
 
-                    <div className="py-1">
-                      {DEMO_ROLES_LIST.map((r) => {
-                        const Icon = ROLE_ICONS[r.role] || ShieldCheck;
-                        const isCurrent = r.role === role;
+                    <div className="py-2.5 space-y-1.5 text-[11px] text-slate-300">
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-400">Statutory Role:</span>
+                        <span className="font-mono text-cyan-200 font-medium">{role}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-400">Email:</span>
+                        <span className="font-mono text-slate-200">{user?.email}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-400">Jurisdiction:</span>
+                        <span className="text-slate-200 truncate max-w-[150px]">{user?.facility_name || user?.facility?.name || 'CPCB / State Board'}</span>
+                      </div>
+                    </div>
 
-                        return (
-                          <button
-                            key={r.role}
-                            type="button"
-                            role="menuitem"
-                            onClick={() => handleSwitchRole(r.role)}
-                            className={`w-full text-left px-3 py-2 flex items-center justify-between hover:bg-white/10 transition-colors ${
-                              isCurrent ? 'bg-blue-900/60 text-cyan-200 font-semibold border-l-2 border-[#00C49E]' : 'text-slate-200'
-                            }`}
-                          >
-                            <div className="flex items-center gap-2.5 min-w-0">
-                              <div className={`p-1.5 rounded-md ${isCurrent ? 'bg-cyan-500/20 text-cyan-300' : 'bg-slate-800 text-slate-400'}`}>
-                                <Icon className="w-3.5 h-3.5" aria-hidden="true" />
-                              </div>
-                              <div className="min-w-0">
-                                <div className="text-xs truncate text-white">{r.title}</div>
-                                <div className="text-[10px] text-slate-400 truncate">{r.name} • {r.facility}</div>
-                              </div>
-                            </div>
-                            {isCurrent && (
-                              <CheckCircle2 className="w-3.5 h-3.5 text-[#00C49E] shrink-0 ml-2" aria-hidden="true" />
-                            )}
-                          </button>
-                        );
-                      })}
+                    <div className="pt-2 border-t border-[#1E5692]/60 flex items-center justify-between">
+                      <p className="text-[10px] text-slate-400 italic">
+                        Role is bound to authenticated credentials.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={handleLogoutClick}
+                        className="px-2.5 py-1 rounded bg-red-950/60 hover:bg-red-900 border border-red-700/60 text-red-200 text-[11px] font-medium transition-colors"
+                      >
+                        Sign Out
+                      </button>
                     </div>
                   </div>
                 )}
@@ -238,7 +258,7 @@ export default function AppLayout({ children }) {
 
                 <button
                   type="button"
-                  onClick={handleLogout}
+                  onClick={handleLogoutClick}
                   className="p-2 rounded-lg bg-[#083569]/90 hover:bg-[#0C477D] border border-[#1E5692] text-slate-300 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
                   aria-label="Sign out of BioTrace"
                   title="Sign out"
@@ -294,29 +314,32 @@ export default function AppLayout({ children }) {
               )}
             </div>
 
-            <div className="pt-1">
+            <div className="pt-2 pb-1 border-t border-[#104F89]">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-[10px] font-mono font-bold text-cyan-300 uppercase tracking-wider">
-                  Switch Operational Context
+                  OPERATIONAL IDENTITY
                 </p>
-                <span className="text-[10px] font-mono text-cyan-400/80">6 Statutory Roles</span>
+                <span className="inline-flex items-center gap-1 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                  <CheckCircle2 className="w-2.5 h-2.5" />
+                  {user?.verification_status || 'VERIFIED'}
+                </span>
               </div>
-              <div className="grid grid-cols-2 gap-1.5">
-                {DEMO_ROLES_LIST.map((r) => (
-                  <button
-                    key={r.role}
-                    type="button"
-                    onClick={() => handleSwitchRole(r.role)}
-                    className={`p-2 rounded-lg border text-left text-[11px] font-medium transition-colors ${
-                      r.role === role
-                        ? 'bg-[#0C477D] border-[#00C49E] text-cyan-200 font-bold shadow-xs'
-                        : 'bg-[#083569]/80 border-[#1E5692] text-slate-200 hover:bg-[#0C477D]/60'
-                    }`}
-                  >
-                    <div className="truncate font-semibold">{r.title}</div>
-                    <div className="text-[9px] text-cyan-300/70 truncate">{r.facility}</div>
-                  </button>
-                ))}
+              <div className="p-3 rounded-lg bg-[#083569]/90 border border-[#1E5692] text-xs">
+                <div className="flex items-center gap-2.5 mb-1.5">
+                  <div className="p-1.5 rounded-md bg-[#00C49E]/15 text-[#00C49E]">
+                    <RoleIcon className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="font-bold text-white text-xs leading-tight">{currentRoleMeta?.title || role}</div>
+                    <div className="text-[11px] text-cyan-200 mt-0.5">{user?.name}</div>
+                  </div>
+                </div>
+                <div className="text-[10px] text-slate-300 font-mono mt-1">
+                  {user?.facility_name || user?.facility?.name || 'CPCB Regulatory Office'}
+                </div>
+                <div className="text-[10px] text-slate-400 mt-2 italic border-t border-[#1E5692]/60 pt-1.5">
+                  Role is bound to authenticated credentials.
+                </div>
               </div>
             </div>
 
@@ -329,7 +352,7 @@ export default function AppLayout({ children }) {
               </div>
               <button
                 type="button"
-                onClick={handleLogout}
+                onClick={handleLogoutClick}
                 className="text-red-400 font-semibold hover:text-red-300 shrink-0 px-2.5 py-1 rounded bg-red-950/40 border border-red-800/40"
               >
                 Sign out
@@ -375,7 +398,7 @@ export default function AppLayout({ children }) {
       <footer className="bg-white border-t border-slate-200 mt-auto py-5 text-slate-500 text-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-[11px] text-center sm:text-left">
           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-            <span className="font-bold text-slate-800">BioTrace (NidusClean)</span>
+            <span className="font-bold text-slate-800">BIOTrace</span>
             <span>&bull;</span>
             <span>Central Pollution Control Board BMW Rules 2016 Compliant</span>
           </div>
@@ -386,6 +409,84 @@ export default function AppLayout({ children }) {
           </div>
         </div>
       </footer>
+
+      {/* Sign Out Confirmation Modal */}
+      {showLogoutModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="logout-dialog-title"
+          onClick={(e) => {
+            if (e.target === e.currentTarget && !isLoggingOut) {
+              setShowLogoutModal(false);
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape' && !isLoggingOut) {
+              setShowLogoutModal(false);
+            }
+          }}
+        >
+          <div className="w-full max-w-sm bg-white rounded-2xl border border-slate-200 shadow-2xl p-5 sm:p-6 text-left">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl border bg-rose-50 border-rose-200 text-rose-600">
+                  <LogOut className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 id="logout-dialog-title" className="text-base font-bold text-slate-900">
+                    Sign Out
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Session termination
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                disabled={isLoggingOut}
+                onClick={() => setShowLogoutModal(false)}
+                className="text-slate-400 hover:text-slate-700 disabled:opacity-50"
+                aria-label="Close dialog"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-2 mb-6">
+              <p className="text-sm font-medium text-slate-800">
+                Are you sure you want to sign out of BIOTrace?
+              </p>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                You will need to authenticate again to access your account.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={isLoggingOut}
+                onClick={() => setShowLogoutModal(false)}
+              >
+                Cancel
+              </Button>
+
+              <Button
+                variant="destructive"
+                size="sm"
+                loading={isLoggingOut}
+                disabled={isLoggingOut}
+                onClick={confirmLogout}
+                icon={LogOut}
+              >
+                Sign Out
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

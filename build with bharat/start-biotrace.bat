@@ -1,5 +1,5 @@
 @echo off
-title BioTrace (NidusClean) Platform Launcher
+title BIOTrace Platform Launcher
 echo =======================================================
 echo   Starting BioTrace Full-Stack Platform
 echo - Backend REST API ^& Socket.IO (Port 5000)

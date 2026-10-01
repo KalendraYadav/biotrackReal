@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_constants.dart';
-import '../../core/network/api_client.dart';
 import '../../core/socket/socket_service.dart';
 import '../../core/storage/secure_storage_service.dart';
 import '../../core/theme/app_colors.dart';
@@ -34,7 +33,7 @@ class _MainShellScreenState extends State<MainShellScreen> {
     _currentUser = widget.initialUser;
   }
 
-  void _showRoleSwitcherSheet() {
+  void _showOperationalIdentitySheet() {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -54,11 +53,11 @@ class _MainShellScreenState extends State<MainShellScreen> {
               children: [
                 const Row(
                   children: [
-                    Icon(Icons.swap_horiz_rounded, color: AppColors.primary, size: 22),
+                    Icon(Icons.badge_outlined, color: AppColors.primary, size: 22),
                     SizedBox(width: 8),
                     Text(
-                      'Switch Operational Context',
-                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                      'Operational Identity',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
                     ),
                   ],
                 ),
@@ -66,78 +65,122 @@ class _MainShellScreenState extends State<MainShellScreen> {
               ],
             ),
             const Text(
-              'Test RBAC & field workflows across all 6 statutory roles:',
-              style: TextStyle(fontSize: 11, color: AppColors.textMuted),
+              'SIGNED IN AS',
+              style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.5, color: AppColors.textMuted),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 12),
 
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: AppConstants.demoAccounts.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 8),
-              itemBuilder: (context, index) {
-                final acc = AppConstants.demoAccounts[index];
-                final isCurrent = acc.role == _currentUser.role;
-
-                return InkWell(
-                  onTap: () async {
-                    Navigator.pop(ctx);
-                    await _switchRole(acc);
-                  },
-                  borderRadius: BorderRadius.circular(10),
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: AppColors.primaryBg,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.primary, width: 1.5),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
                     decoration: BoxDecoration(
-                      color: isCurrent ? AppColors.primaryBg : AppColors.surfaceAlt,
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: isCurrent ? AppColors.primary : AppColors.border,
-                        width: isCurrent ? 1.5 : 1,
-                      ),
                     ),
-                    child: Row(
+                    child: Icon(
+                      _getRoleIcon(_currentUser.role),
+                      color: AppColors.primary,
+                      size: 22,
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          width: 34,
-                          height: 34,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Icon(
-                            _getRoleIcon(acc.role),
-                            color: isCurrent ? AppColors.primary : AppColors.textSecondary,
-                            size: 18,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                acc.title,
-                                style: TextStyle(
-                                  fontSize: 13,
+                        Row(
+                          children: [
+                            Text(
+                              AppRoles.format(_currentUser.role),
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                            const Spacer(),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF10B981).withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                _currentUser.verificationStatus ?? 'VERIFIED',
+                                style: const TextStyle(
+                                  color: Color(0xFF059669),
+                                  fontSize: 9,
                                   fontWeight: FontWeight.bold,
-                                  color: isCurrent ? AppColors.primary : AppColors.textPrimary,
                                 ),
                               ),
-                              Text(
-                                '${acc.name} • ${acc.facility}',
-                                style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                        if (isCurrent)
-                          const Icon(Icons.check_circle, color: AppColors.primary, size: 18),
+                        const SizedBox(height: 4),
+                        Text(
+                          _currentUser.name,
+                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                        ),
+                        Text(
+                          _currentUser.facilityName ?? 'CPCB Regulatory Office',
+                          style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+                        ),
                       ],
                     ),
                   ),
-                );
-              },
+                ],
+              ),
+            ),
+            const SizedBox(height: 14),
+
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceAlt,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Statutory Authorization Notice',
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    'Your operational role is strictly determined by server-side authentication and bound to your official credentials. Role escalation or arbitrary context switching is prohibited by regulatory security policy.',
+                    style: TextStyle(fontSize: 11, color: AppColors.textMuted, height: 1.35),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  _handleLogout();
+                },
+                icon: const Icon(Icons.logout_rounded, size: 16, color: AppColors.danger),
+                label: const Text('Sign Out to Switch Duty Role', style: TextStyle(color: AppColors.danger, fontWeight: FontWeight.bold)),
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: AppColors.danger),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+              ),
             ),
             const SizedBox(height: 10),
           ],
@@ -146,7 +189,7 @@ class _MainShellScreenState extends State<MainShellScreen> {
     );
   }
 
-  IconData _getRoleIcon(String role) {
+  IconData _getRoleIcon(String? role) {
     switch (role) {
       case AppRoles.hospitalAuthority:
         return Icons.local_hospital_rounded;
@@ -165,45 +208,20 @@ class _MainShellScreenState extends State<MainShellScreen> {
     }
   }
 
-  Future<void> _switchRole(DemoAccount acc) async {
-    final res = await ApiClient.post(
-      '/auth/login',
-      body: {'email': acc.email, 'password': acc.password},
-      requiresAuth: false,
-    );
-
-    if (res.isSuccess) {
-      final token = res.data?['token']?.toString();
-      final userMap = res.data?['user'] as Map<String, dynamic>?;
-      if (token != null && userMap != null) {
-        final newUser = UserModel.fromJson(userMap);
-        await SecureStorageService.saveAuthData(token: token, user: newUser);
-        await SocketService.initSocket();
-
-        setState(() {
-          _currentUser = newUser;
-          _selectedTabIndex = 0;
-        });
-
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Switched to ${acc.title} (${acc.name})'),
-              backgroundColor: AppColors.primary,
-              duration: const Duration(seconds: 2),
-            ),
-          );
-        }
-      }
-    }
-  }
-
   void _handleLogout() async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Confirm Sign Out', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-        content: const Text('Are you sure you want to end your statutory session?'),
+        title: const Text('Sign Out', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: const [
+            Text('Are you sure you want to sign out of BIOTrace?', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+            SizedBox(height: 6),
+            Text('You will need to authenticate again to access your account.', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+          ],
+        ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
           ElevatedButton(
@@ -255,7 +273,7 @@ class _MainShellScreenState extends State<MainShellScreen> {
       backgroundColor: AppColors.canvas,
       appBar: AppHeader(
         user: _currentUser,
-        onSwitchRole: _showRoleSwitcherSheet,
+        onShowIdentity: _showOperationalIdentitySheet,
         onLogout: _handleLogout,
       ),
       body: _selectedTabIndex == 0

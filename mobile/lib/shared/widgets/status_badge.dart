@@ -46,6 +46,16 @@ class StatusBadge extends StatelessWidget {
         text = AppColors.danger;
         border = AppColors.dangerBorder;
         break;
+      case 'SUSPENDED':
+        bg = AppColors.warningBg;
+        text = AppColors.warning;
+        border = AppColors.warningBorder;
+        break;
+      case 'REVOKED':
+        bg = const Color(0xFF1E293B);
+        text = const Color(0xFFF1F5F9);
+        border = const Color(0xFF334155);
+        break;
     }
 
     return Container(

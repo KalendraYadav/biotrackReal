@@ -141,7 +141,7 @@ app.use('/api/personnel', personnelRouter);
 // Root & Health check routes
 app.get('/', (req, res) => {
   res.json({
-    message: 'NidusClean (BioTrace) REST API & Socket.IO Gateway is running',
+    message: 'BIOTrace REST API & Socket.IO Gateway is running',
     version: '1.0.0',
     status: 'online',
     sockets_active: true,
@@ -160,6 +160,25 @@ app.get('/api/health', (req, res) => {
     sockets_connected: io.engine?.clientsCount || 0,
     timestamp: new Date().toISOString(),
     service: 'biotrace-backend'
+  });
+});
+
+// JSON 404 handler for unmatched API routes - guarantees JSON responses, never HTML
+app.use('/api/*', (req, res) => {
+  res.status(404).json({
+    error: 'API Endpoint Not Found',
+    code: 'ENDPOINT_NOT_FOUND',
+    message: `API route '${req.originalUrl}' does not exist on this server.`
+  });
+});
+
+// Global API error handler - guarantees JSON responses, never HTML
+app.use((err, req, res, next) => {
+  console.error('[Global API Error]:', err);
+  res.status(err.status || 500).json({
+    error: err.name || 'Internal Server Error',
+    code: err.code || 'INTERNAL_ERROR',
+    message: err.message || 'An unexpected error occurred processing your request.'
   });
 });
 

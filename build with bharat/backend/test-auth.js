@@ -1,7 +1,8 @@
 import express from 'express';
 import cors from 'cors';
+import jwt from 'jsonwebtoken';
 import authRouter from './routes/auth.js';
-import { hashPassword, comparePassword } from './services/authService.js';
+import { hashPassword, comparePassword, DEMO_USERS } from './services/authService.js';
 import { ROLES, ALL_ROLES, isValidRole } from './constants/roles.js';
 
 const app = express();
@@ -243,6 +244,159 @@ async function runTests() {
       headers: { 'Authorization': `Bearer ${roleTokens[ROLES.COLLECTION_OFFICER]}` }
     });
     assert(resRegDeniedColl.status === 403, 'regulatory route REJECTS COLLECTION_OFFICER (403)');
+
+    // -----------------------------------------------------------------
+    // TEST SUITE 7: Master Identity & RBAC Integrity Verification (Tests 1 - 10)
+    // -----------------------------------------------------------------
+    console.log('\n\x1b[36m[Suite 7] Master Identity & RBAC Integrity Verification (Tests 1 - 10)\x1b[0m');
+
+    // TEST 1: Hospital Authority account logs in -> Authorized role is strictly HOSPITAL_AUTHORITY
+    const loginHospRes = await fetch(`${baseUrl}/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'hospital@demo.com', password: 'password123' })
+    });
+    assert(loginHospRes.status === 200, '[TEST 1] Hospital account logs in successfully (200)');
+    const hospData = await loginHospRes.json();
+    assert(hospData.user.role === ROLES.HOSPITAL_AUTHORITY, '[TEST 1] Hospital account authorized role is strictly HOSPITAL_AUTHORITY');
+    assert(hospData.user.email === 'hospital@demo.com', '[TEST 1] User identity corresponds to hospital@demo.com');
+
+    // TEST 2: Hospital account attempts to access inspector-only endpoint -> 403 Forbidden
+    const hospToInspRes = await fetch(`${baseUrl}/test/inspector-only`, {
+      headers: { 'Authorization': `Bearer ${hospData.token}` }
+    });
+    assert(hospToInspRes.status === 403, '[TEST 2] Hospital account cannot access inspector-only endpoint (403 Forbidden)');
+    const hospToInspJson = await hospToInspRes.json();
+    assert(hospToInspJson.error.includes('Forbidden'), '[TEST 2] Response explicitly returns Forbidden error');
+
+    // TEST 3: Hospital account attempts to manipulate role value in request body or headers
+    const manipBodyRes = await fetch(`${baseUrl}/test/inspector-only`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${hospData.token}`,
+        'X-Role': ROLES.COMPLIANCE_INSPECTOR,
+        'Content-Type': 'application/json'
+      }
+    });
+    assert(manipBodyRes.status === 403, '[TEST 3] Untrusted client role header ignored; server strictly rejects with 403');
+
+    // TEST 4: Token manipulation test (tampered JWT or forged signature)
+    const forgedToken = jwt.sign(
+      { id: hospData.user.id, role: ROLES.COMPLIANCE_INSPECTOR, email: hospData.user.email },
+      'forged_secret_key_attacker_attempt_999'
+    );
+    const manipTokenRes = await fetch(`${baseUrl}/test/inspector-only`, {
+      headers: { 'Authorization': `Bearer ${forgedToken}` }
+    });
+    assert(manipTokenRes.status === 401, '[TEST 4] Forged / tampered JWT token rejected with 401 Unauthorized');
+
+    // Tampered token string (mutated signature)
+    const tamperedTokenStr = hospData.token.slice(0, -6) + 'abcdef';
+    const tamperedRes = await fetch(`${baseUrl}/test/inspector-only`, {
+      headers: { 'Authorization': `Bearer ${tamperedTokenStr}` }
+    });
+    assert(tamperedRes.status === 401, '[TEST 4] Tampered token signature strictly rejected with 401 Unauthorized');
+
+    // TEST 5: Collection Officer account -> COLLECTION_OFFICER only
+    const collRes = await fetch(`${baseUrl}/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'collection@demo.com', password: 'password123' })
+    });
+    const collData = await collRes.json();
+    assert(collData.user.role === ROLES.COLLECTION_OFFICER, '[TEST 5] Collection Officer receives COLLECTION_OFFICER role');
+    const collToHosp = await fetch(`${baseUrl}/test/hospital-only`, {
+      headers: { 'Authorization': `Bearer ${collData.token}` }
+    });
+    assert(collToHosp.status === 403, '[TEST 5] Collection Officer rejected from Hospital Authority route (403)');
+    const collToInsp = await fetch(`${baseUrl}/test/inspector-only`, {
+      headers: { 'Authorization': `Bearer ${collData.token}` }
+    });
+    assert(collToInsp.status === 403, '[TEST 5] Collection Officer rejected from Inspector route (403)');
+
+    // TEST 6: Transport Officer account -> TRANSPORT_OFFICER only
+    const transRes = await fetch(`${baseUrl}/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'transport@demo.com', password: 'password123' })
+    });
+    const transData = await transRes.json();
+    assert(transData.user.role === ROLES.TRANSPORT_OFFICER, '[TEST 6] Transport Officer receives TRANSPORT_OFFICER role');
+    const transToTreat = await fetch(`${baseUrl}/test/treatment-only`, {
+      headers: { 'Authorization': `Bearer ${transData.token}` }
+    });
+    assert(transToTreat.status === 403, '[TEST 6] Transport Officer rejected from Treatment Facility route (403)');
+    const transToGov = await fetch(`${baseUrl}/test/government-only`, {
+      headers: { 'Authorization': `Bearer ${transData.token}` }
+    });
+    assert(transToGov.status === 403, '[TEST 6] Transport Officer rejected from Government Authority route (403)');
+
+    // TEST 7: Treatment Facility account -> TREATMENT_FACILITY only
+    const treatRes = await fetch(`${baseUrl}/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'treatment@demo.com', password: 'password123' })
+    });
+    const treatData = await treatRes.json();
+    assert(treatData.user.role === ROLES.TREATMENT_FACILITY, '[TEST 7] Treatment Facility receives TREATMENT_FACILITY role');
+    const treatToGov = await fetch(`${baseUrl}/test/government-only`, {
+      headers: { 'Authorization': `Bearer ${treatData.token}` }
+    });
+    assert(treatToGov.status === 403, '[TEST 7] Treatment Facility rejected from Government Authority route (403)');
+    const treatToInsp = await fetch(`${baseUrl}/test/inspector-only`, {
+      headers: { 'Authorization': `Bearer ${treatData.token}` }
+    });
+    assert(treatToInsp.status === 403, '[TEST 7] Treatment Facility rejected from Inspector route (403)');
+
+    // TEST 8: Government Authority account -> GOVERNMENT_AUTHORITY only
+    const govRes = await fetch(`${baseUrl}/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'regulator@demo.com', password: 'password123' })
+    });
+    const govData = await govRes.json();
+    assert(govData.user.role === ROLES.GOVERNMENT_AUTHORITY, '[TEST 8] Government Authority receives GOVERNMENT_AUTHORITY role');
+    const govToHosp = await fetch(`${baseUrl}/test/hospital-only`, {
+      headers: { 'Authorization': `Bearer ${govData.token}` }
+    });
+    assert(govToHosp.status === 403, '[TEST 8] Government Authority rejected from Hospital Authority route (403)');
+    const govToColl = await fetch(`${baseUrl}/test/collection-only`, {
+      headers: { 'Authorization': `Bearer ${govData.token}` }
+    });
+    assert(govToColl.status === 403, '[TEST 8] Government Authority rejected from Collection Officer route (403)');
+
+    // TEST 9: Compliance Inspector account -> COMPLIANCE_INSPECTOR only
+    const inspRes = await fetch(`${baseUrl}/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'inspector@demo.com', password: 'password123' })
+    });
+    const inspData = await inspRes.json();
+    assert(inspData.user.role === ROLES.COMPLIANCE_INSPECTOR, '[TEST 9] Compliance Inspector receives COMPLIANCE_INSPECTOR role');
+    const inspToHosp = await fetch(`${baseUrl}/test/hospital-only`, {
+      headers: { 'Authorization': `Bearer ${inspData.token}` }
+    });
+    assert(inspToHosp.status === 403, '[TEST 9] Compliance Inspector rejected from Hospital Authority route (403)');
+    const inspToTrans = await fetch(`${baseUrl}/test/transport-only`, {
+      headers: { 'Authorization': `Bearer ${inspData.token}` }
+    });
+    assert(inspToTrans.status === 403, '[TEST 9] Compliance Inspector rejected from Transport Officer route (403)');
+
+    // TEST 10: Demo account identity isolation (authenticates as distinct account, does not mutate existing user)
+    const demoHosp = DEMO_USERS.find(u => u.email === 'hospital@demo.com');
+    const demoInsp = DEMO_USERS.find(u => u.email === 'inspector@demo.com');
+    assert(demoHosp && demoInsp, '[TEST 10] Demo user records exist for testing');
+    assert(demoHosp.id !== demoInsp.id, '[TEST 10] Demo users have distinct user IDs (isolation)');
+    assert(demoHosp.email !== demoInsp.email, '[TEST 10] Demo users have distinct email addresses');
+    assert(demoHosp.role !== demoInsp.role, '[TEST 10] Demo users have distinct statutory roles');
+
+    // Re-verify that hospital user identity in /me remains HOSPITAL_AUTHORITY
+    const meRes = await fetch(`${baseUrl}/me`, {
+      headers: { 'Authorization': `Bearer ${hospData.token}` }
+    });
+    const meData = await meRes.json();
+    assert(meData.user.role === ROLES.HOSPITAL_AUTHORITY, '[TEST 10] Hospital Authority session identity remains strictly HOSPITAL_AUTHORITY');
+    assert(meData.user.id === demoHosp.id, '[TEST 10] Hospital Authority identity ID unchanged');
 
   } catch (err) {
     console.error('\nTest runner encountered an error:', err);

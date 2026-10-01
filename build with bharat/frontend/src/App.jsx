@@ -124,11 +124,16 @@ export default function App() {
               }
             />
 
-            {/* 7. Personnel Directory (Hospital & Government Authority) */}
+            {/* 7. Personnel Directory (Hospital, Treatment Facility, Government Authority, Compliance Inspector) */}
             <Route
               path="/personnel"
               element={
-                <ProtectedRoute allowedRoles={[ROLES.HOSPITAL_AUTHORITY, ROLES.GOVERNMENT_AUTHORITY]}>
+                <ProtectedRoute allowedRoles={[
+                  ROLES.HOSPITAL_AUTHORITY,
+                  ROLES.TREATMENT_FACILITY,
+                  ROLES.GOVERNMENT_AUTHORITY,
+                  ROLES.COMPLIANCE_INSPECTOR
+                ]}>
                   <AppLayout>
                     <PersonnelDirectory />
                   </AppLayout>

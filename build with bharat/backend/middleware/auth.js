@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import { ROLES, ALL_ROLES } from '../constants/roles.js';
+import { ROLES, ALL_ROLES, VERIFICATION_STATUS } from '../constants/roles.js';
 import { getJwtSecret } from '../services/authService.js';
 
 dotenv.config();
@@ -57,17 +57,14 @@ export function authenticateToken(req, res, next) {
 
 /**
  * Role-Based Access Control (RBAC) Middleware Factory
- * Enforces server-side authorization by verifying that the authenticated user's role
- * is in the authorized roles list.
+ * Enforces server-side authorization:
+ * 1. Checks that authenticated user possesses 'VERIFIED' status
+ * 2. Verifies that the authenticated user's role is in the authorized roles list
  * 
- * Rejects unauthorized requests with HTTP 403 Forbidden.
+ * Rejects unauthorized or unverified requests with HTTP 403 Forbidden.
  * 
  * @param {...(string|string[])} allowedRoles - One or more role strings, or an array of roles.
  * @returns {import('express').RequestHandler}
- * 
- * @example
- * router.post('/batches', authenticateToken, authorizeRoles(ROLES.HOSPITAL_AUTHORITY), createBatch);
- * router.get('/audit', authenticateToken, authorizeRoles(ROLES.GOVERNMENT_AUTHORITY, ROLES.COMPLIANCE_INSPECTOR), getAudit);
  */
 export function authorizeRoles(...allowedRoles) {
   // Support both authorizeRoles('A', 'B') and authorizeRoles(['A', 'B'])
@@ -78,6 +75,17 @@ export function authorizeRoles(...allowedRoles) {
       return res.status(401).json({
         error: 'Unauthorized: Authentication required',
         message: 'No authenticated user identity found on request. Ensure authenticateToken runs first.'
+      });
+    }
+
+    // Enforce Verification Lifecycle: Only VERIFIED accounts may execute operational actions
+    const verificationStatus = req.user.verification_status || 'VERIFIED';
+    if (verificationStatus !== 'VERIFIED') {
+      return res.status(403).json({
+        error: `Forbidden: Account is ${verificationStatus.toLowerCase()}`,
+        code: `ACCOUNT_${verificationStatus}`,
+        message: `Your account verification status is '${verificationStatus}'. Operational permissions require an active, VERIFIED account approved by authorized authorities.`,
+        verification_status: verificationStatus
       });
     }
 
@@ -96,11 +104,13 @@ export function authorizeRoles(...allowedRoles) {
   };
 }
 
-export { ROLES, ALL_ROLES };
+export { ROLES, ALL_ROLES, VERIFICATION_STATUS };
 
 export default {
   authenticateToken,
   authorizeRoles,
   ROLES,
-  ALL_ROLES
+  ALL_ROLES,
+  VERIFICATION_STATUS
 };
+

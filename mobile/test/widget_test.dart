@@ -83,7 +83,6 @@ void main() {
   testWidgets('BIOTraceApp builds and renders login screen', (WidgetTester tester) async {
     await tester.pumpWidget(const BIOTraceApp());
     expect(find.text('BIOTrace'), findsWidgets);
-    expect(find.text('NIDUSCLEAN'), findsOneWidget);
     expect(find.text('DUTY ROLE TERMINAL ACCESS'), findsOneWidget);
     expect(find.text('Authenticate & Enter'), findsOneWidget);
     expect(find.text('1-Click Demo Login'), findsOneWidget);
@@ -101,7 +100,6 @@ void main() {
 
       expect(tester.takeException(), isNull);
       expect(find.text('BIOTrace'), findsWidgets);
-      expect(find.text('NIDUSCLEAN'), findsOneWidget);
       expect(find.text('Hospital Authority'), findsWidgets);
       expect(find.text('Collection Officer'), findsOneWidget);
       expect(find.text('Transport Officer'), findsOneWidget);

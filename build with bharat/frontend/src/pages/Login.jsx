@@ -103,6 +103,18 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  // Real-User Onboarding & Registration state
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [regName, setRegName] = useState('');
+  const [regEmail, setRegEmail] = useState('');
+  const [regPhone, setRegPhone] = useState('');
+  const [regRole, setRegRole] = useState('HOSPITAL_AUTHORITY');
+  const [regFacilityId, setRegFacilityId] = useState('fac-hosp-001');
+  const [regPassword, setRegPassword] = useState('');
+  const [regSubmitting, setRegSubmitting] = useState(false);
+  const [regError, setRegError] = useState('');
+  const [regSuccessNotice, setRegSuccessNotice] = useState(null);
+
   // Environment Selector state
   const [isCloudMenuOpen, setIsCloudMenuOpen] = useState(false);
   const [activeEnvironment, setActiveEnvironment] = useState('Production Cloud');
@@ -179,6 +191,76 @@ export default function Login() {
     } catch (err) {
       setIsSubmitting(false);
       setErrorMessage(err.message || 'Authentication gateway connection failed.');
+    }
+  };
+
+  // Real-user statutory onboarding registration handler
+  const handleRegisterSubmit = async (e) => {
+    e.preventDefault();
+    setRegError('');
+
+    // Pre-flight client-side validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(regEmail.trim())) {
+      setRegError('Please enter a valid email address (e.g. rahul@example.com).');
+      return;
+    }
+
+    if (regPassword.length < 6) {
+      setRegError('Password must be at least 6 characters long.');
+      return;
+    }
+
+    setRegSubmitting(true);
+
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: regName.trim(),
+          email: regEmail.trim(),
+          phone_number: regPhone.trim() || undefined,
+          role: regRole,
+          facility_id: regFacilityId,
+          password: regPassword
+        })
+      });
+
+      // Robust Response Parsing: Handle non-JSON server responses gracefully
+      let data;
+      const contentType = res.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        data = await res.json();
+      } else {
+        const rawText = await res.text();
+        throw new Error(
+          res.status === 404
+            ? 'Registration API route was not found (404). Please ensure the backend server is running and restarted with the latest routes.'
+            : `Authentication gateway error (${res.status}): ${rawText.slice(0, 100)}`
+        );
+      }
+
+      if (!res.ok) {
+        throw new Error(data.message || data.error || 'Registration failed');
+      }
+
+      setRegSuccessNotice({
+        name: data.user?.name || regName.trim(),
+        role: data.user?.role || regRole,
+        facility: data.user?.facility_name || 'Assigned Facility',
+        status: data.user?.verification_status || 'PENDING',
+        notice: data.notice
+      });
+
+      setRegName('');
+      setRegEmail('');
+      setRegPhone('');
+      setRegPassword('');
+    } catch (err) {
+      setRegError(err.message || 'Registration failed due to a network or server issue.');
+    } finally {
+      setRegSubmitting(false);
     }
   };
 
@@ -376,17 +458,32 @@ export default function Login() {
             </div>
           )}
 
-          {/* Discreet Credentials Toggle for Registered Administrators & Custom Staff */}
+          {/* Discreet Credentials Toggle & Personnel Onboarding Links */}
           <div className="mt-6 pt-5 border-t border-[#83b4e2]/30 flex flex-col items-center">
-            <button
-              type="button"
-              onClick={() => setShowManualLogin(!showManualLogin)}
-              className="text-xs sm:text-sm text-[#A8C9E9] hover:text-white transition-colors flex items-center gap-1.5 focus-visible:outline-none focus-visible:underline"
-            >
-              <KeyRound className="w-3.5 h-3.5" aria-hidden="true" />
-              <span>{showManualLogin ? 'Hide Custom Credentials Form' : 'Staff Login: Enter with Custom Credentials'}</span>
-              <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${showManualLogin ? 'rotate-180' : ''}`} aria-hidden="true" />
-            </button>
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6">
+              <button
+                type="button"
+                onClick={() => setShowManualLogin(!showManualLogin)}
+                className="text-xs sm:text-sm text-[#A8C9E9] hover:text-white transition-colors flex items-center gap-1.5 focus-visible:outline-none focus-visible:underline"
+              >
+                <KeyRound className="w-3.5 h-3.5" aria-hidden="true" />
+                <span>{showManualLogin ? 'Hide Custom Credentials Form' : 'Staff Login: Enter with Custom Credentials'}</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${showManualLogin ? 'rotate-180' : ''}`} aria-hidden="true" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowRegisterModal(true);
+                  setRegSuccessNotice(null);
+                  setRegError('');
+                }}
+                className="text-xs sm:text-sm text-cyan-300 hover:text-white transition-colors flex items-center gap-1.5 focus-visible:outline-none focus-visible:underline font-semibold"
+              >
+                <UserRound className="w-3.5 h-3.5" aria-hidden="true" />
+                <span>Register Personnel Account</span>
+              </button>
+            </div>
 
             {/* Expandable Custom Login Form */}
             {showManualLogin && (
@@ -591,6 +688,220 @@ export default function Login() {
           </div>
         </div>
       )}
+
+      {/* Real-User Personnel Onboarding Registration Modal Dialog */}
+      {showRegisterModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-[#001A3C]/80 backdrop-blur-md animate-fade-in"
+          onMouseDown={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowRegisterModal(false);
+              setRegSuccessNotice(null);
+            }
+          }}
+          role="presentation"
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            className="w-full max-w-[620px] rounded-[1.6rem] border border-[#83B7E7] bg-gradient-to-br from-[#123E6B]/95 to-[#052B56]/98 p-5 sm:p-8 shadow-2xl shadow-black/60 relative animate-bio-modal max-h-[90vh] overflow-y-auto text-left"
+          >
+            {/* Modal Close Button */}
+            <button
+              type="button"
+              onClick={() => {
+                setShowRegisterModal(false);
+                setRegSuccessNotice(null);
+              }}
+              aria-label="Close registration dialog"
+              className="absolute top-4 right-4 sm:top-6 sm:right-6 text-[#C9E1FA] hover:text-white p-2 rounded-xl hover:bg-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300"
+            >
+              <X className="w-6 h-6 sm:w-7 sm:h-7" aria-hidden="true" />
+            </button>
+
+            {/* Modal Heading */}
+            <div className="flex items-center gap-3.5 mb-5 pr-10">
+              <div className="p-2.5 sm:p-3 rounded-2xl border border-[#7BA7D1]/80 bg-[#0C477D]/80 text-[#91F1CC] shrink-0">
+                <UserRound className="w-6 h-6 sm:w-7 sm:h-7" aria-hidden="true" />
+              </div>
+              <div>
+                <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                  Personnel Registration
+                </h2>
+                <p className="text-xs sm:text-sm text-[#A8C9E9] mt-0.5">
+                  CPCB Digital Chain of Custody statutory onboarding
+                </p>
+              </div>
+            </div>
+
+            {/* Success State */}
+            {regSuccessNotice ? (
+              <div className="p-5 rounded-2xl bg-emerald-950/80 border border-emerald-500/50 text-white animate-fade-in space-y-4">
+                <div className="flex items-center gap-3 text-emerald-400">
+                  <CheckCircle2 className="w-8 h-8 shrink-0" />
+                  <div>
+                    <h3 className="font-bold text-lg text-white">Registration Submitted — Verification Pending</h3>
+                    <p className="text-xs text-emerald-200">Account status: <span className="font-mono font-bold uppercase">{regSuccessNotice.status}</span></p>
+                  </div>
+                </div>
+
+                <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
+                  Your official personnel account for <strong>{regSuccessNotice.name}</strong> has been created with role <strong>{regSuccessNotice.role}</strong> assigned to <strong>{regSuccessNotice.facility}</strong>.
+                </p>
+
+                <div className="p-3 rounded-xl bg-slate-900/60 border border-emerald-500/30 text-xs text-slate-300 leading-relaxed font-mono">
+                  {regSuccessNotice.notice || 'Registration does not grant operational access. Your account will remain PENDING until an authorized administrator verifies your identity, role, and facility assignment.'}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowRegisterModal(false);
+                    setRegSuccessNotice(null);
+                  }}
+                  className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs sm:text-sm transition-colors"
+                >
+                  Return to Login
+                </button>
+              </div>
+            ) : (
+              /* Registration Form */
+              <form onSubmit={handleRegisterSubmit} className="space-y-4">
+                {regError && (
+                  <div className="p-3 rounded-xl bg-rose-950/80 border border-rose-500 text-rose-200 text-xs flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 shrink-0" />
+                    <span>{regError}</span>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div>
+                    <label className="block text-xs font-medium text-slate-200 mb-1">
+                      Full Legal / Staff Name *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={regName}
+                      onChange={(e) => setRegName(e.target.value)}
+                      placeholder="e.g. Dr. Rajesh Sharma"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-900/70 border border-[#83B4E2]/50 text-white placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-slate-200 mb-1">
+                      Official Email *
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={regEmail}
+                      onChange={(e) => setRegEmail(e.target.value)}
+                      placeholder="e.g. rajesh@hospital.org"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-900/70 border border-[#83B4E2]/50 text-white placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div>
+                    <label className="block text-xs font-medium text-slate-200 mb-1">
+                      Contact Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      value={regPhone}
+                      onChange={(e) => setRegPhone(e.target.value)}
+                      placeholder="+91 98100 00000"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-900/70 border border-[#83B4E2]/50 text-white placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-slate-200 mb-1">
+                      Requested Operational Role *
+                    </label>
+                    <select
+                      value={regRole}
+                      onChange={(e) => setRegRole(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl bg-slate-900/90 border border-[#83B4E2]/50 text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                    >
+                      <option value="HOSPITAL_AUTHORITY">Hospital Authority (Healthcare Facility)</option>
+                      <option value="COLLECTION_OFFICER">Collection Officer (Waste Handlers)</option>
+                      <option value="TRANSPORT_OFFICER">Transport Officer (Logistics Unit)</option>
+                      <option value="TREATMENT_FACILITY">Treatment Facility Authority (CBWTF)</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Facility Selector */}
+                <div>
+                  <label className="block text-xs font-medium text-slate-200 mb-1">
+                    Assigned Healthcare / CBWTF Facility *
+                  </label>
+                  <select
+                    value={regFacilityId}
+                    onChange={(e) => setRegFacilityId(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-900/90 border border-[#83B4E2]/50 text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                  >
+                    <option value="fac-hosp-001">AIIMS Central Hospital (New Delhi)</option>
+                    <option value="fac-hosp-002">Apollo Speciality Hospital (Chennai)</option>
+                    <option value="fac-hosp-005">Lilavati Hospital &amp; Research Centre (Mumbai)</option>
+                    <option value="fac-cbwtf-001">EcoSafe Waste Handlers CBWTF (Delhi NCR)</option>
+                    <option value="fac-cbwtf-002">Apex Bio-Clean Treatment Plant (Mumbai)</option>
+                    <option value="fac-cbwtf-003">GreenEarth Bio-Disposal Hub (Bengaluru)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-slate-200 mb-1">
+                    Account Password (min. 6 characters) *
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    minLength={6}
+                    value={regPassword}
+                    onChange={(e) => setRegPassword(e.target.value)}
+                    placeholder="Create secure password"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-900/70 border border-[#83B4E2]/50 text-white placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                  />
+                </div>
+
+                <div className="p-3 rounded-xl bg-blue-950/60 border border-cyan-500/30 text-[11px] text-cyan-200 leading-relaxed">
+                  <strong>Notice on Regulatory Appointments:</strong> Government Authority and Compliance Inspector roles are strictly appointed by statutory CPCB authorities and cannot be self-requested. All operational registrations begin in PENDING status subject to authority verification.
+                </div>
+
+                <div className="pt-2 flex items-center justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowRegisterModal(false)}
+                    className="px-4 py-2 rounded-xl text-slate-300 hover:text-white text-xs sm:text-sm transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={regSubmitting}
+                    className="px-5 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-xs sm:text-sm flex items-center gap-2 transition-colors disabled:opacity-50"
+                  >
+                    {regSubmitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Submitting Request...</span>
+                      </>
+                    ) : (
+                      <span>Submit Verification Request</span>
+                    )}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+

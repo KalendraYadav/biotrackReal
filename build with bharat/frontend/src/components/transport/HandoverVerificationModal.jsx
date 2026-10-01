@@ -1003,7 +1003,7 @@ export default function HandoverVerificationModal({
                           className="w-full px-3 py-2 bg-white border border-hazmat-300 rounded text-xs font-mono text-steel-900 focus:outline-none focus:ring-2 focus:ring-hazmat-500"
                         />
                         <p className="text-[11px] text-steel-500 mt-1">
-                          Supports CPCB format (<span className="text-steel-800">QR-NIDUS-BMW-...</span>), standard code (<span className="text-steel-800">BMW-...</span>), or JSON payload.
+                          Supports CPCB format (<span className="text-steel-800">QR-BIOTRACE-BMW-...</span>), standard code (<span className="text-steel-800">BMW-...</span>), or JSON payload.
                         </p>
                       </div>
 

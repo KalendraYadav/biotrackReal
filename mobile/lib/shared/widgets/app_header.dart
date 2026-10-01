@@ -8,6 +8,7 @@ import 'biotrace_mark.dart';
 class AppHeader extends StatelessWidget implements PreferredSizeWidget {
   final UserModel? user;
   final VoidCallback? onSwitchRole;
+  final VoidCallback? onShowIdentity;
   final VoidCallback? onLogout;
   final VoidCallback? onSettings;
 
@@ -15,6 +16,7 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
     super.key,
     this.user,
     this.onSwitchRole,
+    this.onShowIdentity,
     this.onLogout,
     this.onSettings,
   });
@@ -88,7 +90,7 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
                         border: Border.all(color: AppColors.accentTeal.withValues(alpha: 0.5), width: 0.8),
                       ),
                       child: const Text(
-                        'NIDUSCLEAN',
+                        'CPCB BMW',
                         style: TextStyle(
                           color: AppColors.accentTeal,
                           fontSize: 9,
@@ -154,12 +156,12 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
           ),
           const SizedBox(width: 8),
 
-          // Role Switcher / Menu Action
-          if (onSwitchRole != null)
+          // Operational Duty Identity Action
+          if (onShowIdentity != null || onSwitchRole != null)
             IconButton(
-              icon: const Icon(Icons.swap_horiz_rounded, color: Colors.white, size: 22),
-              tooltip: 'Switch Duty Role',
-              onPressed: onSwitchRole,
+              icon: const Icon(Icons.badge_outlined, color: Colors.white, size: 22),
+              tooltip: 'Operational Identity',
+              onPressed: onShowIdentity ?? onSwitchRole,
             ),
 
           if (onLogout != null)

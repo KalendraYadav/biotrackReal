@@ -11,9 +11,14 @@ import {
   MAX_FILE_SIZE_BYTES,
   getSupabaseClient
 } from './services/storageService.js';
-import { prisma } from './db.js';
+import express from 'express';
+import cors from 'cors';
+import { prisma, testDbConnection } from './db.js';
+import authRouter from './routes/auth.js';
+import wasteBatchesRouter from './routes/wasteBatches.js';
 
-const baseUrl = 'http://localhost:5000/api';
+let baseUrl = 'http://localhost:5000/api';
+let testServer = null;
 
 // Minimal valid 1x1 image buffers
 const validJpeg = Buffer.from([
@@ -59,6 +64,11 @@ async function loginUser(email, password = 'password123') {
 
 async function runStorageTestSuite() {
   console.log('\x1b[1m\x1b[35m=== BIOTRACE PRODUCTION EVIDENCE STORAGE TEST SUITE ===\x1b[0m\n');
+  try {
+    await testDbConnection();
+  } catch {
+    // continue
+  }
   let passed = 0;
   let failed = 0;
 
@@ -243,6 +253,25 @@ async function runStorageTestSuite() {
   // -------------------------------------------------------------
   console.log('\n\x1b[36m[Suite 4] API Route Integration & Storage RBAC\x1b[0m');
 
+  // Verify if existing server on 5000 is running, otherwise boot lightweight test server
+  try {
+    const healthCheck = await fetch(`${baseUrl}/health`, { signal: AbortSignal.timeout(1000) });
+    if (!healthCheck.ok) throw new Error('Unhealthy');
+  } catch {
+    const app = express();
+    app.use(cors());
+    app.use(express.json({ limit: '25mb' }));
+    app.use(express.urlencoded({ extended: true, limit: '25mb' }));
+    app.use('/api/auth', authRouter);
+    app.use('/api/waste-batches', wasteBatchesRouter);
+
+    testServer = await new Promise((resolve) => {
+      const s = app.listen(0, () => resolve(s));
+    });
+    const port = testServer.address().port;
+    baseUrl = `http://localhost:${port}/api`;
+  }
+
   let hospToken, collToken, transToken;
   try {
     hospToken = await loginUser('hospital@demo.com');
@@ -386,6 +415,10 @@ async function runStorageTestSuite() {
       const client = getSupabaseClient();
       await client.storage.from(EVIDENCE_BUCKET).remove([storedPhotoUrl]);
     } catch { /* cleanup best effort */ }
+  }
+
+  if (testServer) {
+    await new Promise((resolve) => testServer.close(resolve));
   }
 
   // -------------------------------------------------------------

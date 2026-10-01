@@ -121,6 +121,16 @@ router.post('/', authenticateToken, authorizeRoles(ROLES.HOSPITAL_AUTHORITY), as
       photo_url
     } = req.body || {};
 
+    // Enforce facility scoping: Hospital Authority cannot create batches for other facilities
+    if (req.user.role === ROLES.HOSPITAL_AUTHORITY && req.user.facility_id) {
+      if (req.body.hospital_id && req.body.hospital_id !== req.user.facility_id) {
+        return res.status(403).json({
+          error: 'Forbidden: Scoped facility access violation',
+          message: 'Hospital Authority cannot register waste batches for another facility.'
+        });
+      }
+    }
+
     const hospital_id = req.user.facility_id || req.body.hospital_id;
 
     if (!hospital_id || !generating_department || !cpcb_waste_category || quantity_kg === undefined) {

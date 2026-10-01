@@ -13,6 +13,16 @@ export const ROLES = Object.freeze({
 
 export const ALL_ROLES = Object.freeze(Object.values(ROLES));
 
+export const VERIFICATION_STATUS = Object.freeze({
+  PENDING: 'PENDING',
+  VERIFIED: 'VERIFIED',
+  REJECTED: 'REJECTED',
+  SUSPENDED: 'SUSPENDED',
+  REVOKED: 'REVOKED'
+});
+
+export const ALL_VERIFICATION_STATUSES = Object.freeze(Object.values(VERIFICATION_STATUS));
+
 /**
  * Validates if a given role string is a valid system role
  * @param {string} role 
@@ -22,4 +32,14 @@ export function isValidRole(role) {
   return ALL_ROLES.includes(role);
 }
 
+/**
+ * Validates if a given verification status string is valid
+ * @param {string} status 
+ * @returns {boolean}
+ */
+export function isValidVerificationStatus(status) {
+  return ALL_VERIFICATION_STATUSES.includes(status);
+}
+
 export default ROLES;
+

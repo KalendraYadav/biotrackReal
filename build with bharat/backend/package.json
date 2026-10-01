@@ -7,7 +7,9 @@
     "dev": "node server.js",
     "start": "node server.js",
     "seed": "node ../seed/index.js",
+    "test": "node test-auth.js && node test-governance.js && node test-endpoints.js && node test-risk.js && node test-storage.js",
     "test:auth": "node test-auth.js",
+    "test:governance": "node test-governance.js",
     "test:endpoints": "node test-endpoints.js",
     "test:risk": "node test-risk.js",
     "test:storage": "node test-storage.js"
