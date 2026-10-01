@@ -269,6 +269,13 @@ export default function Login() {
       {/* Atmospheric lighting and depth gradient overlays */}
       <div className="biotrace-atmosphere" aria-hidden="true" />
 
+      {/* Mobile-First Dual-Subject Cinematic Composition (< 1024px) */}
+      <div className="biotrace-mobile-bg" aria-hidden="true">
+        <div className="biotrace-mobile-hospital" />
+        <div className="biotrace-mobile-vehicle" />
+        <div className="biotrace-mobile-depth" />
+      </div>
+
       {/* Top Navigation Bar: Production Cloud Selector */}
       <div className="relative z-20 w-full px-4 sm:px-8 pt-6 sm:pt-8 flex justify-end">
         <div className="relative">
@@ -331,34 +338,34 @@ export default function Login() {
       </div>
 
       {/* Main Content Area */}
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-6 sm:py-10 max-w-4xl mx-auto w-full">
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 py-3 sm:py-6 lg:py-10 max-w-4xl mx-auto w-full">
         {/* Brand Header */}
-        <header className="text-center flex flex-col items-center mb-8 sm:mb-12">
+        <header className="text-center flex flex-col items-center mb-4 sm:mb-7 lg:mb-12">
           {/* Authentic Geometric BioTrace "B" Mark (Four Quadrants) */}
-          <div className="mb-4 sm:mb-6 transition-transform hover:scale-105 duration-300">
-            <BioTraceMark className="w-[72px] h-[116px] sm:w-[90px] sm:h-[144px]" />
+          <div className="mb-2 sm:mb-4 lg:mb-6 transition-transform hover:scale-105 duration-300">
+            <BioTraceMark className="w-[56px] h-[90px] sm:w-[76px] sm:h-[122px] lg:w-[90px] lg:h-[144px]" />
           </div>
 
           {/* Institutional Wordmark */}
-          <h1 className="text-4xl sm:text-6xl lg:text-[4.25rem] font-light tracking-[0.14em] text-white flex items-center justify-center leading-none">
+          <h1 className="text-3xl sm:text-5xl lg:text-[4.25rem] font-light tracking-[0.14em] text-white flex items-center justify-center leading-none">
             <strong className="font-extrabold text-white">BIO</strong>
             <span className="font-light text-[#D9E9FB] ml-[0.04em]">TRACE</span>
           </h1>
 
           {/* Restrained Tricolor Accent (Saffron, White, Green) */}
-          <div className="flex items-center justify-center gap-2 my-3 sm:my-4" aria-hidden="true">
-            <span className="w-14 sm:w-16 h-1 rounded-full bg-[#FF881B]" />
-            <span className="w-14 sm:w-16 h-1 rounded-full bg-[#F5F9FF]" />
-            <span className="w-14 sm:w-16 h-1 rounded-full bg-[#00CA92]" />
+          <div className="flex items-center justify-center gap-2 my-2 sm:my-3 lg:my-4" aria-hidden="true">
+            <span className="w-10 sm:w-14 lg:w-16 h-1 rounded-full bg-[#FF881B]" />
+            <span className="w-10 sm:w-14 lg:w-16 h-1 rounded-full bg-[#F5F9FF]" />
+            <span className="w-10 sm:w-14 lg:w-16 h-1 rounded-full bg-[#00CA92]" />
           </div>
 
           {/* Primary Tagline */}
-          <p className="text-xs sm:text-sm font-semibold tracking-[0.28em] text-[#C6E2FB] uppercase">
+          <p className="text-[10px] sm:text-xs lg:text-sm font-semibold tracking-[0.24em] sm:tracking-[0.28em] text-[#C6E2FB] uppercase">
             MAKE INDIA CLEAN
           </p>
 
           {/* Secondary Tagline */}
-          <p className="text-sm sm:text-lg text-[#9CC5EC] font-normal leading-relaxed mt-2.5 max-w-md sm:max-w-xl">
+          <p className="text-xs sm:text-base lg:text-lg text-[#9CC5EC] font-normal leading-relaxed mt-1.5 sm:mt-2 lg:mt-2.5 max-w-xs sm:max-w-lg lg:max-w-xl">
             Digital Chain of Custody for
             <br />
             Biomedical Waste Management
@@ -368,7 +375,7 @@ export default function Login() {
         {/* Central Glass Entry Panel */}
         <section 
           aria-label="BioTrace Entry Panel"
-          className="w-full max-w-[760px] rounded-[1.7rem] border border-[#78AADB]/60 bg-[#104F89]/65 backdrop-blur-xl p-6 sm:p-12 shadow-2xl shadow-[#021838]/80 text-center relative"
+          className="w-full max-w-[760px] rounded-2xl sm:rounded-3xl lg:rounded-[1.7rem] border border-[#78AADB]/60 bg-[#104F89]/75 sm:bg-[#104F89]/70 lg:bg-[#104F89]/65 backdrop-blur-xl p-4 sm:p-8 lg:p-12 shadow-2xl shadow-[#021838]/80 text-center relative"
         >
           {/* Role Selector Trigger Button */}
           <button
@@ -377,13 +384,13 @@ export default function Login() {
             onClick={() => setIsRoleModalOpen(true)}
             aria-haspopup="dialog"
             aria-expanded={isRoleModalOpen}
-            className={`w-full min-h-[76px] sm:min-h-[88px] rounded-[1.4rem] border-2 border-[#83B4E2] bg-[#0C477D]/85 hover:bg-[#0C477D] text-white flex items-center justify-between px-5 sm:px-7 text-lg sm:text-2xl font-medium transition-all shadow-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-cyan-400/40 group ${
+            className={`w-full min-h-[64px] sm:min-h-[76px] lg:min-h-[88px] rounded-xl sm:rounded-2xl lg:rounded-[1.4rem] border-2 border-[#83B4E2] bg-[#0C477D]/85 hover:bg-[#0C477D] text-white flex items-center justify-between px-4 sm:px-6 lg:px-7 text-base sm:text-xl lg:text-2xl font-medium transition-all shadow-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-cyan-400/40 group ${
               selectedRole ? 'ring-2 ring-emerald-400/30' : ''
             }`}
           >
-            <div className="flex items-center gap-4 min-w-0">
+            <div className="flex items-center gap-3 sm:gap-4 min-w-0">
               <div 
-                className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center shrink-0 transition-colors"
+                className="w-9 h-9 sm:w-11 sm:h-11 lg:w-12 lg:h-12 rounded-xl flex items-center justify-center shrink-0 transition-colors"
                 style={{
                   backgroundColor: selectedRole ? selectedRole.iconBg : 'rgba(255, 255, 255, 0.1)',
                   color: selectedRole ? selectedRole.iconColor : '#91F1CC'
@@ -392,16 +399,16 @@ export default function Login() {
                 {selectedRole ? (
                   <selectedRole.icon className="w-5 h-5 sm:w-6 sm:h-6" aria-hidden="true" />
                 ) : (
-                  <UserRound className="w-6 h-6 sm:w-7 sm:h-7 text-[#91F1CC]" aria-hidden="true" />
+                  <UserRound className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-[#91F1CC]" aria-hidden="true" />
                 )}
               </div>
 
               <div className="text-left min-w-0">
-                <span className="block truncate font-semibold text-white">
+                <span className="block truncate font-semibold text-white text-sm sm:text-lg lg:text-xl">
                   {selectedRole ? selectedRole.name : 'Select Role'}
                 </span>
                 {selectedRole && (
-                  <span className="block text-xs sm:text-sm text-[#A8C7E5] truncate font-normal">
+                  <span className="block text-[11px] sm:text-xs lg:text-sm text-[#A8C7E5] truncate font-normal">
                     {selectedRole.description}
                   </span>
                 )}
@@ -409,7 +416,7 @@ export default function Login() {
             </div>
 
             <ChevronDown 
-              className={`w-6 h-6 sm:w-7 sm:h-7 text-[#C9E1FA] shrink-0 ml-3 transition-transform duration-200 group-hover:translate-y-0.5 ${
+              className={`w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-[#C9E1FA] shrink-0 ml-2 sm:ml-3 transition-transform duration-200 group-hover:translate-y-0.5 ${
                 isRoleModalOpen ? 'rotate-180' : ''
               }`} 
               aria-hidden="true" 
@@ -421,14 +428,14 @@ export default function Login() {
             type="button"
             onClick={handleEnterClick}
             disabled={!selectedRole || isSubmitting}
-            className={`w-full min-h-[76px] sm:min-h-[88px] mt-6 sm:mt-8 rounded-[1.4rem] border-2 border-[#36B9EE] biotrace-enter-btn text-white flex items-center justify-between px-6 sm:px-8 text-xl sm:text-2xl font-bold tracking-wide transition-all shadow-xl shadow-cyan-950/40 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-cyan-400/40 ${
+            className={`w-full min-h-[64px] sm:min-h-[76px] lg:min-h-[88px] mt-4 sm:mt-6 lg:mt-8 rounded-xl sm:rounded-2xl lg:rounded-[1.4rem] border-2 border-[#36B9EE] biotrace-enter-btn text-white flex items-center justify-between px-4 sm:px-6 lg:px-8 text-base sm:text-xl lg:text-2xl font-bold tracking-wide transition-all shadow-xl shadow-cyan-950/40 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-cyan-400/40 ${
               !selectedRole || isSubmitting ? 'opacity-65 cursor-not-allowed filter-none' : 'cursor-pointer'
             }`}
           >
             <div className="flex items-center gap-3">
               {isSubmitting ? (
                 <>
-                  <Loader2 className="w-6 h-6 animate-spin text-white" aria-hidden="true" />
+                  <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 animate-spin text-white" aria-hidden="true" />
                   <span>Entering Platform...</span>
                 </>
               ) : (
@@ -438,9 +445,9 @@ export default function Login() {
 
             <div className="flex items-center">
               {/* Divider Line */}
-              <span className="h-10 sm:h-12 w-[1px] bg-[#B5F2FF]/40 mr-4 sm:mr-6" aria-hidden="true" />
+              <span className="h-8 sm:h-12 w-[1px] bg-[#B5F2FF]/40 mr-3 sm:mr-6" aria-hidden="true" />
               {/* Arrow Icon */}
-              <ArrowRight className="w-7 h-7 sm:w-8 sm:h-8 text-white biotrace-arrow transition-transform duration-200" aria-hidden="true" />
+              <ArrowRight className="w-6 h-6 sm:w-8 sm:h-8 text-white biotrace-arrow transition-transform duration-200" aria-hidden="true" />
             </div>
           </button>
 
@@ -554,27 +561,27 @@ export default function Login() {
       </main>
 
       {/* Institutional Legal & Geographic Footer */}
-      <footer className="relative z-10 w-full px-6 sm:px-12 py-6 sm:py-8 flex flex-col sm:flex-row items-center justify-between gap-6 text-[#C6E2FB]/90 text-xs">
-        {/* Left Side: Institutional Pillars */}
-        <div className="text-center sm:text-left leading-relaxed tracking-[0.26em] font-semibold">
-          <div>SAFE</div>
-          <div>TRACEABLE</div>
-          <div>COMPLIANT</div>
-          <div>CLEANER INDIA</div>
-          <div className="w-14 h-0.5 bg-[#83b4e2]/60 mt-1 mx-auto sm:mx-0" aria-hidden="true" />
+      <footer className="relative z-10 w-full px-4 sm:px-8 lg:px-12 py-3 sm:py-5 lg:py-8 flex flex-row items-end justify-between gap-3 text-[#C6E2FB]/90 text-xs pb-[max(1rem,env(safe-area-inset-bottom))] lg:pb-8">
+        {/* Left Corner: Institutional Pillars */}
+        <div className="text-left leading-relaxed tracking-[0.16em] sm:tracking-[0.22em] lg:tracking-[0.26em] font-semibold text-[10px] sm:text-[11px] lg:text-xs shrink-0 max-w-[46%]">
+          <div className="drop-shadow-xs">SAFE</div>
+          <div className="drop-shadow-xs">TRACEABLE</div>
+          <div className="drop-shadow-xs">COMPLIANT</div>
+          <div className="drop-shadow-xs whitespace-nowrap">CLEANER INDIA</div>
+          <div className="w-10 sm:w-12 lg:w-14 h-0.5 bg-[#83b4e2]/70 mt-1 sm:mt-1.5" aria-hidden="true" />
         </div>
 
-        {/* Right Side: India Silhouette & People-Process-Technology */}
-        <div className="flex items-center gap-3.5 text-center sm:text-left">
-          <IndiaSilhouette className="w-9 h-13 text-[#9cc5ec] shrink-0" />
-          <div className="tracking-[0.1em] leading-tight font-medium">
-            <div>PEOPLE</div>
-            <div>PROCESS</div>
-            <div>TECHNOLOGY</div>
-            <div className="text-[10px] text-[#83b4e2] font-normal tracking-[0.15em] mt-0.5">
+        {/* Right Corner: India Silhouette & People-Process-Technology */}
+        <div className="flex items-center gap-2 sm:gap-3 lg:gap-3.5 text-right sm:text-left justify-end shrink-0 max-w-[50%]">
+          <IndiaSilhouette className="w-6 h-9 sm:w-8 sm:h-11 lg:w-9 lg:h-13 text-[#9cc5ec] shrink-0 drop-shadow-xs order-2 sm:order-1" />
+          <div className="tracking-[0.08em] sm:tracking-[0.09em] lg:tracking-[0.1em] leading-tight font-medium text-[10px] sm:text-[11px] lg:text-xs order-1 sm:order-2">
+            <div className="drop-shadow-xs">PEOPLE</div>
+            <div className="drop-shadow-xs">PROCESS</div>
+            <div className="drop-shadow-xs">TECHNOLOGY</div>
+            <div className="text-[9px] sm:text-[9.5px] lg:text-[10px] text-[#83b4e2] font-normal tracking-[0.12em] sm:tracking-[0.14em] lg:tracking-[0.15em] mt-0.5 whitespace-nowrap drop-shadow-xs">
               A CLEANER TOMORROW
             </div>
-            <div className="w-14 h-0.5 bg-[#83b4e2]/60 mt-1 mx-auto sm:mx-0" aria-hidden="true" />
+            <div className="w-10 sm:w-12 lg:w-14 h-0.5 bg-[#83b4e2]/70 mt-1 sm:mt-1.5 ml-auto sm:ml-0" aria-hidden="true" />
           </div>
         </div>
       </footer>
